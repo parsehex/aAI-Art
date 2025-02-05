@@ -1,5 +1,6 @@
 import { presetTextures } from '@/data/preset-textures'
 import { TextureGenerator } from '@/utils/TextureGenerator'
+import { generatedTextures } from '@/data/generated-textures'
 
 export default class MainScene extends Phaser.Scene {
   private textureGenerator: TextureGenerator
@@ -14,6 +15,7 @@ export default class MainScene extends Phaser.Scene {
   }
 
   create() {
+    this.loadGeneratedTextures()
     this.loadPage()
     this.updateButtons()
 
@@ -22,7 +24,8 @@ export default class MainScene extends Phaser.Scene {
       const newTexture = customEvent.detail
 
       // Add the new sprite to the list
-      presetTextures.push(newTexture)
+      generatedTextures.push(newTexture)
+      this.saveGeneratedTextures()
 
       // Reload the scene to include the new sprite
       this.loadPage()
@@ -30,15 +33,25 @@ export default class MainScene extends Phaser.Scene {
     })
   }
 
+  loadGeneratedTextures() {
+    const savedTextures = localStorage.getItem('generatedTextures')
+    if (savedTextures) {
+      generatedTextures.push(...JSON.parse(savedTextures))
+    }
+  }
+
+  saveGeneratedTextures() {
+    localStorage.setItem('generatedTextures', JSON.stringify(generatedTextures))
+  }
+
   loadPage() {
     this.children.removeAll()
 
-    // Get the current slice of textures based on the current page
+    const allTextures = [...presetTextures, ...generatedTextures]
     const start = this.currentPage * this.itemsPerPage
     const end = start + this.itemsPerPage
-    const pageTextures = presetTextures.slice(start, end)
+    const pageTextures = allTextures.slice(start, end)
 
-    // Place textures on the scene
     pageTextures.forEach((texture, index) => {
       const x = (index % 4) * 200 + 100
       const y = Math.floor(index / 4) * 200 + 100
@@ -48,15 +61,19 @@ export default class MainScene extends Phaser.Scene {
       sprite.on('pointerdown', () => {
         window.dispatchEvent(new CustomEvent('spriteSelected', { detail: texture }))
       })
+
+      if (generatedTextures.includes(texture)) {
+        sprite.setTint(0xffcc00) // Highlight generated textures
+      }
     })
   }
 
   updateButtons() {
-    // Remove previous buttons if they exist
     if (this.prevButton) this.prevButton.destroy()
     if (this.nextButton) this.nextButton.destroy()
 
-    // Create the "Prev Page" button
+    const totalTextures = presetTextures.length + generatedTextures.length
+
     this.prevButton = this.add
       .text(50, 550, 'Prev Page', { fontSize: '18px' })
       .setInteractive()
@@ -64,36 +81,34 @@ export default class MainScene extends Phaser.Scene {
         if (this.currentPage > 0) {
           this.currentPage--
           this.loadPage()
-          this.updateButtons() // Update button states after page change
+          this.updateButtons()
         }
       })
 
-    // Create the "Next Page" button
     this.nextButton = this.add
       .text(650, 550, 'Next Page', { fontSize: '18px' })
       .setInteractive()
       .on('pointerdown', () => {
-        if ((this.currentPage + 1) * this.itemsPerPage < presetTextures.length) {
+        if ((this.currentPage + 1) * this.itemsPerPage < totalTextures) {
           this.currentPage++
           this.loadPage()
-          this.updateButtons() // Update button states after page change
+          this.updateButtons()
         }
       })
 
-    // Update the button states
     this.updateButtonStates()
   }
 
   updateButtonStates() {
-    // Disable the "Prev Page" button if we are on the first page
+    const totalTextures = presetTextures.length + generatedTextures.length
+
     if (this.currentPage === 0) {
       this.prevButton?.setStyle({ fill: '#555' }).setInteractive(false)
     } else {
       this.prevButton?.setStyle({ fill: '#fff' }).setInteractive(true)
     }
 
-    // Disable the "Next Page" button if there are no more pages
-    if ((this.currentPage + 1) * this.itemsPerPage >= presetTextures.length) {
+    if ((this.currentPage + 1) * this.itemsPerPage >= totalTextures) {
       this.nextButton?.setStyle({ fill: '#555' }).setInteractive(false)
     } else {
       this.nextButton?.setStyle({ fill: '#fff' }).setInteractive(true)

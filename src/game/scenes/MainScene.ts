@@ -19,6 +19,8 @@ export default class MainScene extends Phaser.Scene {
       ...generatedTextures,
     ])
 
+    this.scale.on('resize', this.handleResize, this);
+
     window.addEventListener('newTexture', (event: Event) => {
       const customEvent = event as CustomEvent<TextureDescription>
       const newTexture = customEvent.detail
@@ -30,6 +32,11 @@ export default class MainScene extends Phaser.Scene {
       // Reload the scene to include the new sprite
       this.spriteViewer.reload()
     })
+  }
+
+  handleResize(gameSize: Phaser.Structs.Size) {
+    const { width, height } = gameSize;
+    this.cameras.main.setSize(width, height);
   }
 
   loadGeneratedTextures() {

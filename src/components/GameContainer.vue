@@ -24,7 +24,8 @@ onUnmounted(() => {
 
 <style scoped>
 #game-container {
-  width: 800px;
+  width: 100%;
+  max-width: 100%;
   height: 600px;
   margin: 0 auto;
 }

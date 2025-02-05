@@ -6,8 +6,8 @@ export const gameConfig = {
   parent: 'game-container',
   backgroundColor: '#333333',
   scale: {
-    mode: Scale.FIT,
-    width: 800,
+    mode: Scale.RESIZE,
+    width: '100%',
     height: 600,
   },
   scene: MainScene,
@@ -19,6 +19,7 @@ export const gameConfig = {
     },
   },
 } as Types.Core.GameConfig
+
 
 export default class Game extends PhaserGame {
   constructor() {

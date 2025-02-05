@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white">
-    <div class="relative flex flex-col md:flex-row items-start space-x-4 w-full max-w-6xl">
+    <div class="relative flex flex-col md:flex-row items-center space-x-4 gap-4 w-full max-w-6xl">
       <GameContainer />
       <SpriteGenerator />
     </div>

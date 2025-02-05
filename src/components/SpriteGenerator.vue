@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-gray-800 p-4 rounded-lg shadow-lg border border-gray-700 space-y-4 w-80">
+  <div class="bg-gray-800 p-4 rounded-lg shadow-lg border border-gray-700 space-y-4 w-80 mx-auto">
     <input
       v-model="prompt"
       placeholder="Describe your sprite..."

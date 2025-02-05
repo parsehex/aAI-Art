@@ -1,6 +1,12 @@
 type TextureLayer = {
-  type: 'circle' | 'rect' | 'line';
-  color: string;
+  type: 'circle' | 'rect' | 'line' | 'gradient' | 'pattern';
+  color?: string;
+  colorStart?: string;  // For gradient
+  colorEnd?: string;    // For gradient
+  color1?: string; // For pattern
+  color2?: string; // For pattern
+  patternType?: string; // For pattern
+  direction?: 'horizontal' | 'vertical'; // For gradient
   x?: number;
   y?: number;
   x2?: number;  // End x coordinate for line
@@ -10,6 +16,7 @@ type TextureLayer = {
   radius?: number;
   lineWidth?: number;  // Optional line thickness
 };
+
 
 interface TextureDescription {
   size: number

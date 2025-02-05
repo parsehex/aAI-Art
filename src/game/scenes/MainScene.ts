@@ -3,7 +3,10 @@ import { TextureGenerator } from '@/utils/TextureGenerator';
 
 export default class MainScene extends Phaser.Scene {
   private textureGenerator: TextureGenerator;
-  // You can still have other arrays (e.g., villagers) if needed
+  private currentPage: number = 0;
+  private itemsPerPage: number = 12;
+  private prevButton: Phaser.GameObjects.Text | undefined;
+  private nextButton: Phaser.GameObjects.Text | undefined;
 
   constructor() {
     super({ key: "MainScene" });
@@ -11,41 +14,76 @@ export default class MainScene extends Phaser.Scene {
   }
 
   create() {
-    const canvasWidth = this.game.config.width as number;
-      const canvasHeight = this.game.config.height as number;
-      const spriteSize = Math.min(canvasWidth, canvasHeight) * 0.3; // Adjust sprite size dynamically based on canvas dimensions
+    this.loadPage();
+    this.updateButtons();  // Initialize buttons
+  }
 
-      presetTextures.forEach((texture, index) => {
-        const x = (index % 4) * 200 + 100;  // Adjust based on desired layout
-        const y = Math.floor(index / 4) * 200 + 100;
+  loadPage() {
+    // Clear previous sprites (if needed)
+    this.children.removeAll();
 
-        const sprite = this.textureGenerator.createGameObject(texture, x, y, {
-          width: spriteSize,
-          height: spriteSize,  // Adjust the size to take up more space
-        });
+    // Get the current slice of textures based on the current page
+    const start = this.currentPage * this.itemsPerPage;
+    const end = start + this.itemsPerPage;
+    const pageTextures = presetTextures.slice(start, end);
 
-        sprite.setInteractive();
-        sprite.on('pointerdown', () => {
-          window.dispatchEvent(new CustomEvent('spriteSelected', { detail: texture }));
-        });
+    // Place textures on the scene
+    pageTextures.forEach((texture, index) => {
+      const x = (index % 4) * 200 + 100;
+      const y = Math.floor(index / 4) * 200 + 100;
+      const sprite = this.textureGenerator.createGameObject(texture, x, y);
+
+      sprite.setInteractive();
+      sprite.on('pointerdown', () => {
+        window.dispatchEvent(new CustomEvent('spriteSelected', { detail: texture }));
       });
-
-    window.addEventListener('newTexture', (event: Event) => {
-      // TypeScript casting for the custom event detail:
-      const customEvent = event as CustomEvent;
-      const newTexture = customEvent.detail as TextureDescription;
-
-      // For demonstration, add the new texture at a fixed position.
-      // In a more complex app you might decide where to put it.
-      this.textureGenerator.createGameObject(newTexture, 400, 400, {
-        isInteractive: true,
-        name: newTexture.name,
-      });
-      console.log('New texture added:', newTexture.name);
     });
   }
 
-  update() {
-    // Update logic if needed.
+  updateButtons() {
+    // Remove previous buttons if they exist
+    if (this.prevButton) this.prevButton.destroy();
+    if (this.nextButton) this.nextButton.destroy();
+
+    // Create the "Prev Page" button
+    this.prevButton = this.add.text(50, 550, 'Prev Page', { fontSize: '18px' })
+      .setInteractive()
+      .on('pointerdown', () => {
+        if (this.currentPage > 0) {
+          this.currentPage--;
+          this.loadPage();
+          this.updateButtons(); // Update button states after page change
+        }
+      });
+
+    // Create the "Next Page" button
+    this.nextButton = this.add.text(650, 550, 'Next Page', { fontSize: '18px' })
+      .setInteractive()
+      .on('pointerdown', () => {
+        if ((this.currentPage + 1) * this.itemsPerPage < presetTextures.length) {
+          this.currentPage++;
+          this.loadPage();
+          this.updateButtons(); // Update button states after page change
+        }
+      });
+
+    // Update the button states
+    this.updateButtonStates();
+  }
+
+  updateButtonStates() {
+    // Disable the "Prev Page" button if we are on the first page
+    if (this.currentPage === 0) {
+      this.prevButton?.setStyle({ fill: '#555' }).setInteractive(false);
+    } else {
+      this.prevButton?.setStyle({ fill: '#fff' }).setInteractive(true);
+    }
+
+    // Disable the "Next Page" button if there are no more pages
+    if ((this.currentPage + 1) * this.itemsPerPage >= presetTextures.length) {
+      this.nextButton?.setStyle({ fill: '#555' }).setInteractive(false);
+    } else {
+      this.nextButton?.setStyle({ fill: '#fff' }).setInteractive(true);
+    }
   }
 }

@@ -2,15 +2,6 @@ export const Warehouse: TextureDescription = {
   name: "abandoned-warehouse",
   size: 128,
   layers: [
-    // Sky background
-    {
-      type: "rect",
-      color: "#4a5660",
-      x: 0,
-      y: 0,
-      width: 128,
-      height: 128
-    },
     // Main building structure - faded red brick
     {
       type: "rect",

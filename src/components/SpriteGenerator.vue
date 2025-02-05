@@ -26,10 +26,12 @@
 
 
 <script setup lang="ts">
+import { GenerateSpriteMessages } from '@/data/prompt';
 import { ref, onMounted, watch, nextTick } from 'vue';
+import { useLocalStorage } from '@vueuse/core'
 
-const prompt = ref('');
-const apiKey = ref('');
+const prompt = useLocalStorage('sprite-prompt', '');
+const apiKey = useLocalStorage('openrouter-api-key', '');
 const selectedSprite = ref<TextureDescription | null>(null);
 const spriteCanvas = ref<HTMLCanvasElement | null>(null);
 
@@ -83,17 +85,17 @@ function drawSprite(texture: TextureDescription) {
 
 async function generateSprite() {
   if (!prompt.value.trim()) return;
+  if (!apiKey.value.trim()) return;
 
   try {
-    // Replace this URL and parameters with the correct OpenRouter API details.
-    const response = await fetch('https://api.openrouter.ai/v1/generate', {
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         // Uncomment and set your API key if required:
-        // 'Authorization': `Bearer YOUR_API_KEY`,
+        'Authorization': `Bearer ${apiKey.value}`,
       },
-      body: JSON.stringify({ prompt: prompt.value }),
+      body: JSON.stringify({ messages: GenerateSpriteMessages(prompt.value), model: 'cohere/command-r', temperature: 0.01 }),
     });
 
     if (!response.ok) {
@@ -102,18 +104,21 @@ async function generateSprite() {
     }
 
     const data = await response.json();
-    console.log('Received sprite data:', data);
+    let msg: string = data.choices[0].message.content.trim();
+    let lines = msg.split('\n');
+    if (lines[0].startsWith('```')) {
+      msg = lines.slice(1).join('\n');
+      lines = msg.split('\n');
+    }
+    if (lines[lines.length - 1].startsWith('```')) {
+      msg = lines.slice(0, lines.length - 1).join('\n');
+    }
+    console.log('Received sprite data:', msg);
 
-    // Assume the API returns data in the same format as TextureDescription
-    // You might need to adjust based on the actual response structure.
-    const newTexture = data.texture as TextureDescription;
+    const newTexture = JSON.parse(msg) as TextureDescription;
 
-    // At this point you need to tell your Phaser scene about this new texture.
-    // One approach is to use an event bus or a shared store to pass new texture data.
-    // For example, you might emit a custom event:
     window.dispatchEvent(new CustomEvent('newTexture', { detail: newTexture }));
 
-    // Optionally, clear the prompt input.
     prompt.value = '';
   } catch (error) {
     console.error('Error generating sprite:', error);

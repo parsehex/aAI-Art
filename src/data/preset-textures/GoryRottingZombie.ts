@@ -2,9 +2,6 @@ export const GoryRottingZombie: TextureDescription = {
   name: 'gory-rotting-zombie',
   size: 64,
   layers: [
-    // Background - Dark greenish base for decayed skin
-    { type: 'rect', color: '#2E4E1E', x: 0, y: 0, width: 64, height: 64 },
-
     // Head shape - Rotten greenish face
     { type: 'circle', color: '#3A5A22', x: 32, y: 32, radius: 24 },
 

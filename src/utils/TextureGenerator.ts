@@ -1,5 +1,3 @@
-import type { TextureDescription, TextureLayer } from '../types/Textures'
-
 export class GameObject extends Phaser.GameObjects.Sprite {
   constructor(scene: Phaser.Scene, x: number, y: number, texture: string) {
     super(scene, x, y, texture);
@@ -23,10 +21,6 @@ export class GameObject extends Phaser.GameObjects.Sprite {
     return this;
   }
 }
-
-// TODO thoughts
-// May need to ensure that all textures are scaled the same, in case the LLM draws a big shape or something
-//   I'm thinking of the thing in ML where you squish values between 0 and 1
 
 export class TextureGenerator {
   private scene: Phaser.Scene;
@@ -133,6 +127,9 @@ export class TextureGenerator {
       case 'line':
         this.drawLine(graphics, layer, size)
         break
+      case 'pattern':
+        this.drawPattern(graphics, layer, size)
+        break
     }
   }
 
@@ -141,7 +138,7 @@ export class TextureGenerator {
     layer: TextureLayer,
     size: number,
   ): void {
-    const color = this.parseColor(layer.color)
+    const color = this.parseColor(layer.color as string)
     graphics.fillStyle(color, 1)
     const x = layer.x !== undefined ? layer.x : size / 2
     const y = layer.y !== undefined ? layer.y : size / 2
@@ -150,7 +147,7 @@ export class TextureGenerator {
   }
 
   private drawRect(graphics: Phaser.GameObjects.Graphics, layer: TextureLayer, size: number): void {
-    const color = this.parseColor(layer.color)
+    const color = this.parseColor(layer.color as string)
     graphics.fillStyle(color, 1)
     const x = layer.x !== undefined ? layer.x : (size - (layer.width || 0)) / 2
     const y = layer.y !== undefined ? layer.y : (size - (layer.height || 0)) / 2
@@ -162,7 +159,7 @@ export class TextureGenerator {
     layer: TextureLayer,
     size: number,
   ): void {
-    const color = this.parseColor(layer.color)
+    const color = this.parseColor(layer.color as string)
     const lineWidth = layer.lineWidth || 1
 
     graphics.lineStyle(lineWidth, color, 1)
@@ -176,6 +173,42 @@ export class TextureGenerator {
     graphics.moveTo(x1, y1)
     graphics.lineTo(x2, y2)
     graphics.strokePath()
+  }
+
+  private drawPattern(
+    graphics: Phaser.GameObjects.Graphics,
+    layer: TextureLayer,
+    size: number,
+  ): void {
+    const { patternType, color1, color2, x = 0, y = 0, width = size, height = size } = layer;
+    const patternSize = 8; // Pattern tile size
+
+    if (color1) graphics.fillStyle(Phaser.Display.Color.ValueToColor(color1).color, 1);
+
+    switch (patternType) {
+      case 'checkerboard':
+        for (let i = 0; i < width; i += patternSize) {
+          for (let j = 0; j < height; j += patternSize) {
+            if ((Math.floor(i / patternSize) + Math.floor(j / patternSize)) % 2 === 0) {
+              graphics.fillRect(x + i, y + j, patternSize, patternSize);
+            }
+          }
+        }
+        break;
+      case 'stripes':
+        for (let i = 0; i < width; i += patternSize) {
+          graphics.fillRect(x + i, y, patternSize, height);
+        }
+        break;
+      case 'dots':
+        const dotRadius = 3;
+        for (let i = 0; i < width; i += patternSize) {
+          for (let j = 0; j < height; j += patternSize) {
+            graphics.fillCircle(x + i + patternSize / 2, y + j + patternSize / 2, dotRadius);
+          }
+        }
+        break;
+    }
   }
 
   private parseColor(color: string): number {

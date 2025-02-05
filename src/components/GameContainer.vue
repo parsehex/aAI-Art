@@ -1,5 +1,8 @@
 <template>
-  <div id="game-container" class="relative border-2 border-gray-700 shadow-lg rounded-lg overflow-hidden w-full max-w-6xl">
+  <div
+    id="game-container"
+    class="relative border-2 border-gray-700 shadow-lg rounded-lg overflow-hidden w-full max-w-6xl"
+  >
     <div ref="gameContainer"></div>
   </div>
 </template>

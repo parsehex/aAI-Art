@@ -22,6 +22,6 @@ export const Zombie2: TextureDescription = {
     { type: 'line', color: '#8B4513', x: 26, y: 27, x2: 38, y2: 34, lineWidth: 2 },
 
     // Decay marks on the skin (optional for more detail)
-    { type: 'rect', color: '#8B0000', x: 15, y: 25, width: 12, height: 6 }
-  ]
+    { type: 'rect', color: '#8B0000', x: 15, y: 25, width: 12, height: 6 },
+  ],
 }

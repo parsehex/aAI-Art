@@ -31,6 +31,6 @@ export const GoryRottingZombie: TextureDescription = {
 
     // Rotting patches
     { type: 'rect', color: '#5B7C3A', x: 28, y: 18, width: 6, height: 4 },
-    { type: 'rect', color: '#5B7C3A', x: 38, y: 24, width: 5, height: 3 }
-  ]
+    { type: 'rect', color: '#5B7C3A', x: 38, y: 24, width: 5, height: 3 },
+  ],
 }

@@ -1,14 +1,19 @@
+import { Fence } from './preset-textures/Fence'
+import { TreasureChest } from './preset-textures/TreasureChest'
+import { Tree } from './preset-textures/Tree'
+import { Villager } from './preset-textures/Villager'
+
 interface ChatMessage {
-  role: string;
-  content: string;
+  role: string
+  content: string
 }
 
 export const GenerateSpriteMessages = (input: string) => {
-  const msgs: ChatMessage[] = [];
+  const msgs: ChatMessage[] = []
 
   msgs.push({
     role: 'system',
-    content: `Assistant's task is to create a new detailed texture based on the INPUT, by using the provided instructions.
+    content: `Assistant's task is to create a new detailed texture based on the INPUT, by using the provided instructions and example(s).
 
 # Texture Definition Guide
 
@@ -95,13 +100,24 @@ Colors can be specified in two formats:
 
 ----
 
+Examples:
+Tree: ${JSON.stringify(Tree, null, 2)}
+
+Treasure Chest: ${JSON.stringify(TreasureChest, null, 2)}
+
+Villager: ${JSON.stringify(Villager, null, 2)}
+
+Fence: ${JSON.stringify(Fence, null, 2)}
+
+----
+
 Assistant must respond with the resulting valid JSON object only and without comments.`,
-  });
+  })
 
   msgs.push({
     role: 'user',
-    content: `INPUT:\n\n${input}`
+    content: `INPUT:\n\n${input}`,
   })
 
-  return msgs;
-};
+  return msgs
+}

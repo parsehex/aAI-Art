@@ -117,11 +117,12 @@ export class SpriteViewer {
   }
 
   private createNavigationButtons() {
+    const { width, height } = this.scene.scale.gameSize;
     const index = this.allTextures.indexOf(this.selectedSprite!);
 
     if (index > 0) {
       this.prevButton = this.scene.add
-        .text(250, 550, 'Previous', { fontSize: '18px' })
+        .text(50, height - 50, 'Previous', { fontSize: '18px' })
         .setInteractive()
         .on('pointerdown', () => {
           this.selectedSprite = this.allTextures[index - 1];
@@ -132,7 +133,7 @@ export class SpriteViewer {
 
     if (index < this.allTextures.length - 1) {
       this.nextButton = this.scene.add
-        .text(550, 550, 'Next', { fontSize: '18px' })
+        .text(width - 150, height - 50, 'Next', { fontSize: '18px' })
         .setInteractive()
         .on('pointerdown', () => {
           this.selectedSprite = this.allTextures[index + 1];
@@ -143,34 +144,42 @@ export class SpriteViewer {
   }
 
   private createPaginationButtons() {
+    const { width, height } = this.scene.scale.gameSize;
+
     this.prevButton = this.scene.add
-      .text(50, 550, 'Prev Page', { fontSize: '18px' })
+      .text(50, height - 50, 'Prev Page', { fontSize: '18px' })
       .setInteractive()
       .on('pointerdown', () => {
         if (this.currentPage > 0) {
-          this.currentPage--
-          this.loadPage()
+          this.currentPage--;
+          this.loadPage();
         }
-      })
+      });
+
     this.sprites.push(this.prevButton);
-    this.prevButton?.setStyle({ fill: this.currentPage === 0 ? '#555' : '#fff' })
 
     this.nextButton = this.scene.add
-      .text(650, 550, 'Next Page', { fontSize: '18px' })
+      .text(width - 150, height - 50, 'Next Page', { fontSize: '18px' })
       .setInteractive()
       .on('pointerdown', () => {
         if ((this.currentPage + 1) * this.itemsPerPage < this.allTextures.length) {
-          this.currentPage++
-          this.loadPage()
+          this.currentPage++;
+          this.loadPage();
         }
-      })
+      });
+
     this.sprites.push(this.nextButton);
-    this.nextButton?.setStyle({ fill: (this.currentPage + 1) * this.itemsPerPage >= this.allTextures.length ? '#555' : '#fff' })
   }
 
   private updateButtonStates() {
     if (this.prevButton) this.prevButton.destroy()
     if (this.nextButton) this.nextButton.destroy()
     this.createPaginationButtons()
+  }
+
+  public updateButtonPositions(width: number, height: number) {
+    if (this.prevButton) this.prevButton.setPosition(50, height - 50);
+    if (this.nextButton) this.nextButton.setPosition(width - 150, height - 50);
+    if (this.backButton) this.backButton.setPosition(50, 50);
   }
 }

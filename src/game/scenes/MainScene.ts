@@ -37,7 +37,12 @@ export default class MainScene extends Phaser.Scene {
   handleResize(gameSize: Phaser.Structs.Size) {
     const { width, height } = gameSize;
     this.cameras.main.setSize(width, height);
+
+    if (this.spriteViewer) {
+      this.spriteViewer.updateButtonPositions(width, height);
+    }
   }
+
 
   loadGeneratedTextures() {
     const savedTextures = localStorage.getItem('generatedTextures')

@@ -21,4 +21,5 @@ interface TextureDescription {
   size: number
   layers: TextureLayer[]
   name: string
+  generated?: boolean
 }

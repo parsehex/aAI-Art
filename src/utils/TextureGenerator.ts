@@ -1,3 +1,5 @@
+import { parseColor } from './color'
+
 export class GameObject extends Phaser.GameObjects.Sprite {
   constructor(scene: Phaser.Scene, x: number, y: number, texture: string) {
     super(scene, x, y, texture)
@@ -138,7 +140,7 @@ export class TextureGenerator {
     layer: TextureLayer,
     size: number,
   ): void {
-    const color = this.parseColor(layer.color as string)
+    const color = parseColor(layer.color as string)
     graphics.fillStyle(color, 1)
     const x = layer.x !== undefined ? layer.x : size / 2
     const y = layer.y !== undefined ? layer.y : size / 2
@@ -147,7 +149,7 @@ export class TextureGenerator {
   }
 
   private drawRect(graphics: Phaser.GameObjects.Graphics, layer: TextureLayer, size: number): void {
-    const color = this.parseColor(layer.color as string)
+    const color = parseColor(layer.color as string)
     graphics.fillStyle(color, 1)
     const x = layer.x !== undefined ? layer.x : (size - (layer.width || 0)) / 2
     const y = layer.y !== undefined ? layer.y : (size - (layer.height || 0)) / 2
@@ -155,7 +157,7 @@ export class TextureGenerator {
   }
 
   private drawLine(graphics: Phaser.GameObjects.Graphics, layer: TextureLayer, size: number): void {
-    const color = this.parseColor(layer.color as string)
+    const color = parseColor(layer.color as string)
     const lineWidth = layer.lineWidth || 1
 
     graphics.lineStyle(lineWidth, color, 1)
@@ -207,19 +209,5 @@ export class TextureGenerator {
     }
   }
 
-  private parseColor(color: string): number {
-    if (color.startsWith('#')) {
-      return parseInt(color.replace('#', '0x'))
-    }
-    const colorMap: Record<string, number> = {
-      red: 0xff0000,
-      green: 0x00ff00,
-      blue: 0x0000ff,
-      white: 0xffffff,
-      black: 0x000000,
-      yellow: 0xffff00,
-      transparent: 0x000000,
-    }
-    return colorMap[color.toLowerCase()] || 0xffffff
-  }
+
 }

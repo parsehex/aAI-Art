@@ -15,11 +15,23 @@ export default class MainScene extends Phaser.Scene {
 
   create() {
     this.loadPage();
-    this.updateButtons();  // Initialize buttons
+    this.updateButtons();
+
+    window.addEventListener('newTexture', (event: Event) => {
+      const customEvent = event as CustomEvent<TextureDescription>;
+      const newTexture = customEvent.detail;
+
+      // Add the new sprite to the list
+      presetTextures.push(newTexture);
+
+      // Reload the scene to include the new sprite
+      this.loadPage();
+      this.updateButtons();
+    });
+
   }
 
   loadPage() {
-    // Clear previous sprites (if needed)
     this.children.removeAll();
 
     // Get the current slice of textures based on the current page

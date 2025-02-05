@@ -54,7 +54,7 @@ export default class MainScene extends Phaser.Scene {
 
     pageTextures.forEach((texture, index) => {
       const x = (index % 4) * 200 + 100
-      const y = Math.floor(index / 4) * 200 + 100
+      const y = Math.floor(index / 4) * 200 + 75
       const sprite = this.textureGenerator.createGameObject(texture, x, y)
 
       sprite.setInteractive()

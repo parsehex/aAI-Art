@@ -40,6 +40,7 @@ export default class MainScene extends Phaser.Scene {
 
     if (this.spriteViewer) {
       this.spriteViewer.updateButtonPositions(width, height);
+      this.spriteViewer.reload();
     }
   }
 

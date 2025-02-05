@@ -51,17 +51,35 @@ export class SpriteViewer {
     });
   }
 
+  private calculateGrid() {
+    const { width, height } = this.scene.scale.gameSize;
+    const spriteSize = 145;
+    const padding = 20;
+    const columns = Math.max(1, Math.floor(width / (spriteSize + padding)));
+    const rows = Math.max(1, Math.floor((height - 100) / (spriteSize + padding))); // Leave space for UI
+
+    this.itemsPerPage = columns * rows;
+
+    return { columns, rows, spriteSize, padding };
+  }
+
   private loadPage() {
     this.clearScene();
 
     this.selectedSprite = null;
+    const { columns, rows, spriteSize, padding } = this.calculateGrid();
+
     const start = this.currentPage * this.itemsPerPage;
     const end = start + this.itemsPerPage;
     const pageTextures = this.allTextures.slice(start, end);
 
     this.sprites = pageTextures.map((texture, index) => {
-      const x = (index % 4) * 200 + 100;
-      const y = Math.floor(index / 4) * 200 + 75;
+      const col = index % columns;
+      const row = Math.floor(index / columns);
+
+      const x = col * (spriteSize + padding) + spriteSize / 2;
+      const y = row * (spriteSize + padding) + spriteSize / 2 + 50; // Offset from top
+
       const sprite = this.textureGenerator.createGameObject(texture, x, y);
 
       if (texture.generated) {
@@ -155,6 +173,7 @@ export class SpriteViewer {
           this.loadPage();
         }
       });
+      this.prevButton?.setStyle({ fill: this.currentPage === 0 ? '#555' : '#fff' })
 
     this.sprites.push(this.prevButton);
 
@@ -167,6 +186,7 @@ export class SpriteViewer {
           this.loadPage();
         }
       });
+    this.nextButton?.setStyle({ fill: (this.currentPage + 1) * this.itemsPerPage >= this.allTextures.length ? '#555' : '#fff' })
 
     this.sprites.push(this.nextButton);
   }

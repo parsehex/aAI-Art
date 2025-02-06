@@ -33,11 +33,11 @@
     </button>
 
     <!-- Sprite JSON Preview -->
-    <div v-if="selectedTexture" class="bg-gray-700 p-2 rounded-md">
+    <div :class="[selectedTexture ? '' : 'invisible', 'bg-gray-700', 'p-2', 'rounded-md']">
       <h3 class="text-lg font-bold mb-2">Selected Sprite Data</h3>
       <JsonViewer
-        :data="selectedTexture"
-        class="text-sm bg-gray-800 p-2 rounded-md max-h-[40vh] w-[20vw] overflow-auto"
+        :data="selectedTexture || {}"
+        class="text-sm bg-gray-800 p-2 rounded-md max-h-[40vh] w-[25vw] overflow-auto"
       />
     </div>
   </div>
@@ -119,5 +119,14 @@ async function generateSprite() {
   }
 }
 
-onMounted(fetchModels)
+onMounted(() => {
+  window.addEventListener('spriteSelected', (event: Event) => {
+    const customEvent = event as CustomEvent<TextureDescription>
+    selectedTexture.value = customEvent.detail
+  })
+  window.addEventListener('spriteCleared', () => {
+    selectedTexture.value = null
+  })
+  fetchModels()
+})
 </script>

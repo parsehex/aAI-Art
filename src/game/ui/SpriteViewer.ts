@@ -171,9 +171,9 @@ export class SpriteViewer {
 
       sprite.setInteractive()
       sprite.on('pointerdown', (pointer) => {
-        if (pointer.rightButtonDown()) {
+        if (pointer.rightButtonDown() && texture.generated) {
           this.createContextMenu(pointer.x, pointer.y, sprite, texture)
-        } else {
+        } else if (!pointer.rightButtonDown()) {
           window.dispatchEvent(new CustomEvent('spriteSelected', { detail: texture }))
         }
       })

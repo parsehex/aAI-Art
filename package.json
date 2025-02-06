@@ -17,8 +17,14 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.0.3",
     "@vueuse/core": "^12.5.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-vue-next": "^0.474.0",
     "phaser": "^3.87.0",
     "pinia": "^2.3.1",
+    "radix-vue": "^1.9.13",
+    "tailwind-merge": "^3.0.1",
+    "tailwindcss-animate": "^1.0.7",
     "vue": "^3.5.13"
   },
   "devDependencies": {

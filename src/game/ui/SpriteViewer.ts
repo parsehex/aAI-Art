@@ -1,4 +1,3 @@
-import { parseColor } from '@/utils'
 import type { TextureGenerator } from '@/utils/TextureGenerator'
 
 export class SpriteViewer {
@@ -92,9 +91,9 @@ export class SpriteViewer {
 
       const sprite = this.textureGenerator.createGameObject(texture, x, y)
 
-      if (texture.generated) {
-        sprite.preFX?.addGlow(parseColor('#FDE047'), 4, 0, false)
-      }
+      // if (texture.generated) {
+      //   sprite.preFX?.addGlow(parseColor('#FDE047'), 4, 0, false)
+      // }
 
       sprite.setInteractive()
       sprite.on('pointerdown', () => {
@@ -145,7 +144,7 @@ export class SpriteViewer {
       })
       .setInteractive()
       .on('pointerdown', () => {
-        this.loadPage();
+        this.loadPage()
         window.dispatchEvent(new CustomEvent('spriteCleared'))
       })
 

@@ -20,7 +20,6 @@ export const gameConfig = {
   },
 } as Types.Core.GameConfig
 
-
 export default class Game extends PhaserGame {
   constructor() {
     super(gameConfig)

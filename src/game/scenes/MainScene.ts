@@ -19,7 +19,7 @@ export default class MainScene extends Phaser.Scene {
       ...generatedTextures,
     ])
 
-    this.scale.on('resize', this.handleResize, this);
+    this.scale.on('resize', this.handleResize, this)
 
     window.addEventListener('newTexture', (event: Event) => {
       const customEvent = event as CustomEvent<TextureDescription>
@@ -35,21 +35,20 @@ export default class MainScene extends Phaser.Scene {
   }
 
   handleResize(gameSize: Phaser.Structs.Size) {
-    const { width, height } = gameSize;
-    this.cameras.main.setSize(width, height);
+    const { width, height } = gameSize
+    this.cameras.main.setSize(width, height)
 
     if (this.spriteViewer) {
-      this.spriteViewer.updateButtonPositions(width, height);
-      this.spriteViewer.reload();
+      this.spriteViewer.updateButtonPositions(width, height)
+      this.spriteViewer.reload()
     }
   }
-
 
   loadGeneratedTextures() {
     const savedTextures = localStorage.getItem('generatedTextures')
     if (savedTextures) {
       const data = JSON.parse(savedTextures)
-      const arr = Array.isArray(data) ? data.map((t) => ({...t, generated: true})) : [];
+      const arr = Array.isArray(data) ? data.map((t) => ({ ...t, generated: true })) : []
       generatedTextures.push(...arr)
     }
   }

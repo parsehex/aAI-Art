@@ -208,6 +208,4 @@ export class TextureGenerator {
         break
     }
   }
-
-
 }

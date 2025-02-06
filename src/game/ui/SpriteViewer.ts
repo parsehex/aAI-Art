@@ -37,78 +37,78 @@ export class SpriteViewer {
   }
 
   private clearScene() {
-    this.sprites.forEach(obj => {
-      if (!obj) return;
-      obj.removeAllListeners();
-      obj.destroy();
-    });
-    this.sprites = [];
+    this.sprites.forEach((obj) => {
+      if (!obj) return
+      obj.removeAllListeners()
+      obj.destroy()
+    })
+    this.sprites = []
 
-    this.scene.children.each(child => {
+    this.scene.children.each((child) => {
       if (child instanceof Phaser.GameObjects.Text) {
-        child.destroy();
+        child.destroy()
       }
-    });
+    })
   }
 
   private calculateGrid() {
-    const { width, height } = this.scene.scale.gameSize;
-    const spriteSize = 145;
-    const padding = 20;
-    const columns = Math.max(1, Math.floor(width / (spriteSize + padding)));
-    const rows = Math.max(1, Math.floor((height - 100) / (spriteSize + padding))); // Leave space for UI
+    const { width, height } = this.scene.scale.gameSize
+    const spriteSize = 145
+    const padding = 20
+    const columns = Math.max(1, Math.floor(width / (spriteSize + padding)))
+    const rows = Math.max(1, Math.floor((height - 100) / (spriteSize + padding))) // Leave space for UI
 
-    this.itemsPerPage = columns * rows;
+    this.itemsPerPage = columns * rows
 
-    return { columns, rows, spriteSize, padding };
+    return { columns, rows, spriteSize, padding }
   }
 
   private loadPage() {
-    this.clearScene();
+    this.clearScene()
 
-    this.selectedSprite = null;
-    const { columns, rows, spriteSize, padding } = this.calculateGrid();
+    this.selectedSprite = null
+    const { columns, rows, spriteSize, padding } = this.calculateGrid()
 
-    const start = this.currentPage * this.itemsPerPage;
-    const end = start + this.itemsPerPage;
-    const pageTextures = this.allTextures.slice(start, end);
+    const start = this.currentPage * this.itemsPerPage
+    const end = start + this.itemsPerPage
+    const pageTextures = this.allTextures.slice(start, end)
 
     this.sprites = pageTextures.map((texture, index) => {
-      const col = index % columns;
-      const row = Math.floor(index / columns);
+      const col = index % columns
+      const row = Math.floor(index / columns)
 
-      const x = col * (spriteSize + padding) + spriteSize / 2;
-      const y = row * (spriteSize + padding) + spriteSize / 2;
+      const x = col * (spriteSize + padding) + spriteSize / 2
+      const y = row * (spriteSize + padding) + spriteSize / 2
 
-      const sprite = this.textureGenerator.createGameObject(texture, x, y);
+      const sprite = this.textureGenerator.createGameObject(texture, x, y)
 
       if (texture.generated) {
-        sprite.preFX?.addGlow(parseColor('#FDE047'), 4, 0, false);
+        sprite.preFX?.addGlow(parseColor('#FDE047'), 4, 0, false)
       }
 
-      sprite.setInteractive();
+      sprite.setInteractive()
       sprite.on('pointerdown', () => {
-        window.dispatchEvent(new CustomEvent('spriteSelected', { detail: texture }));
-      });
+        window.dispatchEvent(new CustomEvent('spriteSelected', { detail: texture }))
+      })
 
-      let label: Phaser.GameObjects.Text | null = null;
+      let label: Phaser.GameObjects.Text | null = null
       sprite.on('pointerover', () => {
         label = this.scene.add.text(sprite.x - 50, sprite.y - 50, texture.name, {
           fontSize: '12px',
           backgroundColor: '#000',
           color: '#fff',
-        });
-        this.sprites.push(label);
-      });
+        })
+        this.sprites.push(label)
+      })
       sprite.on('pointerout', () => {
-        label?.destroy();
-      });
+        label?.destroy()
+      })
 
-      this.sprites.push(sprite);
-      return sprite;
-    });
+      this.sprites.push(sprite)
+      return sprite
+    })
 
-    this.updateButtonStates();
+    this.updateButtonStates()
   }
 
   private showSelectedSprite() {
@@ -117,9 +117,9 @@ export class SpriteViewer {
     this.clearScene()
     const largeSprite = this.textureGenerator.createGameObject(this.selectedSprite, 400, 300, {
       scale: 3,
-      isInteractive: false
+      isInteractive: false,
     })
-    this.sprites.push(largeSprite);
+    this.sprites.push(largeSprite)
 
     this.createBackButton()
     this.createNavigationButtons()
@@ -127,26 +127,31 @@ export class SpriteViewer {
 
   private createBackButton() {
     this.backButton = this.scene.add
-      .text(50, 50, 'Back to List', { fontSize: '18px', backgroundColor: '#222', color: '#fff', padding: { x: 10, y: 5 } })
+      .text(50, 50, 'Back to List', {
+        fontSize: '18px',
+        backgroundColor: '#222',
+        color: '#fff',
+        padding: { x: 10, y: 5 },
+      })
       .setInteractive()
-      .on('pointerdown', () => this.loadPage());
+      .on('pointerdown', () => this.loadPage())
 
-    this.sprites.push(this.backButton);
+    this.sprites.push(this.backButton)
   }
 
   private createNavigationButtons() {
-    const { width, height } = this.scene.scale.gameSize;
-    const index = this.allTextures.indexOf(this.selectedSprite!);
+    const { width, height } = this.scene.scale.gameSize
+    const index = this.allTextures.indexOf(this.selectedSprite!)
 
     if (index > 0) {
       this.prevButton = this.scene.add
         .text(50, height - 50, 'Previous', { fontSize: '18px' })
         .setInteractive()
         .on('pointerdown', () => {
-          this.selectedSprite = this.allTextures[index - 1];
-          this.showSelectedSprite();
-        });
-      this.sprites.push(this.prevButton);
+          this.selectedSprite = this.allTextures[index - 1]
+          this.showSelectedSprite()
+        })
+      this.sprites.push(this.prevButton)
     }
 
     if (index < this.allTextures.length - 1) {
@@ -154,41 +159,43 @@ export class SpriteViewer {
         .text(width - 150, height - 50, 'Next', { fontSize: '18px' })
         .setInteractive()
         .on('pointerdown', () => {
-          this.selectedSprite = this.allTextures[index + 1];
-          this.showSelectedSprite();
-        });
-      this.sprites.push(this.nextButton);
+          this.selectedSprite = this.allTextures[index + 1]
+          this.showSelectedSprite()
+        })
+      this.sprites.push(this.nextButton)
     }
   }
 
   private createPaginationButtons() {
-    const { width, height } = this.scene.scale.gameSize;
+    const { width, height } = this.scene.scale.gameSize
 
     this.prevButton = this.scene.add
       .text(50, height - 50, 'Prev Page', { fontSize: '18px' })
       .setInteractive()
       .on('pointerdown', () => {
         if (this.currentPage > 0) {
-          this.currentPage--;
-          this.loadPage();
+          this.currentPage--
+          this.loadPage()
         }
-      });
-      this.prevButton?.setStyle({ fill: this.currentPage === 0 ? '#555' : '#fff' })
+      })
+    this.prevButton?.setStyle({ fill: this.currentPage === 0 ? '#555' : '#fff' })
 
-    this.sprites.push(this.prevButton);
+    this.sprites.push(this.prevButton)
 
     this.nextButton = this.scene.add
       .text(width - 150, height - 50, 'Next Page', { fontSize: '18px' })
       .setInteractive()
       .on('pointerdown', () => {
         if ((this.currentPage + 1) * this.itemsPerPage < this.allTextures.length) {
-          this.currentPage++;
-          this.loadPage();
+          this.currentPage++
+          this.loadPage()
         }
-      });
-    this.nextButton?.setStyle({ fill: (this.currentPage + 1) * this.itemsPerPage >= this.allTextures.length ? '#555' : '#fff' })
+      })
+    this.nextButton?.setStyle({
+      fill: (this.currentPage + 1) * this.itemsPerPage >= this.allTextures.length ? '#555' : '#fff',
+    })
 
-    this.sprites.push(this.nextButton);
+    this.sprites.push(this.nextButton)
   }
 
   private updateButtonStates() {
@@ -198,8 +205,8 @@ export class SpriteViewer {
   }
 
   public updateButtonPositions(width: number, height: number) {
-    if (this.prevButton) this.prevButton.setPosition(50, height - 50);
-    if (this.nextButton) this.nextButton.setPosition(width - 150, height - 50);
-    if (this.backButton) this.backButton.setPosition(50, 50);
+    if (this.prevButton) this.prevButton.setPosition(50, height - 50)
+    if (this.nextButton) this.nextButton.setPosition(width - 150, height - 50)
+    if (this.backButton) this.backButton.setPosition(50, 50)
   }
 }

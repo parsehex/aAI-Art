@@ -37,7 +37,7 @@
       <h3 class="text-lg font-bold mb-2">Selected Sprite Data</h3>
       <JsonViewer
         :data="selectedTexture || {}"
-        class="text-sm bg-gray-800 p-2 rounded-md max-h-[40vh] w-[25vw] overflow-auto"
+        class="text-sm bg-gray-800 p-2 rounded-md max-h-[40vh] w-[20vw] overflow-auto"
       />
     </div>
   </div>

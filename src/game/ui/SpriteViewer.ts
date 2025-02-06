@@ -144,7 +144,10 @@ export class SpriteViewer {
         padding: { x: 10, y: 5 },
       })
       .setInteractive()
-      .on('pointerdown', () => this.loadPage())
+      .on('pointerdown', () => {
+        this.loadPage();
+        window.dispatchEvent(new CustomEvent('spriteCleared'))
+      })
 
     this.sprites.push(this.backButton)
   }

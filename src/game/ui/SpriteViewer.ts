@@ -78,7 +78,7 @@ export class SpriteViewer {
       const row = Math.floor(index / columns);
 
       const x = col * (spriteSize + padding) + spriteSize / 2;
-      const y = row * (spriteSize + padding) + spriteSize / 2 + 50; // Offset from top
+      const y = row * (spriteSize + padding) + spriteSize / 2;
 
       const sprite = this.textureGenerator.createGameObject(texture, x, y);
 

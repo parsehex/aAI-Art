@@ -16,26 +16,33 @@
     >
       Generate Sprite
     </button>
+
+    <div v-if="selectedTexture" class="bg-gray-700 p-2 rounded-md">
+      <h3 class="text-lg font-bold mb-2">Selected Sprite Data</h3>
+      <JsonViewer :data="selectedTexture" class="text-sm bg-gray-800 p-2 rounded-md max-h-[40vh] w-[20vw] overflow-auto" />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
 import { GenerateSpriteMessages } from '@/data/prompt'
 import { useLocalStorage } from '@vueuse/core'
+import JsonViewer from '@/components/JsonViewer/Viewer.vue'
 
 const prompt = useLocalStorage('sprite-prompt', '')
 const apiKey = useLocalStorage('openrouter-api-key', '')
 
+const selectedTexture = ref<TextureDescription | null>(null)
+
 async function generateSprite() {
-  if (!prompt.value.trim()) return
-  if (!apiKey.value.trim()) return
+  if (!prompt.value.trim() || !apiKey.value.trim()) return
 
   try {
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        // Uncomment and set your API key if required:
         Authorization: `Bearer ${apiKey.value}`,
       },
       body: JSON.stringify({
@@ -52,14 +59,15 @@ async function generateSprite() {
 
     const data = await response.json()
     let msg: string = data.choices[0].message.content.trim()
-    let lines = msg.split('\n')
+
+    const lines = msg.split('\n')
     if (lines[0].startsWith('```')) {
       msg = lines.slice(1).join('\n')
-      lines = msg.split('\n')
     }
     if (lines[lines.length - 1].startsWith('```')) {
       msg = lines.slice(0, lines.length - 1).join('\n')
     }
+
     console.log('Received sprite data:', msg)
 
     const newTexture = JSON.parse(msg) as TextureDescription
@@ -71,6 +79,13 @@ async function generateSprite() {
     console.error('Error generating sprite:', error)
   }
 }
+
+onMounted(() => {
+  window.addEventListener('spriteSelected', (event: Event) => {
+    const customEvent = event as CustomEvent<TextureDescription>
+    selectedTexture.value = customEvent.detail
+  })
+})
 </script>
 
 <style scoped>
@@ -82,12 +97,5 @@ async function generateSprite() {
   background-color: rgba(255, 255, 255, 0.9);
   padding: 10px;
   border-radius: 4px;
-}
-.sprite-generator h3 {
-  color: gray;
-}
-.sprite-generator input {
-  padding: 5px;
-  margin-right: 5px;
 }
 </style>

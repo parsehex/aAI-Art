@@ -14,10 +14,12 @@ export default class MainScene extends Phaser.Scene {
 
   create() {
     this.loadGeneratedTextures()
-    this.spriteViewer = new SpriteViewer(this, this.textureGenerator, [
-      ...presetTextures,
-      ...generatedTextures,
-    ])
+    this.spriteViewer = new SpriteViewer(
+      this,
+      this.textureGenerator,
+      presetTextures,
+      generatedTextures,
+    )
 
     this.scale.on('resize', this.handleResize, this)
 
@@ -55,5 +57,6 @@ export default class MainScene extends Phaser.Scene {
 
   saveGeneratedTextures() {
     localStorage.setItem('generatedTextures', JSON.stringify(generatedTextures))
+    this.spriteViewer.combineTextures()
   }
 }

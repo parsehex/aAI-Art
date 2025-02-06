@@ -1,3 +1,4 @@
+import { delay } from '@/utils'
 import type { TextureGenerator } from '@/utils/TextureGenerator'
 
 export class SpriteViewer {
@@ -6,6 +7,8 @@ export class SpriteViewer {
   private textureGenerator: TextureGenerator
   private currentPage: number = 0
   private itemsPerPage: number = 12
+  private presetTextures: TextureDescription[]
+  private generatedTextures: TextureDescription[]
   private allTextures: TextureDescription[]
   private selectedSprite: TextureDescription | null = null
   private prevButton?: Phaser.GameObjects.Text
@@ -15,11 +18,15 @@ export class SpriteViewer {
   constructor(
     scene: Phaser.Scene,
     textureGenerator: TextureGenerator,
-    allTextures: TextureDescription[],
+    presetTextures: TextureDescription[],
+    generatedTextures: TextureDescription[],
   ) {
     this.scene = scene
+    this.scene.game.input.mouse?.disableContextMenu();
     this.textureGenerator = textureGenerator
-    this.allTextures = [...allTextures]
+    this.presetTextures = presetTextures
+    this.generatedTextures = generatedTextures
+    this.combineTextures()
 
     this.createPaginationButtons()
     this.loadPage()
@@ -29,6 +36,10 @@ export class SpriteViewer {
       this.selectedSprite = customEvent.detail
       this.showSelectedSprite()
     })
+  }
+
+  public combineTextures() {
+    this.allTextures = [...this.presetTextures, ...this.generatedTextures]
   }
 
   public reload() {
@@ -48,6 +59,69 @@ export class SpriteViewer {
         child.destroy()
       }
     })
+  }
+
+  private async createContextMenu(
+    x: number,
+    y: number,
+    sprite: Phaser.GameObjects.GameObject,
+    texture: TextureDescription,
+  ) {
+    // Remove any existing context menu
+    this.scene.children.each((child) => {
+      if (child.getData('contextMenu')) {
+        child.destroy()
+      }
+    })
+
+    // Create background rectangle
+    const bg = this.scene.add
+      .rectangle(x, y, 80, 30, 0x222222, 0.9)
+      .setOrigin(0)
+      .setInteractive()
+      .setData('contextMenu', true)
+
+    // Create delete text
+    const deleteText = this.scene.add
+      .text(x + 10, y + 5, 'Delete', {
+        fontSize: '14px',
+        color: '#fff',
+      })
+      .setInteractive()
+      .setData('contextMenu', true)
+
+    // Delete sprite on click
+    deleteText.on('pointerdown', () => {
+      this.removeSprite(sprite, texture)
+    })
+
+    await delay(2)
+    // Hide menu when clicking elsewhere
+    this.scene.input.once('pointerdown', () => {
+      bg.destroy()
+      deleteText.destroy()
+    })
+  }
+
+  // Function to remove the sprite
+  private async removeSprite(sprite: Phaser.GameObjects.GameObject, texture: TextureDescription) {
+    // Remove from scene
+    sprite.destroy()
+
+    // Remove from generatedTextures
+    const index = this.generatedTextures.indexOf(texture)
+    if (index !== -1) {
+      this.generatedTextures.splice(index, 1)
+      this.combineTextures()
+    }
+
+    // TODO go to prev page if last sprite
+
+    // Save new texture list
+    localStorage.setItem('generatedTextures', JSON.stringify(this.generatedTextures))
+
+    // Reload sprite list
+    this.reload()
   }
 
   private calculateGrid() {
@@ -96,8 +170,12 @@ export class SpriteViewer {
       // }
 
       sprite.setInteractive()
-      sprite.on('pointerdown', () => {
-        window.dispatchEvent(new CustomEvent('spriteSelected', { detail: texture }))
+      sprite.on('pointerdown', (pointer) => {
+        if (pointer.rightButtonDown()) {
+          this.createContextMenu(pointer.x, pointer.y, sprite, texture)
+        } else {
+          window.dispatchEvent(new CustomEvent('spriteSelected', { detail: texture }))
+        }
       })
 
       let label: Phaser.GameObjects.Text | null = null

@@ -20,3 +20,9 @@ export function copyToClipboard(text: string): boolean {
     return false
   }
 }
+
+export function delay(ms: number) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms)
+  })
+}

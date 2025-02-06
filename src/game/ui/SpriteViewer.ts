@@ -73,12 +73,22 @@ export class SpriteViewer {
     const end = start + this.itemsPerPage
     const pageTextures = this.allTextures.slice(start, end)
 
+    const totalWidth = columns * (spriteSize + padding) - padding
+    const totalHeight = rows * (spriteSize + padding) - padding
+
+    const offsetX = (this.scene.scale.gameSize.width - totalWidth) / 2
+
+    const navButtonHeight = 50
+    const bottomMargin = 20
+    const availableHeight = this.scene.scale.gameSize.height - (navButtonHeight + bottomMargin)
+    const offsetY = (availableHeight - totalHeight) / 2
+
     this.sprites = pageTextures.map((texture, index) => {
       const col = index % columns
       const row = Math.floor(index / columns)
 
-      const x = col * (spriteSize + padding) + spriteSize / 2
-      const y = row * (spriteSize + padding) + spriteSize / 2
+      const x = col * (spriteSize + padding) + spriteSize / 2 + offsetX
+      const y = row * (spriteSize + padding) + spriteSize / 2 + offsetY
 
       const sprite = this.textureGenerator.createGameObject(texture, x, y)
 

@@ -178,7 +178,7 @@ export class TextureGenerator {
     layer: TextureLayer,
     size: number,
   ): void {
-    const { patternType, color1, color2, x = 0, y = 0, width = size, height = size } = layer
+    const { patternType, color1, x = 0, y = 0, width = size, height = size } = layer
     const patternSize = 8 // Pattern tile size
 
     if (color1) graphics.fillStyle(Phaser.Display.Color.ValueToColor(color1).color, 1)

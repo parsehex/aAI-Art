@@ -9,7 +9,7 @@ export class SpriteViewer {
   private itemsPerPage: number = 12
   private presetTextures: TextureDescription[]
   private generatedTextures: TextureDescription[]
-  private allTextures: TextureDescription[]
+  private allTextures!: TextureDescription[]
   private selectedSprite: TextureDescription | null = null
   private prevButton?: Phaser.GameObjects.Text
   private nextButton?: Phaser.GameObjects.Text
@@ -170,7 +170,7 @@ export class SpriteViewer {
       // }
 
       sprite.setInteractive()
-      sprite.on('pointerdown', (pointer) => {
+      sprite.on('pointerdown', (pointer: any) => {
         if (pointer.rightButtonDown() && texture.generated) {
           this.createContextMenu(pointer.x, pointer.y, sprite, texture)
         } else if (!pointer.rightButtonDown()) {

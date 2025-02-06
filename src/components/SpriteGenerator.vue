@@ -56,7 +56,6 @@ const apiKey = useLocalStorage('openrouter-api-key', '')
 const selectedTexture = ref<TextureDescription | null>(null)
 const models = ref<{ id: string; name: string }[]>([])
 const selectedModel = useLocalStorage('selected-model', 'cohere/command-r')
-const open = ref(false)
 
 const isFavorite = (id: string) => FAVORITE_MODELS.includes(id)
 

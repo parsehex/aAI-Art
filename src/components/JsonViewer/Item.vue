@@ -1,5 +1,5 @@
 <template>
-	<div class="json-viewer-item" :style="{ marginLeft: `${depth * 5}px` }">
+	<div class="json-viewer-item">
 		<div v-if="isObject" @click="toggle" class="item-content">
 			<span class="toggle-icon">{{ isExpanded ? '▼' : '▶' }}</span>
 			<span class="key">{{ isArray ? `[${(data as any[]).length}]` : '{...}' }}</span>
@@ -12,16 +12,17 @@
 			</template>
 			<template v-else>
 				<div v-for="(value, key) in data" :key="key" class="object-item">
-					<span class="key">{{ key }}:</span>
-					<JsonViewerItem :data="value" :depth="depth + 1" />
+					<div class="key-line">
+						<span class="key">{{ key }}:</span>
+					</div>
+					<div class="value-line">
+						<JsonViewerItem class="inline" :data="value" :depth="depth + 1" />
+					</div>
 				</div>
 			</template>
 		</div>
 		<span v-if="!isObject" class="primitive" :class="valueType">
-			<UTooltip v-if="typeof data === 'string'" text="Copy value">
-				<span class="string-value" @click="copyValue(data)">{{ formatValue(data) }}</span>
-			</UTooltip>
-			<template v-else>{{ formatValue(data) }}</template>
+			{{ formatValue(data) }}
 		</span>
 	</div>
 </template>
@@ -101,6 +102,7 @@ export default defineComponent({
 .key {
 	color: #881391;
 	margin-right: 4px;
+	font-weight: bold;
 }
 
 .primitive {
@@ -113,10 +115,6 @@ export default defineComponent({
 	white-space: pre-wrap;
 }
 
-.string-value {
-	cursor: pointer;
-}
-
 .primitive.number {
 	color: #1a01ff;
 }
@@ -126,12 +124,20 @@ export default defineComponent({
 }
 
 .nested-content {
-	margin-left: 10px;
+	padding-left: 15px;
 }
 
 .array-item,
 .object-item {
-	display: flex;
-	align-items: flex-start;
+	display: block;
+	margin-top: 4px;
+}
+
+.key-line {
+	display: inline;
+}
+
+.value-line {
+  display: inline;
 }
 </style>

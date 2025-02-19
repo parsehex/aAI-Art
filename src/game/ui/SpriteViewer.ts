@@ -43,7 +43,9 @@ export class SpriteViewer {
   }
 
   public reload() {
-    this.loadPage()
+    if (!this.selectedSprite) return this.loadPage()
+
+    this.showSelectedSprite()
   }
 
   private clearScene() {

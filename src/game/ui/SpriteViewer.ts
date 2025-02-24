@@ -167,10 +167,6 @@ export class SpriteViewer {
 
       const sprite = this.textureGenerator.createGameObject(texture, x, y)
 
-      // if (texture.generated) {
-      //   sprite.preFX?.addGlow(parseColor('#FDE047'), 4, 0, false)
-      // }
-
       sprite.setInteractive()
       sprite.on('pointerdown', (pointer: any) => {
         if (pointer.rightButtonDown() && texture.generated) {
@@ -212,6 +208,7 @@ export class SpriteViewer {
 
     this.createBackButton()
     this.createNavigationButtons()
+    this.createSaveButton(largeSprite)
   }
 
   private createBackButton() {
@@ -256,6 +253,46 @@ export class SpriteViewer {
         })
       this.sprites.push(this.nextButton)
     }
+  }
+
+  private createSaveButton(sprite: Phaser.GameObjects.Sprite) {
+    const { width, height } = this.scene.scale.gameSize
+    const saveButton = this.scene.add
+      .text(width / 2 - 50, height - 100, 'Save Sprite', {
+        fontSize: '18px',
+        backgroundColor: '#222',
+        color: '#fff',
+        padding: { x: 10, y: 5 },
+      })
+      .setInteractive()
+      .on('pointerdown', () => {
+        this.exportSprite(sprite)
+      })
+    this.sprites.push(saveButton)
+  }
+
+  private exportSprite(sprite: Phaser.GameObjects.Sprite) {
+    if (!this.selectedSprite) return;
+
+    const bounds = sprite.getBounds()
+    const spriteName = this.selectedSprite.name;
+
+    this.scene.game.renderer.snapshotArea(
+      bounds.x,
+      bounds.y,
+      bounds.width,
+      bounds.height,
+      (image) => {
+        const a = document.createElement('a')
+        a.href = (image as HTMLImageElement).src
+        a.download = (spriteName + '.png') || 'sprite.png'
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+      },
+      // snapshot type and quality settings:
+      'image/png', 1.0
+    )
   }
 
   private createPaginationButtons() {

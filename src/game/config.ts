@@ -4,7 +4,8 @@ import MainScene from './scenes/MainScene'
 export const gameConfig = {
   type: AUTO,
   parent: 'game-container',
-  backgroundColor: '#333333',
+  pixelArt: true,
+  transparent: true,
   scale: {
     mode: Scale.RESIZE,
     width: '100%',
@@ -15,7 +16,6 @@ export const gameConfig = {
     default: 'arcade',
     arcade: {
       gravity: { y: 0, x: 0 },
-      debug: import.meta.env.DEV,
     },
   },
 } as Types.Core.GameConfig

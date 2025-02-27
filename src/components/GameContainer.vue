@@ -1,7 +1,7 @@
 <template>
   <div
     id="game-container"
-    class="relative border-2 border-gray-700 shadow-lg rounded-lg overflow-hidden w-full max-w-6xl"
+    class="relative mt-2 mx-auto border-2 border-gray-700 shadow-lg rounded-lg overflow-hidden w-full max-w-6xl"
   >
     <div ref="gameContainer"></div>
   </div>
@@ -24,9 +24,8 @@ onUnmounted(() => {
 
 <style scoped>
 #game-container {
-  width: 100%;
+  width: 50vw;
   max-width: 100%;
-  height: 300px; /* updated height  */
-  margin: 0 auto;
+  height: 400px;
 }
 </style>

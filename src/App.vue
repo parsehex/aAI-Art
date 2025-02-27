@@ -1,9 +1,9 @@
 <template>
-  <div
-    class="flex flex-col items-center min-h-screen min-w-screen bg-gray-900 text-white px-2"
-  >
-    <p class="my-2">An experiment to generate graphics using AI language models. All sprites and SVGs shown were created by prompting an LLM (bigger models are better).</p>
-    <div class="flex flex-col items-center space-y-4 w-full max-w-6xl">
+  <div class="flex flex-col items-center min-h-screen min-w-screen bg-gray-900 text-white px-2">
+    <p class="my-2">
+      An experiment to generate graphics using AI language models. All sprites and SVGs shown were created by prompting an LLM (bigger models are better).
+    </p>
+    <div class="w-full max-w-6xl">
       <!-- Generation Type Toggle -->
       <div class="flex space-x-4 mb-4">
         <button
@@ -33,9 +33,12 @@
       <!-- Generator Components -->
       <div class="w-full">
         <template v-if="generationType === 'sprite'">
-          <div class="relative flex flex-col md:flex-row items-center space-x-4 gap-4">
-            <GameContainer />
-            <SpriteGenerator />
+          <div class="flex flex-row gap-4">
+            <SpriteList />
+            <div class="flex flex-col flex-1 space-y-4">
+              <SpriteGenerator />
+              <GameContainer />
+            </div>
           </div>
         </template>
         <template v-else>
@@ -51,6 +54,7 @@ import { ref } from 'vue'
 import GameContainer from './components/GameContainer.vue'
 import SpriteGenerator from './components/SpriteGenerator.vue'
 import SvgGenerator from './components/SvgGenerator.vue'
+import SpriteList from './components/SpriteList.vue'
 
 const generationType = ref<'sprite' | 'svg'>('sprite')
 </script>

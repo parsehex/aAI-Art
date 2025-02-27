@@ -9,7 +9,7 @@ export const gameConfig = {
   scale: {
     mode: Scale.RESIZE,
     width: '100%',
-    height: 600,
+    height: 300,
   },
   scene: MainScene,
   physics: {

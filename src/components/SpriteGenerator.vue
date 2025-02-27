@@ -11,8 +11,7 @@
       </template>
     </GeneratorForm>
 
-    <div :class="[selectedTexture ? '' : 'invisible', 'bg-gray-800 p-4 rounded-lg shadow-lg border border-gray-700 space-y-4 w-80 mx-auto']">
-      <!-- Sprite JSON Preview -->
+    <!-- <div :class="[selectedTexture ? '' : 'invisible', 'bg-gray-800 p-4 rounded-lg shadow-lg border border-gray-700 space-y-4 w-80 mx-auto']">
       <div class="bg-gray-700 p-2 rounded-md">
         <h3 class="text-lg font-bold mb-2">Selected Sprite Data</h3>
         <JsonViewer
@@ -20,7 +19,7 @@
           class="text-sm bg-gray-800 p-2 rounded-md max-h-[40vh] w-[20vw] overflow-auto"
         />
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 

@@ -1,7 +1,7 @@
 <template>
   <div class="flex items-center gap-4">
     <div class="max-w-sm">
-      <GeneratorForm placeholder="Describe your SVG...">
+      <GeneratorForm ref="Form" placeholder="Describe your SVG...">
         <template #button>
           <button
             @click="generateSvg"
@@ -67,9 +67,11 @@ const Form = ref<typeof GeneratorForm>()
 // TODO use data structure with name
 const generatedSVGs = ref<string[]>([])
 
+// legacy:
 const prompt = useLocalStorage('svg-prompt', '')
 const apiKey = useLocalStorage('openrouter-api-key', '')
 const selectedModel = useLocalStorage('selected-model', 'cohere/command-r')
+
 const viewingSvg = ref('')
 
 const svgPresets = presetSVGs

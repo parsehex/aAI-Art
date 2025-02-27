@@ -1,6 +1,6 @@
 <template>
   <div>
-    <GeneratorForm placeholder="Describe your sprite...">
+    <GeneratorForm ref="Form" placeholder="Describe your sprite...">
       <template #button>
         <button
           @click="generateSprite"
@@ -33,6 +33,7 @@ import { GenerateSpriteMessages } from '@/data/prompt'
 
 const Form = ref<typeof GeneratorForm>()
 
+// legacy:
 const prompt = useLocalStorage('sprite-prompt', '')
 const apiKey = useLocalStorage('openrouter-api-key', '')
 const selectedTexture = ref<TextureDescription | null>(null)

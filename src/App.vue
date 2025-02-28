@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col items-center min-h-screen min-w-screen bg-gray-900 text-white px-2">
     <p class="my-2">
-      An experiment to generate graphics using AI language models. All sprites and SVGs shown were created by prompting an LLM (bigger models are better).
+      An app to generate graphics using AI language models. All sprites and SVGs shown were created by prompting an LLM (bigger models are better).
     </p>
     <div class="w-full max-w-6xl">
       <!-- Generation Type Toggle -->

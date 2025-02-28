@@ -1,2 +1,3 @@
-# sprite-generator
- 
+# aAI Art
+
+> alternative AI Art

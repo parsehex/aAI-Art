@@ -10,6 +10,7 @@ type Model = { id: string; name: string }
 export const useAIStore = defineStore('ai', () => {
   const provider = useLocalStorage<Provider>('ai-provider', 'openrouter')
   const apiKey = useLocalStorage('openrouter-api-key', '')
+  const ollamaHost = useLocalStorage('ollama-host', 'http://localhost:11434')
   const selectedModel = useLocalStorage('selected-model', 'cohere/command-r')
   const models = ref<Model[]>([])
 
@@ -45,7 +46,7 @@ export const useAIStore = defineStore('ai', () => {
       }
     } else if (provider.value === 'ollama') {
       try {
-        const ollama = new Ollama({ host: 'http://localhost:11434' })
+        const ollama = new Ollama({ host: ollamaHost.value })
         const { models: ollamaModels } = await ollama.list()
         const m = ollamaModels.map((m: any) => ({
           id: m.name,
@@ -101,7 +102,7 @@ export const useAIStore = defineStore('ai', () => {
       }
     } else if (provider.value === 'ollama') {
       try {
-        const ollama = new Ollama({ host: 'http://localhost:11434' })
+        const ollama = new Ollama({ host: ollamaHost.value })
         const { message } = await ollama.chat({
           model: modelId,
           messages,
@@ -126,10 +127,14 @@ export const useAIStore = defineStore('ai', () => {
   // Refetch on provider change
   onMounted(() => nextTick(fetchModels))
   watch(provider, () => nextTick(fetchModels))
+  watch(ollamaHost, () => {
+    if (provider.value === 'ollama') nextTick(fetchModels)
+  })
 
   return {
     provider,
     apiKey,
+    ollamaHost,
     selectedModel,
     models,
     fetchModels,

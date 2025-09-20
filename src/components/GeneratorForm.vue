@@ -10,6 +10,9 @@
         <option value="ollama">Ollama (Local)</option>
       </select>
     </div>
+    <input v-if="store.provider === 'ollama'" v-model="store.ollamaHost"
+      placeholder="Ollama Host (e.g., http://localhost:11434)"
+      class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
     <input v-if="store.provider === 'openrouter'" v-model="store.apiKey" placeholder="OpenRouter API Key"
       class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
     <div>

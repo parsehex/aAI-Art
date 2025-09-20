@@ -68,6 +68,41 @@ Layers are drawn in order from first to last (bottom to top). Each layer represe
 }
 \`\`\`
 
+#### 4. Ellipse (\`ellipse\`)
+\`\`\`typescript
+{
+  "type": "ellipse",
+  "color": "string",    // CSS color or hex code
+  "x": "number",        // Center X position
+  "y": "number",        // Center Y position
+  "width": "number",    // Ellipse width
+  "height": "number"    // Ellipse height
+}
+\`\`\`
+
+#### 5. Polygon (\`polygon\`)
+\`\`\`typescript
+{
+  "type": "polygon",
+  "color": "string",    // CSS color or hex code
+  "points": "[[number, number], ...]", // Array of [x, y] points, closed shape
+  "lineWidth": "number" // Optional: Outline thickness (default: 1)
+}
+\`\`\`
+Example points: \`[[10,10], [20,30], [30,10], [20,0]]\`
+
+#### 6. Path (\`path\`)
+\`\`\`typescript
+{
+  "type": "path",
+  "color": "string",    // Fill or stroke color
+  "path": "string",     // SVG-like path data (e.g., "M10 10 L20 20 Q30 0 40 10 Z")
+  "fill": "boolean",    // Whether to fill the path (default: true)
+  "lineWidth": "number" // Optional: Stroke thickness if not filling
+}
+\`\`\`
+Supported commands: M (move), L (line), Q (quadratic curve), Z (close).
+
 ## Colors
 Colors can be specified in two formats:
 1. Hex codes: \`"#FF0000"\`, \`"#8B4513"\`
@@ -79,8 +114,8 @@ Colors can be specified in two formats:
 - All coordinates are in pixels
 
 ## Best Practices
-1. Build complex shapes by layering simpler shapes.
-2. Use meaningful color names or hex codes for clarity.
+1. Carefully consider the user's input and earnestly attempt to create the request.
+2. Build complex shapes by layering simpler shapes.
 3. Keep the size reasonable (64x64 is common for simple sprites).
 4. Use descriptive names for your textures.
 
@@ -92,6 +127,10 @@ Colors can be specified in two formats:
   "layers": [
     // Middle-ground elements
     { "type": "circle", "color": "#FF0000", "x": 32, "y": 32, "radius": 20 },
+    // Ellipse for oval body
+    { "type": "ellipse", "color": "#00FF00", "x": 32, "y": 40, "width": 30, "height": 40 },
+    // Polygon for a star shape
+    { "type": "polygon", "color": "#0000FF", "points": [[32,10], [38,30], [58,30], [42,42], [48,62], [32,50], [16,62], [22,42], [6,30], [26,30]] },
     // Finally, details and highlights
     { "type": "line", "color": "#FFFFFF", "x": 10, "y": 10, "x2": 54, "y2": 54, "lineWidth": 2 }
   ]

@@ -148,6 +148,15 @@ export class TextureGenerator {
       case 'pattern':
         this.drawPattern(graphics, layer, size)
         break
+      case 'ellipse':
+        this.drawEllipse(graphics, layer, size)
+        break
+      case 'polygon':
+        this.drawPolygon(graphics, layer, size)
+        break
+      case 'path':
+        this.drawPath(graphics, layer, size)
+        break
     }
   }
 
@@ -223,5 +232,111 @@ export class TextureGenerator {
         }
         break
     }
+  }
+
+  private drawEllipse(
+    graphics: Phaser.GameObjects.Graphics,
+    layer: TextureLayer,
+    size: number,
+  ): void {
+    const color = parseColor(layer.color as string)
+    graphics.fillStyle(color, 1)
+    const x = Math.max(0, Math.min(layer.x || size / 2, size))
+    const y = Math.max(0, Math.min(layer.y || size / 2, size))
+    const width = Math.max(1, Math.min(layer.width || size, size))
+    const height = Math.max(1, Math.min(layer.height || size, size))
+    graphics.fillEllipse(x, y, width, height)
+  }
+
+  private drawPolygon(
+    graphics: Phaser.GameObjects.Graphics,
+    layer: TextureLayer,
+    size: number,
+  ): void {
+    const color = parseColor(layer.color as string)
+    const points = layer.points || []
+    if (points.length < 3) return // Need at least 3 points for polygon
+
+    graphics.fillStyle(color, 1)
+    graphics.beginPath()
+    const [firstX, firstY] = points[0] || [0, 0]
+    const clampedFirstX = Math.max(0, Math.min(firstX, size))
+    const clampedFirstY = Math.max(0, Math.min(firstY, size))
+    graphics.moveTo(clampedFirstX, clampedFirstY)
+    for (let i = 1; i < points.length; i++) {
+      const [px, py] = points[i]
+      const clampedX = Math.max(0, Math.min(px, size))
+      const clampedY = Math.max(0, Math.min(py, size))
+      graphics.lineTo(clampedX, clampedY)
+    }
+    graphics.closePath()
+    graphics.fillPath()
+
+    // Optional outline
+    if (layer.lineWidth && layer.lineWidth > 0) {
+      const lineColor = parseColor(layer.color as string) // Reuse color or add strokeColor
+      graphics.lineStyle(layer.lineWidth, lineColor, 1)
+      graphics.strokePath()
+    }
+  }
+
+  private drawPath(graphics: Phaser.GameObjects.Graphics, layer: TextureLayer, size: number): void {
+    const pathData = layer.path || ''
+    const color = parseColor(layer.color as string)
+    const shouldFill = layer.fill !== undefined ? layer.fill : true
+    const lineWidth = layer.lineWidth || 1
+
+    if (!pathData) return
+
+    // Simple SVG path parser supporting M, L, Z (basic lines and closes)
+    graphics.beginPath()
+    let currentX = 0,
+      currentY = 0
+    let i = 0
+    while (i < pathData.length) {
+      const char = pathData[i]
+      i++
+      if (char === 'M') {
+        const mx = this.parseNumber(pathData, i)
+        i += mx.length
+        const my = this.parseNumber(pathData, i)
+        i += my.length
+        currentX = Math.max(0, Math.min(parseFloat(mx), size))
+        currentY = Math.max(0, Math.min(parseFloat(my), size))
+        graphics.moveTo(currentX, currentY)
+      } else if (char === 'L') {
+        const lx = this.parseNumber(pathData, i)
+        i += lx.length
+        const ly = this.parseNumber(pathData, i)
+        i += ly.length
+        currentX = Math.max(0, Math.min(parseFloat(lx), size))
+        currentY = Math.max(0, Math.min(parseFloat(ly), size))
+        graphics.lineTo(currentX, currentY)
+      } else if (char === 'Z') {
+        graphics.closePath()
+      } else if (char === ' ') {
+        // Skip whitespace
+      } else {
+        // Skip unknown commands (e.g., Q for curves - can add arc support later)
+        i--
+      }
+    }
+
+    if (shouldFill) {
+      graphics.fillStyle(color, 1)
+      graphics.fillPath()
+    }
+    if (lineWidth > 0) {
+      graphics.lineStyle(lineWidth, color, 1)
+      graphics.strokePath()
+    }
+  }
+
+  private parseNumber(str: string, start: number): string {
+    let i = start
+    while (i < str.length && (/\d|\.|-/.test(str[i]) || str[i] === ' ')) {
+      i++
+    }
+    return str.substring(start, i).trim()
   }
 }

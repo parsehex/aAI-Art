@@ -1,5 +1,5 @@
 type TextureLayer = {
-  type: 'circle' | 'rect' | 'line' | 'gradient' | 'pattern'
+  type: 'circle' | 'rect' | 'line' | 'gradient' | 'pattern' | 'ellipse' | 'polygon' | 'path'
   color?: string
   colorStart?: string // For gradient
   colorEnd?: string // For gradient
@@ -15,6 +15,9 @@ type TextureLayer = {
   height?: number
   radius?: number
   lineWidth?: number // Optional line thickness
+  points?: [number, number][] // For polygon: array of [x, y] points
+  path?: string // For path: SVG-like path data (e.g., "M10 10 L20 20")
+  fill?: boolean // For path: whether to fill the shape
 }
 
 interface TextureDescription {

@@ -14,6 +14,13 @@ export const useTexturesStore = defineStore('textures', () => {
     save()
   }
 
+  function updateGeneratedTextureName(index: number, newName: string) {
+    if (generatedTextures.value[index]) {
+      generatedTextures.value[index].name = newName
+      save()
+    }
+  }
+
   function load() {
     const savedTextures = localStorage.getItem('generatedTextures')
     if (savedTextures) {
@@ -32,6 +39,7 @@ export const useTexturesStore = defineStore('textures', () => {
     generatedTextures,
     addGeneratedTexture,
     removeGeneratedTextureByIndex,
+    updateGeneratedTextureName,
     load,
     save,
   }

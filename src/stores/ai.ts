@@ -13,6 +13,7 @@ export const useAIStore = defineStore('ai', () => {
   const ollamaHost = useLocalStorage('ollama-host', 'http://localhost:11434')
   const selectedModel = useLocalStorage('selected-model', 'cohere/command-r')
   const models = ref<Model[]>([])
+  const isLoading = ref(false)
 
   const FAVORITE_MODELS = ['cohere/command-r' /* add more */]
   const favoriteModelIds = useLocalStorage<string[]>('favorite-models', FAVORITE_MODELS)
@@ -77,51 +78,58 @@ export const useAIStore = defineStore('ai', () => {
     messages: any[],
     options: { temperature?: number } = { temperature: 0.01 },
   ): Promise<string> => {
-    let content: string
-    if (provider.value === 'openrouter') {
-      if (!apiKey.value.trim()) throw new Error('API key required for OpenRouter')
-      try {
-        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${apiKey.value}`,
-          },
-          body: JSON.stringify({
+    isLoading.value = true
+    try {
+      let content: string
+      if (provider.value === 'openrouter') {
+        // there's an issue here where the request finishes before isLoading is toggled / the button is active again
+        // this only seems to happen with openrouter, even when ollama takes only a few seconds before ui is instantly responsive again
+        if (!apiKey.value.trim()) throw new Error('API key required for OpenRouter')
+        try {
+          const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${apiKey.value}`,
+            },
+            body: JSON.stringify({
+              model: modelId,
+              messages,
+              ...options,
+            }),
+          })
+          if (!response.ok) throw new Error(`API error: ${response.statusText}`)
+          const data = await response.json()
+          content = data.choices[0]?.message?.content?.trim() || ''
+        } catch (error) {
+          console.error('Error generating with OpenRouter:', error)
+          throw error
+        }
+      } else if (provider.value === 'ollama') {
+        try {
+          const ollama = new Ollama({ host: ollamaHost.value })
+          const { message } = await ollama.chat({
             model: modelId,
             messages,
             ...options,
-          }),
-        })
-        if (!response.ok) throw new Error(`API error: ${response.statusText}`)
-        const data = await response.json()
-        content = data.choices[0]?.message?.content?.trim() || ''
-      } catch (error) {
-        console.error('Error generating with OpenRouter:', error)
-        throw error
+          })
+          content = message.content.trim()
+        } catch (error) {
+          console.error('Error generating with Ollama:', error)
+          throw error
+        }
+      } else {
+        throw new Error('Unknown provider')
       }
-    } else if (provider.value === 'ollama') {
-      try {
-        const ollama = new Ollama({ host: ollamaHost.value })
-        const { message } = await ollama.chat({
-          model: modelId,
-          messages,
-          ...options,
-        })
-        content = message.content.trim()
-      } catch (error) {
-        console.error('Error generating with Ollama:', error)
-        throw error
-      }
-    } else {
-      throw new Error('Unknown provider')
-    }
 
-    // Strip markdown code blocks
-    const lines = content.split('\n')
-    if (lines[0]?.startsWith('```')) lines.shift()
-    if (lines[lines.length - 1]?.startsWith('```')) lines.pop()
-    return lines.join('\n')
+      // Strip markdown code blocks
+      const lines = content.split('\n')
+      if (lines[0]?.startsWith('```')) lines.shift()
+      if (lines[lines.length - 1]?.startsWith('```')) lines.pop()
+      return lines.join('\n')
+    } finally {
+      isLoading.value = false
+    }
   }
 
   // Refetch on provider change
@@ -137,6 +145,7 @@ export const useAIStore = defineStore('ai', () => {
     ollamaHost,
     selectedModel,
     models,
+    isLoading,
     fetchModels,
     generate,
     favoriteModels,

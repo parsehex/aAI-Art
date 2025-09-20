@@ -4,7 +4,7 @@
       <template #button>
         <button :disabled="!canSend" @click="generateSprite"
           class="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition disabled:opacity-50">
-          <span v-if="!isLoading">Generate Sprite</span>
+          <span v-if="!store.isLoading">Generate Sprite</span>
           <span v-else class="flex items-center justify-center">
             <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
             Generating...
@@ -35,10 +35,9 @@ const Form = ref<typeof GeneratorForm>()
 const store = useAIStore()
 
 const selectedTexture = ref<TextureDescription | null>(null)
-const isLoading = ref(false)
 
 const canSend = computed(() => {
-  if (isLoading.value) return false;
+  if (store.isLoading) return false;
   const form = Form.value
   if (!form) return false
   if (!form.prompt) return false;
@@ -52,7 +51,6 @@ async function generateSprite() {
   const p = form.prompt
   if (!p.trim() || !store.selectedModel) return
 
-  isLoading.value = true
   try {
     const content = await store.generate(
       store.selectedModel,
@@ -66,8 +64,6 @@ async function generateSprite() {
     form.prompt = ''
   } catch (error) {
     console.error('Error generating sprite:', error)
-  } finally {
-    isLoading.value = false
   }
 }
 
@@ -75,6 +71,9 @@ onMounted(() => {
   window.addEventListener('spriteSelected', (event: Event) => {
     const customEvent = event as CustomEvent<TextureDescription>
     selectedTexture.value = customEvent.detail
+
+    if (!selectedTexture.value.prompt || !Form.value) return
+    Form.value.prompt = selectedTexture.value.prompt
   })
   window.addEventListener('spriteCleared', () => {
     selectedTexture.value = null

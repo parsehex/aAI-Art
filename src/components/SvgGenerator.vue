@@ -3,9 +3,9 @@
     <div class="max-w-sm">
       <GeneratorForm ref="Form" placeholder="Describe your SVG...">
         <template #button>
-          <button :disabled="isLoading" @click="generateSvg"
+          <button :disabled="!canSend" @click="generateSvg"
             class="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition disabled:opacity-50">
-            <span v-if="!isLoading">Generate SVG</span>
+            <span v-if="!store.isLoading">Generate SVG</span>
             <span v-else class="flex items-center">
               <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
               Generating...
@@ -36,7 +36,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import GeneratorForm from '@/components/GeneratorForm.vue'
 import { presetSVGs } from '@/data/preset-svgs/registry'
 import { useAIStore } from '@/stores/ai'
@@ -47,9 +47,16 @@ const Form = ref<typeof GeneratorForm>()
 const generatedSVGs = ref<string[]>([])
 
 const viewingSvg = ref('')
-const isLoading = ref(false)
 
 const store = useAIStore()
+
+const canSend = computed(() => {
+  if (store.isLoading) return false;
+  const form = Form.value
+  if (!form) return false
+  if (!form.prompt) return false;
+  return true;
+})
 
 const svgPresets = presetSVGs
 
@@ -76,7 +83,6 @@ async function generateSvg() {
   const p = form.prompt
   if (!p.trim() || !store.selectedModel) return
 
-  isLoading.value = true
   try {
     const content = await store.generate(
       store.selectedModel,
@@ -88,8 +94,6 @@ async function generateSvg() {
     viewingSvg.value = content
   } catch (error) {
     console.error('Error generating SVG:', error)
-  } finally {
-    isLoading.value = false
   }
 }
 

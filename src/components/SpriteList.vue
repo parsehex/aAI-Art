@@ -26,7 +26,8 @@
         <Check class="w-4 h-4" />
       </button>
       <button v-if="texture.generated && texture.prompt" @click.stop="regenerateSprite(texture)"
-        class="ml-2 text-green-400 hover:text-green-600 text-lg" title="Regenerate">
+        :disabled="aiStore.isLoading" class="ml-2 text-green-400 hover:text-green-600 text-lg disabled:opacity-50"
+        title="Regenerate">
         <RefreshCw class="w-4 h-4" />
       </button>
       <button v-if="texture.generated && texture.id !== editingId" @click.stop="startEdit(texture.id, texture.name)"

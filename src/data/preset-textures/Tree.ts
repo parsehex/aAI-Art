@@ -1,4 +1,5 @@
 export const Tree: TextureDescription = {
+  id: 'tree-1',
   name: 'tree',
   size: 64,
   layers: [

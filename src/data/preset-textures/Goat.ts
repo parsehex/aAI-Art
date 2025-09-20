@@ -1,4 +1,5 @@
 export const Goat: TextureDescription = {
+  id: 'goat-1',
   name: 'goat_side',
   size: 128,
   layers: [

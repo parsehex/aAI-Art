@@ -1,4 +1,5 @@
 export const Villager: TextureDescription = {
+  id: 'villager-1',
   name: 'villager',
   size: 64,
   layers: [

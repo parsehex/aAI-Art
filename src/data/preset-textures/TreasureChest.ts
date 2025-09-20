@@ -1,4 +1,5 @@
 export const TreasureChest: TextureDescription = {
+  id: 'treasure-chest-1',
   name: 'treasure-chest',
   size: 64,
   layers: [

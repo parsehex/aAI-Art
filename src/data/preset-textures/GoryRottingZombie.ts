@@ -1,4 +1,5 @@
 export const GoryRottingZombie: TextureDescription = {
+  id: 'gory-rotting-zombie-1',
   name: 'gory-rotting-zombie',
   size: 64,
   layers: [

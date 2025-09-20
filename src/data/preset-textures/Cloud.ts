@@ -1,4 +1,5 @@
 export const Cloud: TextureDescription = {
+  id: 'cloud-1',
   name: 'cloud',
   size: 64,
   layers: [

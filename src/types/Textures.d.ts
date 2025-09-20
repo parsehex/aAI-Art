@@ -21,5 +21,7 @@ interface TextureDescription {
   size: number
   layers: TextureLayer[]
   name: string
+  id: string
   generated?: boolean
+  thumbnail?: string
 }

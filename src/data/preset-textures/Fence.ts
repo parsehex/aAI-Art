@@ -1,4 +1,5 @@
 export const Fence: TextureDescription = {
+  id: 'fence-1',
   name: 'fence',
   size: 64,
   layers: [

@@ -1,4 +1,5 @@
 import { parseColor } from './color'
+import { getOffscreenScene, initGame } from '@/utils/OffscreenPhaserGame'
 
 export class GameObject extends Phaser.GameObjects.Sprite {
   constructor(scene: Phaser.Scene, x: number, y: number, texture: string) {
@@ -26,10 +27,16 @@ export class GameObject extends Phaser.GameObjects.Sprite {
 
 export class TextureGenerator {
   private scene: Phaser.Scene
+  public offscreenScene?: Phaser.Scene
   private textureCache: Map<string, string> = new Map()
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene
+
+    initGame()
+    setTimeout(() => {
+      this.offscreenScene = getOffscreenScene()
+    }, 100)
   }
 
   createGameObject(
@@ -41,12 +48,14 @@ export class TextureGenerator {
       isInteractive?: boolean
       scale?: number
       name?: string
+      background?: boolean // New option for background rendering
     } = {},
   ): GameObject {
-    const textureKey = this.getTextureKey(desc)
+    const targetScene = options.background && this.offscreenScene ? this.offscreenScene : this.scene
+    const textureKey = this.getTextureKey(desc, targetScene)
 
     // Create the game object
-    const gameObject = new GameObject(this.scene, x, y, textureKey)
+    const gameObject = new GameObject(targetScene, x, y, textureKey)
 
     // Apply options
     if (options.scale) {
@@ -66,13 +75,15 @@ export class TextureGenerator {
     return gameObject
   }
 
-  private getTextureKey(desc: TextureDescription): string {
+  private getTextureKey(desc: TextureDescription, targetScene: Phaser.Scene): string {
     // Generate a unique key based on the texture description
     const descString = JSON.stringify(desc)
     const hash = this.hashString(descString)
 
-    if (!this.textureCache.has(hash)) {
-      const graphics = this.scene.add.graphics()
+    const cacheKey = `${targetScene.sys.settings.key}-${hash}`
+
+    if (!this.textureCache.has(cacheKey)) {
+      const graphics = targetScene.add.graphics()
       const size = desc.size
 
       desc.layers.forEach((layer) => {
@@ -83,10 +94,10 @@ export class TextureGenerator {
       graphics.generateTexture(textureKey, size, size)
       graphics.destroy()
 
-      this.textureCache.set(hash, textureKey)
+      this.textureCache.set(cacheKey, textureKey)
     }
 
-    return this.textureCache.get(hash)!
+    return this.textureCache.get(cacheKey)!
   }
 
   private hashString(str: string): string {
@@ -99,8 +110,13 @@ export class TextureGenerator {
     return hash.toString(36)
   }
 
-  createSprite(desc: TextureDescription, x: number, y: number): Phaser.GameObjects.Sprite {
-    const graphics = this.scene.add.graphics()
+  createSprite(
+    desc: TextureDescription,
+    x: number,
+    y: number,
+    targetScene: Phaser.Scene,
+  ): Phaser.GameObjects.Sprite {
+    const graphics = targetScene.add.graphics()
     const size = desc.size
 
     desc.layers.forEach((layer) => {
@@ -111,7 +127,7 @@ export class TextureGenerator {
     graphics.generateTexture(textureKey, size, size)
     graphics.destroy()
     console.log('x, y', x, y)
-    return this.scene.add.sprite(x, y, textureKey)
+    return targetScene.add.sprite(x, y, textureKey)
   }
 
   private drawLayer(

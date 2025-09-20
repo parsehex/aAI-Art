@@ -1,4 +1,5 @@
 export const Warehouse: TextureDescription = {
+  id: 'abandoned-warehouse-1',
   name: 'abandoned-warehouse',
   size: 128,
   layers: [

@@ -1,5 +1,6 @@
 import { delay } from '@/utils'
 import type { TextureGenerator } from '@/utils/TextureGenerator'
+import { useTexturesStore } from '@/stores/textures'
 
 export class SpriteViewer {
   private scene: Phaser.Scene
@@ -26,10 +27,10 @@ export class SpriteViewer {
 
     // We've removed any phaser grid rendering – our Vue SpriteList now shows all sprites.
     // Listen for the spriteSelected event to render the sprite.
-    window.addEventListener('spriteSelected', (event: Event) => {
+    window.addEventListener('spriteSelected', async (event: Event) => {
       const customEvent = event as CustomEvent<TextureDescription>
       this.selectedSprite = customEvent.detail
-      this.showSelectedSprite()
+      await this.showSelectedSprite()
     })
 
     // Clear the currently selected sprite when told.
@@ -50,9 +51,9 @@ export class SpriteViewer {
     this.showSelectedSprite()
   }
 
-  private clearScene() {
+  private clearScene(scene = this.scene) {
     // Destroy all children that were added by this viewer.
-    this.scene.children.each((child) => {
+    scene.children.each((child) => {
       // We use an identifying flag (data key) to mark objects this viewer added.
       if (child.getData('spriteViewer')) {
         child.destroy()
@@ -61,7 +62,7 @@ export class SpriteViewer {
   }
 
   // Displays the selected sprite enlarged plus UI controls.
-  private showSelectedSprite() {
+  private async showSelectedSprite() {
     if (!this.selectedSprite) return
 
     this.clearScene()
@@ -119,6 +120,41 @@ export class SpriteViewer {
       'image/png',
       1.0,
     )
+  }
+
+  public async getThumbnail(def: TextureDescription): Promise<string> {
+    return new Promise((resolve) => {
+      const offscreenScene = this.textureGenerator['offscreenScene']
+      if (!offscreenScene) {
+        resolve('') // Or throw an error
+        return
+      }
+
+      this.clearScene(offscreenScene)
+      const { width, height } = offscreenScene.scale.gameSize
+      const x = width / 2
+      const y = height / 2
+      const sprite = this.textureGenerator.createGameObject(def, x, y, {
+        scale: 3,
+        isInteractive: false,
+        background: true, // Use the background scene for thumbnail generation
+      })
+      sprite.setData('spriteViewer', true)
+
+      const bounds = sprite.getBounds()
+      offscreenScene.game.renderer.snapshotArea(
+        bounds.x,
+        bounds.y,
+        bounds.width,
+        bounds.height,
+        (image) => {
+          const dataURL = (image as HTMLImageElement).src as string
+          resolve(dataURL)
+        },
+        'image/png',
+        1.0,
+      )
+    })
   }
 
   // Called by the scene on a resize.

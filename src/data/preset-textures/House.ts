@@ -1,4 +1,5 @@
 export const House: TextureDescription = {
+  id: 'house-1',
   name: 'house',
   size: 64,
   layers: [

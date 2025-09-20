@@ -24,13 +24,14 @@ export default class MainScene extends Phaser.Scene {
 
     this.scale.on('resize', this.handleResize, this)
 
-    window.addEventListener('newTexture', (event: Event) => {
+    window.addEventListener('newTexture', async (event: Event) => {
       const customEvent = event as CustomEvent<TextureDescription>
       const newTexture = customEvent.detail
 
-
       // Add the new sprite to the list
       const store = useTexturesStore()
+      const dataUrl = await this.spriteViewer.getThumbnail(newTexture)
+      if (dataUrl) newTexture.thumbnail = dataUrl
       store.addGeneratedTexture(newTexture)
       // No need for reload() as Vue list will update reactively
       this.spriteViewer.combineTextures()

@@ -1,21 +1,27 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { v4 } from 'uuid'
 
 export const useTexturesStore = defineStore('textures', () => {
   const generatedTextures = ref<TextureDescription[]>([])
 
   function addGeneratedTexture(texture: TextureDescription) {
-    generatedTextures.value.push({ ...texture, generated: true })
+    generatedTextures.value.push({ ...texture, id: v4(), generated: true })
     save()
   }
 
-  function removeGeneratedTextureByIndex(index: number) {
-    generatedTextures.value.splice(index, 1)
-    save()
+  function removeGeneratedTexture(id: string) {
+    const index = generatedTextures.value.findIndex((t) => t.id === id)
+    if (index > -1) {
+      generatedTextures.value.splice(index, 1)
+      save()
+    }
   }
 
-  function updateGeneratedTextureName(index: number, newName: string) {
+  function updateGeneratedTextureName(id: string, newName: string) {
+    const index = generatedTextures.value.findIndex((t) => t.id === id)
     if (generatedTextures.value[index]) {
+      console.log('upd')
       generatedTextures.value[index].name = newName
       save()
     }
@@ -38,7 +44,7 @@ export const useTexturesStore = defineStore('textures', () => {
   return {
     generatedTextures,
     addGeneratedTexture,
-    removeGeneratedTextureByIndex,
+    removeGeneratedTexture,
     updateGeneratedTextureName,
     load,
     save,

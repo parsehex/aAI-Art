@@ -12,6 +12,7 @@ import { Zombie } from './Zombie'
 // import { Zombie2 } from './Zombie2'
 
 export const PatternTexture: TextureDescription = {
+  id: 'pattern-1',
   name: 'pattern-texture',
   size: 64,
   layers: [

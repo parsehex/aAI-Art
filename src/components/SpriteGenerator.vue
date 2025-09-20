@@ -2,10 +2,10 @@
   <div>
     <GeneratorForm ref="Form" placeholder="Describe your sprite...">
       <template #button>
-        <button :disabled="isLoading" @click="generateSprite"
+        <button :disabled="!canSend" @click="generateSprite"
           class="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition disabled:opacity-50">
           <span v-if="!isLoading">Generate Sprite</span>
-          <span v-else class="flex items-center">
+          <span v-else class="flex items-center justify-center">
             <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
             Generating...
           </span>
@@ -24,7 +24,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import JsonViewer from '@/components/JsonViewer/Viewer.vue'
 import GeneratorForm from '@/components/GeneratorForm.vue'
 import { GenerateSpriteMessages } from '@/data/prompt'
@@ -36,6 +36,14 @@ const store = useAIStore()
 
 const selectedTexture = ref<TextureDescription | null>(null)
 const isLoading = ref(false)
+
+const canSend = computed(() => {
+  if (isLoading.value) return false;
+  const form = Form.value
+  if (!form) return false
+  if (!form.prompt) return false;
+  return true;
+})
 
 async function generateSprite() {
   const form = Form.value

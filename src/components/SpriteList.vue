@@ -25,6 +25,10 @@
         class="ml-2 text-yellow-400 hover:text-yellow-600 text-lg">
         <Check class="w-4 h-4" />
       </button>
+      <button v-if="texture.generated && texture.prompt" @click.stop="regenerateSprite(texture)"
+        class="ml-2 text-green-400 hover:text-green-600 text-lg" title="Regenerate">
+        <RefreshCw class="w-4 h-4" />
+      </button>
       <button v-if="texture.generated && texture.id !== editingId" @click.stop="startEdit(texture.id, texture.name)"
         class="ml-2 text-blue-400 hover:text-blue-600 text-lg">
         <Pencil class="w-4 h-4" />
@@ -41,9 +45,12 @@
 import { computed, ref, onMounted } from 'vue'
 import { presetTextures } from '@/data/preset-textures/registry'
 import { useTexturesStore } from '@/stores/textures'
-import { Check, Pencil, X } from 'lucide-vue-next'
+import { useAIStore } from '@/stores/ai'
+import { Check, Pencil, X, RefreshCw } from 'lucide-vue-next'
+import { GenerateSpriteMessages } from '@/data/prompt'
 
 const store = useTexturesStore()
+const aiStore = useAIStore()
 const showPresets = ref(true)
 const editingId = ref<string | null>(null)
 const editingName = ref('')
@@ -67,6 +74,11 @@ const visibleTextures = computed(() => {
 function selectSprite(texture: TextureDescription) {
   // Dispatch the event to notify our Phaser scene to render the sprite.
   window.dispatchEvent(new CustomEvent('spriteSelected', { detail: texture }))
+}
+
+function regenerateSprite(texture: TextureDescription) {
+  if (!texture.prompt) return
+  window.dispatchEvent(new CustomEvent('regenerateTexture', { detail: { id: texture.id, prompt: texture.prompt } }))
 }
 
 function startEdit(id: string, name: string) {

@@ -30,6 +30,7 @@ export class SpriteViewer {
     window.addEventListener('spriteSelected', async (event: Event) => {
       const customEvent = event as CustomEvent<TextureDescription>
       this.selectedSprite = customEvent.detail
+      this.clearScene()
       await this.showSelectedSprite()
     })
 

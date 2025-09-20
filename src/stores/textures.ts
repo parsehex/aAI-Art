@@ -21,8 +21,16 @@ export const useTexturesStore = defineStore('textures', () => {
   function updateGeneratedTextureName(id: string, newName: string) {
     const index = generatedTextures.value.findIndex((t) => t.id === id)
     if (generatedTextures.value[index]) {
-      console.log('upd')
       generatedTextures.value[index].name = newName
+      save()
+    }
+  }
+
+  function updateGeneratedTexture(id: string, updated: TextureDescription) {
+    const index = generatedTextures.value.findIndex((t) => t.id === id)
+    if (index > -1) {
+      updated.generated = true
+      generatedTextures.value[index] = updated
       save()
     }
   }
@@ -46,6 +54,7 @@ export const useTexturesStore = defineStore('textures', () => {
     addGeneratedTexture,
     removeGeneratedTexture,
     updateGeneratedTextureName,
+    updateGeneratedTexture,
     load,
     save,
   }

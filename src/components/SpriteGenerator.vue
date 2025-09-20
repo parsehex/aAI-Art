@@ -61,6 +61,7 @@ async function generateSprite() {
     )
 
     const newTexture = JSON.parse(content) as TextureDescription
+    newTexture.prompt = p
     window.dispatchEvent(new CustomEvent('newTexture', { detail: newTexture }))
     form.prompt = ''
   } catch (error) {

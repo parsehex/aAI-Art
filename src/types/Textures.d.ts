@@ -24,4 +24,5 @@ interface TextureDescription {
   id: string
   generated?: boolean
   thumbnail?: string
+  prompt?: string
 }

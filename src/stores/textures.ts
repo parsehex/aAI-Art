@@ -9,6 +9,11 @@ export const useTexturesStore = defineStore('textures', () => {
     save()
   }
 
+  function removeGeneratedTextureByIndex(index: number) {
+    generatedTextures.value.splice(index, 1)
+    save()
+  }
+
   function load() {
     const savedTextures = localStorage.getItem('generatedTextures')
     if (savedTextures) {
@@ -26,6 +31,7 @@ export const useTexturesStore = defineStore('textures', () => {
   return {
     generatedTextures,
     addGeneratedTexture,
+    removeGeneratedTextureByIndex,
     load,
     save,
   }

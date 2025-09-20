@@ -1,5 +1,6 @@
 // src/data/preset-textures/textureRegistry.ts
 import { Cloud } from './Cloud'
+import { BrownBear } from './BrownBear'
 import { Fence } from './Fence'
 // import { Goat } from './Goat'
 import { GoryRottingZombie } from './GoryRottingZombie'
@@ -31,6 +32,7 @@ export const PatternTexture: TextureDescription = {
 
 export const presetTextures: TextureDescription[] = [
   Cloud,
+  BrownBear,
   Fence,
   House,
   TreasureChest,

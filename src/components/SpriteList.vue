@@ -1,5 +1,5 @@
 <template>
-  <div class="sprite-list overflow-y-auto h-full border-r border-gray-700 pr-2">
+  <div class="sprite-list flex flex-col items-center overflow-y-auto h-full border-r border-gray-700">
     <button @click="togglePresets" class="w-full bg-gray-700 text-white p-2 rounded-md hover:bg-gray-600 mb-2"> {{
       showPresets ? 'Hide Presets' : 'Show Presets' }} </button>
     <div v-for="texture in visibleTextures" :key="`texture-${texture.id}`"
@@ -30,6 +30,10 @@
         title="Regenerate">
         <RefreshCw class="w-4 h-4" />
       </button>
+      <button v-if="texture.generated" @click.stop="copyToClipboard(texture)"
+        class="ml-2 text-purple-400 hover:text-purple-600 text-lg" title="Copy JSON to Clipboard">
+        <Clipboard class="w-4 h-4" />
+      </button>
       <button v-if="texture.generated && texture.id !== editingId" @click.stop="startEdit(texture.id, texture.name)"
         class="ml-2 text-blue-400 hover:text-blue-600 text-lg">
         <Pencil class="w-4 h-4" />
@@ -47,7 +51,7 @@ import { computed, ref, onMounted } from 'vue'
 import { presetTextures } from '@/data/preset-textures/registry'
 import { useTexturesStore } from '@/stores/textures'
 import { useAIStore } from '@/stores/ai'
-import { Check, Pencil, X, RefreshCw } from 'lucide-vue-next'
+import { Check, Pencil, X, RefreshCw, Clipboard } from 'lucide-vue-next'
 import { GenerateSpriteMessages } from '@/data/prompt'
 
 const store = useTexturesStore()
@@ -82,6 +86,16 @@ function regenerateSprite(texture: TextureDescription) {
   window.dispatchEvent(new CustomEvent('regenerateTexture', { detail: { id: texture.id, prompt: texture.prompt } }))
 }
 
+async function copyToClipboard(texture: TextureDescription) {
+  const json = JSON.stringify(texture, null, 2)
+  try {
+    await navigator.clipboard.writeText(json)
+    console.log('Texture JSON copied to clipboard')
+  } catch (err) {
+    console.error('Failed to copy JSON:', err)
+  }
+}
+
 function startEdit(id: string, name: string) {
   editingId.value = id
   editingName.value = name
@@ -96,11 +110,12 @@ function finishEdit(id: string) {
 </script>
 <style scoped>
 .sprite-list {
-  width: 250px;
+  width: 350px;
   background: #1f2937;
 }
 
 .sprite-item {
   border-bottom: 1px solid #444;
+  width: 100%;
 }
 </style>

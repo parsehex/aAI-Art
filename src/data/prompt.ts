@@ -1,5 +1,4 @@
-import { Fence } from './preset-textures/Fence'
-import { TreasureChest } from './preset-textures/TreasureChest'
+import { BrownBear } from './preset-textures/BrownBear'
 import { Tree } from './preset-textures/Tree'
 import { Villager } from './preset-textures/Villager'
 
@@ -7,6 +6,21 @@ interface ChatMessage {
   role: string
   content: string
 }
+
+function formatTextureJson(texture: TextureDescription): string {
+  const layersStr = texture.layers.map((layer) => `    ${JSON.stringify(layer)}`).join(',\n')
+  return `{
+  "name": "${texture.name}",
+  "size": ${texture.size},
+  "layers": [
+${layersStr}
+  ]
+}`
+}
+
+const TreeJson = formatTextureJson(Tree)
+const VillagerJson = formatTextureJson(Villager)
+const BrownBearJson = formatTextureJson(BrownBear)
 
 export const GenerateSpriteMessages = (input: string) => {
   const msgs: ChatMessage[] = []
@@ -109,15 +123,15 @@ Colors can be specified in two formats:
 2. Named colors: \`"red"\`, \`"blue"\`, \`"white"\`, \`"black"\`, \`"yellow"\`, \`"transparent"\`
 
 ## Coordinate System
-- The canvas uses a top-left coordinate system (0,0 is top-left corner)
-- The default canvas size is specified by the \`size\` property
+- Canvas uses top-left coordinates (0,0 is the top-left corner)
+- Specify the canvas size with the \`size\` property
 - All coordinates are in pixels
 
 ## Best Practices
 1. Carefully consider the user's input and earnestly attempt to create the request.
 2. Build complex shapes by layering simpler shapes.
 3. Keep the size reasonable (64x64 is common for simple sprites).
-4. Use descriptive names for your textures.
+4. Use the provided examples to better understand good quality results.
 
 ## Example Structure
 \`\`\`json
@@ -140,13 +154,12 @@ Colors can be specified in two formats:
 ----
 
 Examples:
-Tree: ${JSON.stringify(Tree, null, 2)}
 
-Treasure Chest: ${JSON.stringify(TreasureChest, null, 2)}
+Tree: ${TreeJson}
 
-Villager: ${JSON.stringify(Villager, null, 2)}
+Villager: ${VillagerJson}
 
-Fence: ${JSON.stringify(Fence, null, 2)}
+Bear: ${BrownBearJson}
 
 ----
 

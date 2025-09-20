@@ -30,8 +30,8 @@
         title="Regenerate">
         <RefreshCw class="w-4 h-4" />
       </button>
-      <button v-if="texture.generated" @click.stop="copyToClipboard(texture)"
-        class="ml-2 text-purple-400 hover:text-purple-600 text-lg" title="Copy JSON to Clipboard">
+      <button @click.stop="copyToClipboard(texture)" class="ml-2 text-purple-400 hover:text-purple-600 text-lg"
+        title="Copy JSON to Clipboard">
         <Clipboard class="w-4 h-4" />
       </button>
       <button v-if="texture.generated && texture.id !== editingId" @click.stop="startEdit(texture.id, texture.name)"

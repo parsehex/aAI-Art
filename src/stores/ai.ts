@@ -8,7 +8,7 @@ type Provider = 'openrouter' | 'ollama'
 type Model = { id: string; name: string }
 
 export const useAIStore = defineStore('ai', () => {
-  const provider = useLocalStorage<Provider>('ai-provider', 'openrouter')
+  const provider = useLocalStorage<Provider>('ai-provider', 'ollama')
   const apiKey = useLocalStorage('openrouter-api-key', '')
   const ollamaHost = useLocalStorage('ollama-host', 'http://localhost:11434')
   const selectedModel = useLocalStorage('selected-model', 'cohere/command-r')

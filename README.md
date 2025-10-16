@@ -6,13 +6,9 @@ This is an app that explores using AI to create procedural graphics, in contrast
 
 ![Preview image of the aAI-Art web app](./aai-art-preview.png)
 
-## Features
+Here are some examples of sprites created by LLMs:
 
-<!-- TODO replace section with examples -->
-
-- **AI-Powered Sprite Generation**: Use LLMs to create procedural sprite definitions
-- **SVG Generation**: SVGs can also be generated from a text description.
-- **Preset Library**: Collection of pre-defined sprites and textures
+![Preview image of sprites generated with aAI-Art](./ai-sprites.png)
 
 ## Getting Started
 

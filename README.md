@@ -4,7 +4,7 @@
 
 This is an app that explores using AI to create procedural graphics, in contrast to using traditional image models. Instead of generating images directly, we prompt an LLM to return JSON instructions that define sprites, which are then rendered using [Phaser.js](https://phaser.io).
 
-![Preview image of the aAI-Art web app](https://github.com/parsehex/aAI-Art/aai-art-preview.png)
+![Preview image of the aAI-Art web app](./aai-art-preview.png)
 
 ## Features
 

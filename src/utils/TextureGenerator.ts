@@ -75,7 +75,12 @@ export class TextureGenerator {
     return gameObject
   }
 
-  private getTextureKey(desc: TextureDescription, targetScene: Phaser.Scene): string {
+  public getTextureKey(desc: TextureDescription, targetScene: Phaser.Scene): string {
+    if (!desc || !desc.size || !desc.layers) {
+      console.error('Invalid texture description:', desc)
+      return 'fallback-texture'
+    }
+
     // Generate a unique key based on the texture description
     const descString = JSON.stringify(desc)
     const hash = this.hashString(descString)
@@ -101,6 +106,9 @@ export class TextureGenerator {
   }
 
   private hashString(str: string): string {
+    if (!str || typeof str !== 'string') {
+      return '0'
+    }
     let hash = 0
     for (let i = 0; i < str.length; i++) {
       const char = str.charCodeAt(i)
@@ -130,11 +138,10 @@ export class TextureGenerator {
     return targetScene.add.sprite(x, y, textureKey)
   }
 
-  private drawLayer(
-    graphics: Phaser.GameObjects.Graphics,
-    layer: TextureLayer,
-    size: number,
-  ): void {
+  public drawLayer(graphics: Phaser.GameObjects.Graphics, layer: TextureLayer, size: number): void {
+    // Skip invisible layers
+    if (layer.visible === false) return
+
     switch (layer.type) {
       case 'circle':
         this.drawCircle(graphics, layer, size)

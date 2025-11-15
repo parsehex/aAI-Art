@@ -18,6 +18,7 @@ type TextureLayer = {
   points?: [number, number][] // For polygon: array of [x, y] points
   path?: string // For path: SVG-like path data (e.g., "M10 10 L20 20")
   fill?: boolean // For path: whether to fill the shape
+  visible?: boolean // Layer visibility
 }
 
 interface TextureDescription {

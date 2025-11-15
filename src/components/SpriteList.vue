@@ -38,6 +38,10 @@
         class="ml-2 text-blue-400 hover:text-blue-600 text-lg">
         <Pencil class="w-4 h-4" />
       </button>
+      <button @click.stop="editSprite(texture)" class="ml-2 text-green-400 hover:text-green-600 text-lg"
+        title="Edit Sprite">
+        <Edit class="w-4 h-4" />
+      </button>
       <button v-if="texture.generated" @click.stop="store.removeGeneratedTexture(texture.id)"
         class="ml-2 text-red-400 hover:text-red-600 text-xl font-bold">
         <!-- X icon is a little small -->
@@ -51,7 +55,7 @@ import { computed, ref, onMounted } from 'vue'
 import { presetTextures } from '@/data/preset-textures/registry'
 import { useTexturesStore } from '@/stores/textures'
 import { useAIStore } from '@/stores/ai'
-import { Check, Pencil, X, RefreshCw, Clipboard } from 'lucide-vue-next'
+import { Check, Pencil, X, RefreshCw, Clipboard, Edit } from 'lucide-vue-next'
 import { GenerateSpriteMessages } from '@/data/prompt'
 
 const store = useTexturesStore()
@@ -59,6 +63,7 @@ const aiStore = useAIStore()
 const showPresets = ref(true)
 const editingId = ref<string | null>(null)
 const editingName = ref('')
+const selectedTextureId = ref<string | null>(null)
 
 onMounted(() => {
   const saved = localStorage.getItem('showPresets')
@@ -78,6 +83,7 @@ const visibleTextures = computed(() => {
 
 function selectSprite(texture: TextureDescription) {
   // Dispatch the event to notify our Phaser scene to render the sprite.
+  selectedTextureId.value = texture.id
   window.dispatchEvent(new CustomEvent('spriteSelected', { detail: texture }))
 }
 
@@ -106,6 +112,10 @@ function finishEdit(id: string) {
     store.updateGeneratedTextureName(id, editingName.value)
     editingId.value = null
   }
+}
+
+function editSprite(texture: TextureDescription) {
+  window.dispatchEvent(new CustomEvent('editSprite', { detail: texture }))
 }
 </script>
 <style scoped>

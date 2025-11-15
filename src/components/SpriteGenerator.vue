@@ -25,7 +25,7 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
-import JsonViewer from '@/components/JsonViewer/Viewer.vue'
+// import { JsonViewer } from '@parsehex/vuepak'
 import GeneratorForm from '@/components/GeneratorForm.vue'
 import { GenerateSpriteMessages } from '@/data/prompt'
 import { useAIStore } from '@/stores/ai'

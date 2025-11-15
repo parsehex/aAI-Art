@@ -1,3 +1,4 @@
+import '@parsehex/vuepak/vuepak.css'
 import './assets/main.css'
 
 import { createApp } from 'vue'

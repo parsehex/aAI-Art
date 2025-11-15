@@ -132,9 +132,7 @@ function selectLayer(index: number) {
 function toggleLayerVisibility(index: number) {
   const newLayers = props.spriteData.layers.map((layer, i) => {
     if (i !== index) return layer
-    console.log('SpriteEditor.vue: toggleLayerVisibility - layer.visible BEFORE:', layer.visible)
     const newVisibleState = !(layer.visible ?? true)
-    console.log('SpriteEditor.vue: toggleLayerVisibility - layer.visible AFTER:', newVisibleState)
     return {
       ...layer,
       visible: newVisibleState,
@@ -144,7 +142,6 @@ function toggleLayerVisibility(index: number) {
     ...props.spriteData,
     layers: newLayers,
   }
-  console.log('SpriteEditor.vue: toggleLayerVisibility - emitting spriteUpdated', newSpriteData)
   emit('spriteUpdated', newSpriteData)
   render(newSpriteData)
 }
@@ -163,7 +160,6 @@ function addLayer() {
     ...props.spriteData,
     layers: [...props.spriteData.layers, newLayer],
   }
-  console.log('SpriteEditor.vue: addLayer - emitting spriteUpdated', newSpriteData)
   emit('spriteUpdated', newSpriteData)
   render(newSpriteData) // Render the new sprite data immediately
 }
@@ -180,7 +176,6 @@ function removeLayer(index: number) {
     } else if (selectedLayerIndex.value && selectedLayerIndex.value > index) {
       selectedLayerIndex.value--
     }
-    console.log('SpriteEditor.vue: removeLayer - emitting spriteUpdated', newSpriteData)
     emit('spriteUpdated', newSpriteData)
   }
 }
@@ -190,7 +185,6 @@ function updateSprite() {
     ...props.spriteData,
     layers: props.spriteData.layers.map((layer) => ({ ...layer })),
   }
-  console.log('SpriteEditor.vue: updateSprite - emitting spriteUpdated', newSpriteData)
   emit('spriteUpdated', newSpriteData)
   render(newSpriteData)
 }
@@ -211,7 +205,6 @@ onUnmounted(() => {
 watch(
   () => props.spriteData,
   (newVal) => {
-    console.log('SpriteEditor.vue: spriteData prop changed', newVal)
     render(newVal)
   },
   { deep: true },
@@ -245,7 +238,6 @@ class SpriteEditorScene extends Phaser.Scene {
   }
 
   updateSpriteData(newSpriteData: TextureDescription) {
-    console.log('SpriteEditorScene: updateSpriteData called with', newSpriteData)
     this.spriteData = newSpriteData
     if (this.sprite) {
       const textureKey = this.textureGenerator.getTextureKey(this.spriteData, this)

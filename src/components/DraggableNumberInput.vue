@@ -2,7 +2,7 @@
   <div class="draggable-number-input w-full flex flex-col gap-1 my-2">
     <label v-if="label" class="cursor-ew-resize select-none" @mousedown="startDrag">{{ label }}</label>
     <input :value="modelValue" type="number" :class="inputClass" @input="handleInput" @mousedown="startDrag"
-      @wheel.prevent="handleWheel" />
+      @wheel="handleWheel" />
   </div>
 </template>
 <script setup lang="ts">
@@ -73,12 +73,6 @@ function stopDrag() {
 }
 
 function handleWheel(event: WheelEvent) {
-  const delta = event.deltaY > 0 ? -props.step : props.step
-  let newValue = props.modelValue + delta
-
-  if (props.min !== undefined) newValue = Math.max(props.min, newValue)
-  if (props.max !== undefined) newValue = Math.min(props.max, newValue)
-
-  emit('update:modelValue', newValue)
+  return;
 }
 </script>

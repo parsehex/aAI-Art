@@ -20,6 +20,11 @@
       </div>
       <button @click="addLayer" class="w-full mt-4 bg-green-600 text-white py-2 rounded hover:bg-green-700"> + Layer
       </button>
+      <div class="mt-4">
+        <label class="block text-sm font-medium text-gray-300">Texture Size</label>
+        <DraggableNumberInput v-model="spriteSize" :step="1" :min="16" :max="512"
+          @update:modelValue="updateSpriteSize" />
+      </div>
     </div>
     <div class="editor-main flex-1 flex flex-col">
       <div class="properties-panel bg-gray-800 p-4 border-b border-gray-700">
@@ -89,6 +94,7 @@ const canvasContainer = ref<HTMLDivElement>()
 const game = ref<Phaser.Game>()
 const selectedLayerIndex = ref<number | null>(null)
 const spritePreviewUrl = ref<string>('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==')
+const spriteSize = ref(props.spriteData.size)
 
 const selectedLayer = computed(() => {
   return selectedLayerIndex.value !== null ? props.spriteData.layers[selectedLayerIndex.value] : null
@@ -254,6 +260,15 @@ function updateSprite() {
   render(newSpriteData)
 }
 
+function updateSpriteSize() {
+  const newSpriteData = {
+    ...props.spriteData,
+    size: spriteSize.value,
+  }
+  emit('spriteUpdated', newSpriteData)
+  render(newSpriteData)
+}
+
 function render(data: TextureDescription) {
   if (game.value) {
     const scene = game.value.scene.getScene('SpriteEditorScene') as SpriteEditorScene
@@ -270,6 +285,7 @@ onUnmounted(() => {
 watch(
   () => props.spriteData,
   (newVal) => {
+    spriteSize.value = newVal.size
     render(newVal)
   },
   { deep: true },

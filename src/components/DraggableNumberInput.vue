@@ -1,5 +1,5 @@
 <template>
-  <div class="draggable-number-input flex flex-col gap-1 my-2">
+  <div class="draggable-number-input w-full flex flex-col gap-1 my-2">
     <label v-if="label" class="cursor-ew-resize select-none" @mousedown="startDrag">{{ label }}</label>
     <input :value="modelValue" type="number" :class="inputClass" @input="handleInput" @mousedown="startDrag"
       @wheel.prevent="handleWheel" />

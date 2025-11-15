@@ -78,7 +78,9 @@ export default class MainScene extends Phaser.Scene {
 
   handleResize(gameSize: Phaser.Structs.Size) {
     const { width, height } = gameSize
+    if (width === this.cameras.main.width && height === this.cameras.main.height) return
     this.cameras.main.setSize(width, height)
+    console.log('resized', gameSize)
 
     if (this.spriteViewer) {
       this.spriteViewer.updateButtonPositions(width, height)

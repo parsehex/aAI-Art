@@ -10,19 +10,19 @@
           generationType === 'sprite'
             ? 'bg-blue-500 text-white'
             : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-        ]"> Generate </button>
+        ]"> Generate Sprites </button>
         <button @click="generationType = 'edit'" :class="[
           'px-4 py-2 rounded-md transition',
           generationType === 'edit'
             ? 'bg-blue-500 text-white'
             : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-        ]"> Edit </button>
+        ]"> Edit Sprite </button>
         <button @click="generationType = 'svg'" :class="[
           'px-4 py-2 rounded-md transition',
           generationType === 'svg'
             ? 'bg-blue-500 text-white'
             : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-        ]"> SVG Generator </button>
+        ]"> Generate SVGs </button>
       </div>
       <!-- Generator Components -->
       <div class="w-full">

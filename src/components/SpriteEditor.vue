@@ -18,7 +18,7 @@
           </button>
         </div>
       </div>
-      <button @click="addLayer" class="w-full mt-4 bg-green-600 text-white py-2 rounded hover:bg-green-700"> Add Layer
+      <button @click="addLayer" class="w-full mt-4 bg-green-600 text-white py-2 rounded hover:bg-green-700"> + Layer
       </button>
     </div>
     <div class="editor-main flex-1 flex flex-col">
@@ -26,16 +26,10 @@
         <h3 class="text-lg font-bold mb-4 text-white">Properties</h3>
         <div v-if="selectedLayer" class="space-y-4">
           <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-300">X</label>
-              <input v-model.number="selectedLayer.x" type="number" class="w-full p-2 bg-gray-700 text-white rounded"
-                @input="updateSprite" />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-300">Y</label>
-              <input v-model.number="selectedLayer.y" type="number" class="w-full p-2 bg-gray-700 text-white rounded"
-                @input="updateSprite" />
-            </div>
+            <DraggableNumberInput v-model="selectedLayer.x!" label="X" :step="1" :min="0" :max="spriteData.size"
+              @update:modelValue="updateSprite" />
+            <DraggableNumberInput v-model="selectedLayer.y!" label="Y" :step="1" :min="0" :max="spriteData.size"
+              @update:modelValue="updateSprite" />
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-300">Color</label>
@@ -43,27 +37,17 @@
               @input="updateSprite" />
           </div>
           <div v-if="selectedLayer.type === 'rect'" class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-300">Width</label>
-              <input v-model.number="selectedLayer.width" type="number"
-                class="w-full p-2 bg-gray-700 text-white rounded" @input="updateSprite" />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-300">Height</label>
-              <input v-model.number="selectedLayer.height" type="number"
-                class="w-full p-2 bg-gray-700 text-white rounded" @input="updateSprite" />
-            </div>
+            <DraggableNumberInput v-model="selectedLayer.width!" label="Width" :step="1" :min="1" :max="spriteData.size"
+              @update:modelValue="updateSprite" />
+            <DraggableNumberInput v-model="selectedLayer.height!" label="Height" :step="1" :min="1"
+              :max="spriteData.size" @update:modelValue="updateSprite" />
           </div>
-          <div v-if="selectedLayer.type === 'circle'">
-            <label class="block text-sm font-medium text-gray-300">Radius</label>
-            <input v-model.number="selectedLayer.radius" type="number" class="w-full p-2 bg-gray-700 text-white rounded"
-              @input="updateSprite" />
-          </div>
+          <DraggableNumberInput v-if="selectedLayer.type === 'circle'" v-model="selectedLayer.radius!" label="Radius"
+            :step="1" :min="1" :max="spriteData.size / 2" @update:modelValue="updateSprite" />
         </div>
         <div v-else class="text-gray-400">Select a layer to edit properties</div>
       </div>
       <div class="canvas-container flex-1 bg-gray-900" ref="canvasContainer">
-        <!-- Phaser canvas will be inserted here -->
       </div>
     </div>
   </div>
@@ -74,6 +58,7 @@ import Phaser from 'phaser'
 import { Eye, EyeOff, X } from 'lucide-vue-next'
 import { TextureGenerator } from '@/utils'
 import { cloneFnJSON } from '@vueuse/core'
+import DraggableNumberInput from './DraggableNumberInput.vue'
 
 interface Props {
   spriteData: TextureDescription
@@ -235,6 +220,8 @@ class SpriteEditorScene extends Phaser.Scene {
 
     // Generate and set the preview URL for the Vue component
     this.generatePreview()
+
+    this.scale.on('resize', this.handleResize.bind(this))
   }
 
   updateSpriteData(newSpriteData: TextureDescription) {
@@ -246,14 +233,14 @@ class SpriteEditorScene extends Phaser.Scene {
     }
   }
 
-  update() {
-    // Update the sprite when spriteData changes
-    if (this.sprite) {
-      const textureKey = this.textureGenerator.getTextureKey(this.spriteData, this)
-      this.sprite.setTexture(textureKey)
-      this.generatePreview()
-    }
-  }
+  // update() {
+  //   // Update the sprite when spriteData changes
+  //   if (this.sprite) {
+  //     const textureKey = this.textureGenerator.getTextureKey(this.spriteData, this)
+  //     this.sprite.setTexture(textureKey)
+  //     this.generatePreview()
+  //   }
+  // }
 
   private generatePreview() {
     // Generate a data URL for the sprite preview
@@ -280,6 +267,13 @@ class SpriteEditorScene extends Phaser.Scene {
         spritePreviewUrl.value = dataUrl
       }
     }
+  }
+
+  handleResize(gameSize: Phaser.Structs.Size) {
+    const { width, height } = gameSize
+    if (width === this.cameras.main.width && height === this.cameras.main.height) return
+    console.log('resized', gameSize)
+    this.cameras.main.setSize(width, height)
   }
 }
 </script>

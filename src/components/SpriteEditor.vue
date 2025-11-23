@@ -73,10 +73,10 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted, watch, computed, onUnmounted } from 'vue'
+import { cloneFnJSON, useResizeObserver } from '@vueuse/core'
 import Phaser from 'phaser'
 import { Eye, EyeOff, X } from 'lucide-vue-next'
 import { TextureGenerator } from '@/utils'
-import { cloneFnJSON } from '@vueuse/core'
 import { defaultLayerProperties } from '@/utils/layerDefaults'
 import DraggableNumberInput from './DraggableNumberInput.vue'
 import CircleProperties from './LayerProperties/CircleProperties.vue'
@@ -177,8 +177,14 @@ function updateLayerProperties(layer: TextureLayer) {
 }
 
 onMounted(() => {
-  if (canvasContainer.value && props.spriteData) {
-    initPhaserGame()
+  if (canvasContainer.value) {
+    useResizeObserver(canvasContainer, (entries) => {
+      const entry = entries[0]
+      const { width, height } = entry.contentRect
+      if (width > 0 && height > 0 && !game.value && props.spriteData) {
+        initPhaserGame()
+      }
+    })
   }
 })
 
@@ -217,7 +223,8 @@ function toggleLayerVisibility(index: number) {
   if (!props.spriteData) return
   const newLayers = props.spriteData.layers.map((layer, i) => {
     if (i !== index) return layer
-    const newVisibleState = !(layer.visible ?? true)
+    let newVisibleState = layer.visible === false ? true : false
+    console.log(newVisibleState)
     return {
       ...layer,
       visible: newVisibleState,
@@ -280,6 +287,17 @@ function updateSpriteSize() {
   }
   emit('spriteUpdated', newSpriteData)
   render(newSpriteData)
+}
+
+function updateThumbnail(dataUrl: string) {
+  if (!props.spriteData) return
+  if (props.spriteData.thumbnail === dataUrl) return
+
+  const newSpriteData = {
+    ...props.spriteData,
+    thumbnail: dataUrl
+  }
+  emit('spriteUpdated', newSpriteData)
 }
 
 function render(data: TextureDescription) {
@@ -381,8 +399,7 @@ class SpriteEditorScene extends Phaser.Scene {
       const canvas = texture.getSourceImage() as HTMLCanvasElement
       if (canvas) {
         const dataUrl = canvas.toDataURL()
-        // Update the Vue component's spritePreviewUrl
-        spritePreviewUrl.value = dataUrl
+        updateThumbnail(dataUrl)
       }
     }
   }

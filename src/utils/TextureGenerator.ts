@@ -105,6 +105,38 @@ export class TextureGenerator {
     return this.textureCache.get(cacheKey)!
   }
 
+  async generateThumbnail(desc: TextureDescription): Promise<string> {
+    if (!this.offscreenScene) {
+      await new Promise<void>((resolve) => {
+        const check = () => {
+          if (this.offscreenScene) resolve()
+          else setTimeout(check, 50)
+        }
+        check()
+      })
+    }
+
+    const scene = this.offscreenScene!
+    const size = desc.size
+    const graphics = scene.add.graphics()
+
+    desc.layers.forEach((layer) => {
+      this.drawLayer(graphics, layer, size)
+    })
+
+    const textureKey = `thumb-${Date.now()}-${Math.random()}`
+    graphics.generateTexture(textureKey, size, size)
+    graphics.destroy()
+
+    const texture = scene.textures.get(textureKey)
+    const canvas = texture.getSourceImage() as HTMLCanvasElement
+    const dataUrl = canvas.toDataURL()
+
+    scene.textures.remove(textureKey)
+
+    return dataUrl
+  }
+
   private hashString(str: string): string {
     if (!str || typeof str !== 'string') {
       return '0'
@@ -140,7 +172,10 @@ export class TextureGenerator {
 
   public drawLayer(graphics: Phaser.GameObjects.Graphics, layer: TextureLayer, size: number): void {
     // Skip invisible layers
-    if (layer.visible === false) return
+    if (layer.visible === false) {
+      console.log('Skipping invisible layer')
+      return
+    }
 
     switch (layer.type) {
       case 'circle':

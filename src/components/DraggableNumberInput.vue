@@ -1,8 +1,8 @@
 <template>
   <div class="draggable-number-input w-full flex flex-col gap-1 my-2">
     <label v-if="label" class="cursor-ew-resize select-none" @mousedown="startDrag">{{ label }}</label>
-    <input :value="modelValue" type="number" :class="inputClass" @input="handleInput" @mousedown="startDrag"
-      @wheel="handleWheel" />
+    <input ref="inputRef" :value="modelValue" type="number" :class="inputClass + ' cursor-ew-resize'"
+      @input="handleInput" @mousedown="startDrag" @wheel="handleWheel" />
   </div>
 </template>
 <script setup lang="ts">
@@ -29,6 +29,7 @@ const emit = defineEmits<{
   'update:modelValue': [value: number]
 }>()
 
+const inputRef = ref<HTMLInputElement | null>(null)
 const isDragging = ref(false)
 const startValue = ref(0)
 const startMouseX = ref(0)
@@ -44,19 +45,27 @@ function handleInput(event: Event) {
 function startDrag(event: MouseEvent) {
   if (event.button !== 0) return // Only left mouse button
 
-  isDragging.value = true
+  isDragging.value = false
   startValue.value = props.modelValue
   startMouseX.value = event.clientX
 
   document.addEventListener('mousemove', handleDrag)
   document.addEventListener('mouseup', stopDrag)
+
+  // Prevent default to avoid text selection during drag
+  // We will manually focus if it's a click
   event.preventDefault()
 }
 
 function handleDrag(event: MouseEvent) {
+  const deltaX = event.clientX - startMouseX.value
+
+  if (!isDragging.value && Math.abs(deltaX) > 5) {
+    isDragging.value = true
+  }
+
   if (!isDragging.value) return
 
-  const deltaX = event.clientX - startMouseX.value
   const deltaValue = deltaX * props.sensitivity * props.step
   let newValue = startValue.value + deltaValue
 
@@ -67,6 +76,10 @@ function handleDrag(event: MouseEvent) {
 }
 
 function stopDrag() {
+  if (!isDragging.value && inputRef.value) {
+    inputRef.value.focus()
+  }
+
   isDragging.value = false
   document.removeEventListener('mousemove', handleDrag)
   document.removeEventListener('mouseup', stopDrag)

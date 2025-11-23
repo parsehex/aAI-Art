@@ -6,7 +6,10 @@ export const useTexturesStore = defineStore('textures', () => {
   const generatedTextures = ref<TextureDescription[]>([])
 
   function addGeneratedTexture(texture: TextureDescription) {
-    generatedTextures.value.push({ ...texture, id: v4(), generated: true })
+    // If it already has an ID, keep it (important for overriding presets)
+    // Otherwise generate one
+    const newId = texture.id || v4()
+    generatedTextures.value.push({ ...texture, id: newId, generated: true })
     save()
   }
 

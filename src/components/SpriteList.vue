@@ -3,10 +3,7 @@
     <button @click="togglePresets" class="w-full bg-gray-700 text-white p-2 rounded-md hover:bg-gray-600 mb-2"> {{
       showPresets ? 'Hide Presets' : 'Show Presets' }} </button>
     <div v-for="texture in visibleTextures" :key="`texture-${texture.id}`"
-      class="sprite-item flex items-center space-x-2 p-2 hover:bg-gray-800 cursor-pointer" @click="() => {
-        if (texture.generated && texture.id === editingId) return;
-        selectSprite(texture)
-      }">
+      class="sprite-item flex items-center space-x-2 p-2 hover:bg-gray-800 cursor-pointer" @click="handleTextureClick(texture)">
       <div v-if="(texture as any).thumbnail" class="w-16 h-16 rounded flex-shrink-0">
         <img :src="(texture as any).thumbnail" :alt="texture.name"
           class="w-16 h-16 object-contain rounded bg-gray-800" />
@@ -58,6 +55,12 @@ import { useAIStore } from '@/stores/ai'
 import { Check, Pencil, X, RefreshCw, Clipboard, Edit } from 'lucide-vue-next'
 import { GenerateSpriteMessages } from '@/data/prompt'
 
+const props = withDefaults(defineProps<{
+  mode?: 'generate' | 'edit'
+}>(), {
+  mode: 'generate'
+})
+
 const store = useTexturesStore()
 const aiStore = useAIStore()
 const showPresets = ref(true)
@@ -78,8 +81,39 @@ function togglePresets() {
 }
 
 const visibleTextures = computed(() => {
-  return showPresets.value ? [...presetTextures, ...store.generatedTextures] : store.generatedTextures
+  // Create a map of generated textures for quick lookup
+  const generatedMap = new Map(store.generatedTextures.map(t => [t.id, t]))
+
+  // Start with presets
+  let textures: TextureDescription[] = []
+
+  if (showPresets.value) {
+    textures = presetTextures.map(preset => {
+      // If there's a generated version (override), use that instead
+      if (generatedMap.has(preset.id)) {
+        const override = generatedMap.get(preset.id)!
+        generatedMap.delete(preset.id) // Remove from map so we don't add it again later
+        return override
+      }
+      return preset
+    })
+  }
+
+  // Add remaining generated textures (new ones that aren't overrides)
+  textures = [...textures, ...generatedMap.values()]
+
+  return textures
 })
+
+function handleTextureClick(texture: TextureDescription) {
+  if (texture.generated && texture.id === editingId.value) return;
+
+  if (props.mode === 'edit') {
+    editSprite(texture)
+  } else {
+    selectSprite(texture)
+  }
+}
 
 function selectSprite(texture: TextureDescription) {
   // Dispatch the event to notify our Phaser scene to render the sprite.

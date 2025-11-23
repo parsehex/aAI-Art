@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col items-center min-h-screen min-w-screen bg-gray-900 text-white px-2">
+  <div class="flex flex-col items-center min-h-screen min-w-screen text-white px-2">
     <p class="my-2"> An app to generate graphics using AI language models. All sprites and SVGs shown were created by
       prompting an LLM (bigger models are better). </p>
     <div class="w-full max-w-6xl">
@@ -36,7 +36,12 @@
           </div>
         </template>
         <template v-else-if="generationType === 'edit'">
-          <SpriteEditor :spriteData="selectedSpriteForEditing" @spriteUpdated="handleSpriteUpdate" />
+          <div class="flex flex-row gap-4 h-[calc(100vh-150px)]">
+            <SpriteList mode="edit" />
+            <div class="flex-1 h-full">
+              <SpriteEditor :spriteData="selectedSpriteForEditing" @spriteUpdated="handleSpriteUpdate" />
+            </div>
+          </div>
         </template>
         <template v-else>
           <SvgGenerator />
@@ -46,7 +51,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import GameContainer from './components/GameContainer.vue'
 import SpriteGenerator from './components/SpriteGenerator.vue'
 import SvgGenerator from './components/SvgGenerator.vue'
@@ -59,9 +64,21 @@ const generationType = ref<'sprite' | 'svg' | 'edit'>('sprite')
 const selectedSpriteForEditing = ref<TextureDescription | null>(null)
 const store = useTexturesStore()
 
+onMounted(() => {
+  store.load()
+})
+
 function handleSpriteUpdate(updatedSprite: TextureDescription) {
-  // Update the sprite in the store
-  store.updateGeneratedTexture(updatedSprite.id, updatedSprite)
+  // Check if it exists in generated textures
+  const exists = store.generatedTextures.some(t => t.id === updatedSprite.id)
+
+  if (exists) {
+    store.updateGeneratedTexture(updatedSprite.id, updatedSprite)
+  } else {
+    // It's a new edit (possibly of a preset), add it to generated
+    store.addGeneratedTexture(updatedSprite)
+  }
+
   // Also update the local ref to ensure reactivity in SpriteEditor
   selectedSpriteForEditing.value = updatedSprite
 }

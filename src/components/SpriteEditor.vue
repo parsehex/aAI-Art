@@ -1,67 +1,74 @@
 <template>
   <div class="sprite-editor flex h-full">
-    <div class="layer-panel w-64 bg-gray-800 p-4 border-r border-gray-700 overflow-y-auto">
-      <h3 class="text-lg font-bold mb-4 text-white">Layers</h3>
-      <div class="space-y-2">
-        <div v-for="(layer, index) in spriteData.layers" :key="index"
-          class="layer-item flex items-center p-2 bg-gray-700 rounded cursor-pointer"
-          :class="{ 'bg-blue-600': selectedLayerIndex === index }" @click="selectLayer(index)">
-          <div class="layer-preview w-8 h-8 border border-gray-600 rounded flex-shrink-0"
-            :style="{ backgroundColor: layer.color || '#ccc' }"></div>
-          <span class="mx-2 flex-1 text-sm text-white">{{ getLayerName(layer, index) }}</span>
-          <button @click.stop="toggleLayerVisibility(index)" class="mr-2 text-gray-400 hover:text-white">
-            <Eye v-if="layer.visible !== false" class="w-4 h-4" />
-            <EyeOff v-else class="w-4 h-4" />
-          </button>
-          <button @click.stop="removeLayer(index)" class="text-red-400 hover:text-red-600">
-            <X class="w-4 h-4" />
-          </button>
-        </div>
-      </div>
-      <button @click="addLayer" class="w-full mt-4 bg-green-600 text-white py-2 rounded hover:bg-green-700"> + Layer
-      </button>
-      <div class="mt-4">
-        <label class="block text-sm font-medium text-gray-300">Texture Size</label>
-        <DraggableNumberInput v-model="spriteSize" :step="1" :min="16" :max="512"
-          @update:modelValue="updateSpriteSize" />
+    <div v-if="!spriteData" class="flex-1 flex items-center justify-center text-gray-400">
+      <div class="text-center">
+        <p class="text-xl mb-2">Select a sprite to edit</p>
+        <p class="text-sm">Choose a sprite from the list on the left</p>
       </div>
     </div>
-    <div class="editor-main flex-1 flex flex-col">
-      <div class="properties-panel bg-gray-800 p-4 border-b border-gray-700">
-        <h3 class="text-lg font-bold mb-4 text-white">Properties</h3>
-        <div v-if="selectedLayer" class="space-y-4">
-          <div>
-            <select v-model="selectedLayer.type" class="w-full p-2 bg-gray-700 text-white rounded"
-              @change="changeLayerType">
-              <option value="circle">Circle</option>
-              <option value="rect">Rectangle</option>
-              <option value="line">Line</option>
-              <option value="gradient">Gradient</option>
-              <option value="pattern">Pattern</option>
-              <option value="ellipse">Ellipse</option>
-              <option value="polygon">Polygon</option>
-              <option value="path">Path</option>
-            </select>
+    <template v-else>
+      <div class="layer-panel w-64 bg-gray-800 p-4 border-r border-gray-700 overflow-y-auto">
+        <h3 class="text-lg font-bold mb-4 text-white">Layers</h3>
+        <div class="space-y-2">
+          <div v-for="(layer, index) in spriteData.layers" :key="index"
+            class="layer-item flex items-center p-2 bg-gray-700 rounded cursor-pointer"
+            :class="{ 'bg-blue-600': selectedLayerIndex === index }" @click="selectLayer(index)">
+            <div class="layer-preview w-8 h-8 border border-gray-600 rounded flex-shrink-0"
+              :style="{ backgroundColor: layer.color || '#ccc' }"></div>
+            <span class="mx-2 flex-1 text-sm text-white">{{ getLayerName(layer, index) }}</span>
+            <button @click.stop="toggleLayerVisibility(index)" class="mr-2 text-gray-400 hover:text-white">
+              <Eye v-if="layer.visible !== false" class="w-4 h-4" />
+              <EyeOff v-else class="w-4 h-4" />
+            </button>
+            <button @click.stop="removeLayer(index)" class="text-red-400 hover:text-red-600">
+              <X class="w-4 h-4" />
+            </button>
           </div>
-          <div class="grid grid-cols-2 gap-4">
-            <DraggableNumberInput v-model="selectedLayer.x!" label="X" :step="1" :min="0" :max="spriteData.size"
-              @update:modelValue="updateSprite" />
-            <DraggableNumberInput v-model="selectedLayer.y!" label="Y" :step="1" :min="0" :max="spriteData.size"
-              @update:modelValue="updateSprite" />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-300">Color</label>
-            <input v-model="selectedLayer.color" type="color" class="w-full p-2 bg-gray-700 text-white rounded"
-              @input="updateSprite" />
-          </div>
-          <component :is="currentLayerPropertiesComponent" :layer="selectedLayer" :sprite-size="spriteData.size"
-            @update:layer="updateLayerProperties" />
         </div>
-        <div v-else class="text-gray-400">Select a layer to edit properties</div>
+        <button @click="addLayer" class="w-full mt-4 bg-green-600 text-white py-2 rounded hover:bg-green-700"> + Layer
+        </button>
+        <div class="mt-4">
+          <DraggableNumberInput v-model="spriteSize" label="Texture Size" :step="1" :min="16" :max="512"
+            @update:modelValue="updateSpriteSize" />
+        </div>
       </div>
-      <div class="canvas-container flex-1 bg-gray-900" ref="canvasContainer">
+      <div class="editor-main flex-1 flex flex-col">
+        <div class="canvas-container flex-1 min-h-96" ref="canvasContainer">
+        </div>
+        <div class="properties-panel bg-gray-800 p-4 border-t border-gray-700">
+          <h3 class="text-lg font-bold mb-4 text-white">Properties</h3>
+          <div v-if="selectedLayer" class="space-y-4">
+            <div>
+              <select v-model="selectedLayer.type" class="w-full p-2 bg-gray-700 text-white rounded"
+                @change="changeLayerType">
+                <option value="circle">Circle</option>
+                <option value="rect">Rectangle</option>
+                <option value="line">Line</option>
+                <option value="gradient">Gradient</option>
+                <option value="pattern">Pattern</option>
+                <option value="ellipse">Ellipse</option>
+                <option value="polygon">Polygon</option>
+                <option value="path">Path</option>
+              </select>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <DraggableNumberInput v-model="selectedLayer.x!" label="X" :step="1" :min="0" :max="spriteData.size"
+                @update:modelValue="updateSprite" />
+              <DraggableNumberInput v-model="selectedLayer.y!" label="Y" :step="1" :min="0" :max="spriteData.size"
+                @update:modelValue="updateSprite" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-300">Color</label>
+              <input v-model="selectedLayer.color" type="color" class="w-full p-2 bg-gray-700 text-white rounded"
+                @input="updateSprite" />
+            </div>
+            <component :is="currentLayerPropertiesComponent" :layer="selectedLayer" :sprite-size="spriteData.size"
+              @update:layer="updateLayerProperties" />
+          </div>
+          <div v-else class="text-gray-400">Select a layer to edit properties</div>
+        </div>
       </div>
-    </div>
+    </template>
   </div>
 </template>
 <script setup lang="ts">
@@ -82,7 +89,7 @@ import PolygonProperties from './LayerProperties/PolygonProperties.vue'
 import PathProperties from './LayerProperties/PathProperties.vue'
 
 interface Props {
-  spriteData: TextureDescription
+  spriteData: TextureDescription | null
 }
 
 const props = defineProps<Props>()
@@ -94,10 +101,10 @@ const canvasContainer = ref<HTMLDivElement>()
 const game = ref<Phaser.Game>()
 const selectedLayerIndex = ref<number | null>(null)
 const spritePreviewUrl = ref<string>('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==')
-const spriteSize = ref(props.spriteData.size)
+const spriteSize = ref(props.spriteData?.size || 64)
 
 const selectedLayer = computed(() => {
-  return selectedLayerIndex.value !== null ? props.spriteData.layers[selectedLayerIndex.value] : null
+  return selectedLayerIndex.value !== null && props.spriteData ? props.spriteData.layers[selectedLayerIndex.value] : null
 })
 
 const currentLayerPropertiesComponent = computed(() => {
@@ -125,7 +132,7 @@ const currentLayerPropertiesComponent = computed(() => {
 })
 
 function changeLayerType() {
-  if (!selectedLayer.value || selectedLayerIndex.value === null) return
+  if (!selectedLayer.value || selectedLayerIndex.value === null || !props.spriteData) return
 
   const newType = selectedLayer.value.type
   const commonProperties = {
@@ -155,7 +162,7 @@ function changeLayerType() {
 }
 
 function updateLayerProperties(layer: TextureLayer) {
-  if (selectedLayerIndex.value === null) return
+  if (selectedLayerIndex.value === null || !props.spriteData) return
 
   const newLayers = [...props.spriteData.layers]
   newLayers[selectedLayerIndex.value] = layer
@@ -170,13 +177,14 @@ function updateLayerProperties(layer: TextureLayer) {
 }
 
 onMounted(() => {
-  if (canvasContainer.value) {
+  if (canvasContainer.value && props.spriteData) {
     initPhaserGame()
   }
 })
 
 function initPhaserGame() {
-  if (!canvasContainer.value) return
+  if (!canvasContainer.value || !props.spriteData) return
+  if (canvasContainer.value.clientWidth === 0 || canvasContainer.value.clientHeight === 0) return
 
   const config: Phaser.Types.Core.GameConfig = {
     type: Phaser.AUTO,
@@ -206,6 +214,7 @@ function selectLayer(index: number) {
 }
 
 function toggleLayerVisibility(index: number) {
+  if (!props.spriteData) return
   const newLayers = props.spriteData.layers.map((layer, i) => {
     if (i !== index) return layer
     const newVisibleState = !(layer.visible ?? true)
@@ -223,6 +232,7 @@ function toggleLayerVisibility(index: number) {
 }
 
 function addLayer() {
+  if (!props.spriteData) return
   const newLayer: TextureLayer = {
     ...defaultLayerProperties.rect,
     type: 'rect',
@@ -236,6 +246,7 @@ function addLayer() {
 }
 
 function removeLayer(index: number) {
+  if (!props.spriteData) return
   if (props.spriteData.layers.length > 1) {
     const newLayers = props.spriteData.layers.filter((_, i) => i !== index)
     const newSpriteData = {
@@ -252,6 +263,7 @@ function removeLayer(index: number) {
 }
 
 function updateSprite() {
+  if (!props.spriteData) return
   const newSpriteData = {
     ...props.spriteData,
     layers: props.spriteData.layers.map((layer) => ({ ...layer })),
@@ -261,6 +273,7 @@ function updateSprite() {
 }
 
 function updateSpriteSize() {
+  if (!props.spriteData) return
   const newSpriteData = {
     ...props.spriteData,
     size: spriteSize.value,
@@ -285,8 +298,17 @@ onUnmounted(() => {
 watch(
   () => props.spriteData,
   (newVal) => {
-    spriteSize.value = newVal.size
-    render(newVal)
+    if (newVal) {
+      spriteSize.value = newVal.size
+      if (!game.value && canvasContainer.value) {
+        initPhaserGame()
+      } else {
+        render(newVal)
+      }
+    } else {
+      game.value?.destroy(true)
+      game.value = undefined
+    }
   },
   { deep: true },
 )
@@ -301,7 +323,7 @@ class SpriteEditorScene extends Phaser.Scene {
   }
 
   init() {
-    this.spriteData = cloneFnJSON(props.spriteData);
+    this.spriteData = cloneFnJSON(props.spriteData as TextureDescription);
   }
 
   create() {
@@ -373,8 +395,3 @@ class SpriteEditorScene extends Phaser.Scene {
   }
 }
 </script>
-<style scoped>
-.sprite-editor {
-  height: 100vh;
-}
-</style>

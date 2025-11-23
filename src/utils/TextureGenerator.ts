@@ -172,10 +172,7 @@ export class TextureGenerator {
 
   public drawLayer(graphics: Phaser.GameObjects.Graphics, layer: TextureLayer, size: number): void {
     // Skip invisible layers
-    if (layer.visible === false) {
-      console.log('Skipping invisible layer')
-      return
-    }
+    if (layer.visible === false) return
 
     switch (layer.type) {
       case 'circle':

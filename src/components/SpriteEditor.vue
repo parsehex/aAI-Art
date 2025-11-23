@@ -289,12 +289,13 @@ function updateSpriteSize() {
   render(newSpriteData)
 }
 
-function updateThumbnail(dataUrl: string) {
-  if (!props.spriteData) return
-  if (props.spriteData.thumbnail === dataUrl) return
+function updateThumbnail(dataUrl: string, contextSpriteData?: TextureDescription) {
+  const targetData = contextSpriteData || props.spriteData
+  if (!targetData) return
+  if (targetData.thumbnail === dataUrl) return
 
   const newSpriteData = {
-    ...props.spriteData,
+    ...targetData,
     thumbnail: dataUrl
   }
   emit('spriteUpdated', newSpriteData)
@@ -303,9 +304,13 @@ function updateThumbnail(dataUrl: string) {
 function render(data: TextureDescription) {
   if (game.value) {
     const scene = game.value.scene.getScene('SpriteEditorScene') as SpriteEditorScene
-    if (scene) {
+    if (scene && scene.sys && scene.sys.settings.active) {
       scene.updateSpriteData(data)
+    } else {
+      console.warn('Scene not active or not found', scene)
     }
+  } else {
+    console.warn('Game not initialized')
   }
 }
 
@@ -328,7 +333,7 @@ watch(
       game.value = undefined
     }
   },
-  { deep: true },
+  { deep: true, flush: 'post' },
 )
 
 class SpriteEditorScene extends Phaser.Scene {
@@ -399,7 +404,7 @@ class SpriteEditorScene extends Phaser.Scene {
       const canvas = texture.getSourceImage() as HTMLCanvasElement
       if (canvas) {
         const dataUrl = canvas.toDataURL()
-        updateThumbnail(dataUrl)
+        updateThumbnail(dataUrl, this.spriteData)
       }
     }
   }

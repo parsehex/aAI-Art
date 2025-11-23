@@ -19,29 +19,37 @@
         </span>
         <span v-else>{{ texture.name }}</span>
       </div>
+      <!-- Confirm name change -->
       <button v-if="texture.generated && texture.id === editingId" @click.stop="finishEdit(texture.id)"
-        class="ml-2 text-yellow-400 hover:text-yellow-600 text-lg">
+        class="ml-2 text-yellow-400 hover:text-yellow-600 text-lg" title="Confirm Name Change">
         <Check class="w-4 h-4" />
       </button>
-      <button v-if="texture.generated && texture.prompt" @click.stop="regenerateSprite(texture)"
+      <!-- Regenerate sprite -->
+      <button v-if="!isEdit && texture.generated && texture.prompt" @click.stop="regenerateSprite(texture)"
         :disabled="aiStore.isLoading" class="ml-2 text-green-400 hover:text-green-600 text-lg disabled:opacity-50"
-        title="Regenerate">
+        title="Regenerate Sprite">
         <RefreshCw class="w-4 h-4" />
       </button>
-      <button @click.stop="copyToClipboard(texture)" class="ml-2 text-purple-400 hover:text-purple-600 text-lg"
-        title="Copy JSON to Clipboard">
+      <!-- Copy JSON to clipboard -->
+      <button v-if="!isEdit" @click.stop="copyToClipboard(texture)"
+        class="ml-2 text-purple-400 hover:text-purple-600 text-lg" title="Copy JSON to Clipboard">
         <Clipboard class="w-4 h-4" />
       </button>
-      <button v-if="texture.generated && texture.id !== editingId" @click.stop="startEdit(texture.id, texture.name)"
-        class="ml-2 text-blue-400 hover:text-blue-600 text-lg">
+      <!-- Edit sprite name -->
+      <button v-if="!isEdit && texture.generated && texture.id !== editingId"
+        @click.stop="startEdit(texture.id, texture.name)" class="ml-2 text-blue-400 hover:text-blue-600 text-lg"
+        title="Edit Sprite Name">
         <Pencil class="w-4 h-4" />
       </button>
-      <button @click.stop="editSprite(texture)" class="ml-2 text-green-400 hover:text-green-600 text-lg"
+      <!-- Edit sprite -->
+      <button v-if="!isEdit" @click.stop="editSprite(texture)" class="ml-2 text-green-400 hover:text-green-600 text-lg"
         title="Edit Sprite">
         <Edit class="w-4 h-4" />
       </button>
+      <!-- Remove sprite (or reset modified preset) -->
       <button v-if="texture.generated" @click.stop="store.removeGeneratedTexture(texture.id)"
-        class="ml-2 text-red-400 hover:text-red-600 text-xl font-bold">
+        class="ml-2 text-red-400 hover:text-red-600 text-xl font-bold"
+        :title="texture.generated ? 'Remove Sprite' : 'Reset Modified Preset'">
         <!-- X icon is a little small -->
         <X class="w-5 h-5" />
       </button>
@@ -71,6 +79,7 @@ const editingId = ref<string | null>(null)
 const editingName = ref('')
 const selectedTextureId = ref<string | null>(null)
 const textureGenerator = new TextureGenerator({} as Phaser.Scene)
+const isEdit = computed(() => props.mode === 'edit')
 
 onMounted(() => {
   const saved = localStorage.getItem('showPresets')
@@ -137,7 +146,7 @@ watch(
 function handleTextureClick(texture: TextureDescription) {
   if (texture.generated && texture.id === editingId.value) return;
 
-  if (props.mode === 'edit') {
+  if (isEdit.value) {
     window.dispatchEvent(new CustomEvent('editSprite', { detail: texture }))
   } else {
     selectedTextureId.value = texture.id

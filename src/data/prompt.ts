@@ -25,6 +25,9 @@ const BrownBearJson = formatTextureJson(BrownBear)
 export const GenerateSpriteMessages = (input: string) => {
   const msgs: ChatMessage[] = []
 
+  // TODO update this to match the new schema
+  // - shouldn't need to mention "visible" -- dont know what use invisible layers would be & it defaults to true, saves on tokens
+  // - "rotation" -- this is optional and can be used on all layer types, defaults is 0 when not specified
   msgs.push({
     role: 'system',
     content: `Assistant's task is to create a new detailed texture based on the INPUT, by using the provided instructions and example(s).

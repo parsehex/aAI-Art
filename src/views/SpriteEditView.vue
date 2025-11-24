@@ -54,6 +54,11 @@ watch(() => route.params.id, () => {
 	loadSpriteFromRoute()
 })
 
+// Watch for store changes (e.g. deletions/resets)
+watch(() => store.generatedTextures, () => {
+	loadSpriteFromRoute()
+}, { deep: true })
+
 function loadSpriteFromRoute() {
 	const spriteId = route.params.id as string | undefined
 	if (spriteId) {
@@ -63,7 +68,11 @@ function loadSpriteFromRoute() {
 
 		if (sprite) {
 			selectedSpriteForEditing.value = sprite
+		} else {
+			selectedSpriteForEditing.value = null
 		}
+	} else {
+		selectedSpriteForEditing.value = null
 	}
 }
 </script>

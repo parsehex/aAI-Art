@@ -75,7 +75,13 @@ export class TextureGenerator {
       return 'fallback-texture'
     }
 
-    const descString = JSON.stringify(desc)
+    // Only hash properties that affect rendering
+    const renderProps = {
+      size: desc.size,
+      layers: desc.layers,
+    }
+
+    const descString = JSON.stringify(renderProps)
     const hash = this.hashString(descString)
     return `texture-${hash}`
   }
@@ -96,7 +102,7 @@ export class TextureGenerator {
   /**
    * Draw a single layer to the Konva layer
    */
-  public drawLayer(layer: Konva.Layer, layerDesc: TextureLayer, size: number): void {
+  public drawLayer(layer: Konva.Container, layerDesc: TextureLayer, size: number): void {
     // Skip invisible layers
     if (layerDesc.visible === false) return
 
@@ -125,7 +131,7 @@ export class TextureGenerator {
     }
   }
 
-  private drawCircle(layer: Konva.Layer, layerDesc: TextureLayer, size: number): void {
+  private drawCircle(layer: Konva.Container, layerDesc: TextureLayer, size: number): void {
     const color = parseColor(layerDesc.color as string)
     const x = layerDesc.x !== undefined ? layerDesc.x : size / 2
     const y = layerDesc.y !== undefined ? layerDesc.y : size / 2
@@ -136,12 +142,13 @@ export class TextureGenerator {
       y,
       radius,
       fill: this.colorToHex(color),
+      rotation: layerDesc.rotation || 0,
     })
 
     layer.add(circle)
   }
 
-  private drawRect(layer: Konva.Layer, layerDesc: TextureLayer, size: number): void {
+  private drawRect(layer: Konva.Container, layerDesc: TextureLayer, size: number): void {
     const color = parseColor(layerDesc.color as string)
     const width = layerDesc.width || 0
     const height = layerDesc.height || 0
@@ -154,12 +161,13 @@ export class TextureGenerator {
       width,
       height,
       fill: this.colorToHex(color),
+      rotation: layerDesc.rotation || 0,
     })
 
     layer.add(rect)
   }
 
-  private drawLine(layer: Konva.Layer, layerDesc: TextureLayer, size: number): void {
+  private drawLine(layer: Konva.Container, layerDesc: TextureLayer, size: number): void {
     const color = parseColor(layerDesc.color as string)
     const lineWidth = layerDesc.lineWidth || 1
 
@@ -172,16 +180,36 @@ export class TextureGenerator {
       points: [x1, y1, x2, y2],
       stroke: this.colorToHex(color),
       strokeWidth: lineWidth,
+      rotation: layerDesc.rotation || 0,
     })
 
     layer.add(line)
   }
 
-  private drawPattern(layer: Konva.Layer, layerDesc: TextureLayer, size: number): void {
-    const { patternType, color1, x = 0, y = 0, width = size, height = size } = layerDesc
+  private drawPattern(layer: Konva.Container, layerDesc: TextureLayer, size: number): void {
+    const {
+      patternType,
+      color1,
+      x = 0,
+      y = 0,
+      width = size,
+      height = size,
+      rotation = 0,
+    } = layerDesc
     const patternSize = 8 // Pattern tile size
 
     const color = color1 ? this.colorToHex(color1) : '#000000'
+
+    // Create a group for the pattern to handle rotation
+    const group = new Konva.Group({
+      x: x + width / 2, // Rotate around center
+      y: y + height / 2,
+      rotation: rotation,
+    })
+
+    // Offset for drawing inside the group (centered)
+    const offsetX = -width / 2
+    const offsetY = -height / 2
 
     switch (patternType) {
       case 'checkerboard':
@@ -189,13 +217,13 @@ export class TextureGenerator {
           for (let j = 0; j < height; j += patternSize) {
             if ((Math.floor(i / patternSize) + Math.floor(j / patternSize)) % 2 === 0) {
               const rect = new Konva.Rect({
-                x: x + i,
-                y: y + j,
+                x: offsetX + i,
+                y: offsetY + j,
                 width: patternSize,
                 height: patternSize,
                 fill: color,
               })
-              layer.add(rect)
+              group.add(rect)
             }
           }
         }
@@ -203,13 +231,13 @@ export class TextureGenerator {
       case 'stripes':
         for (let i = 0; i < width; i += patternSize) {
           const rect = new Konva.Rect({
-            x: x + i,
-            y: y,
+            x: offsetX + i,
+            y: offsetY,
             width: patternSize,
             height: height,
             fill: color,
           })
-          layer.add(rect)
+          group.add(rect)
         }
         break
       case 'dots':
@@ -217,19 +245,21 @@ export class TextureGenerator {
         for (let i = 0; i < width; i += patternSize) {
           for (let j = 0; j < height; j += patternSize) {
             const circle = new Konva.Circle({
-              x: x + i + patternSize / 2,
-              y: y + j + patternSize / 2,
+              x: offsetX + i + patternSize / 2,
+              y: offsetY + j + patternSize / 2,
               radius: dotRadius,
               fill: color,
             })
-            layer.add(circle)
+            group.add(circle)
           }
         }
         break
     }
+
+    layer.add(group)
   }
 
-  private drawEllipse(layer: Konva.Layer, layerDesc: TextureLayer, size: number): void {
+  private drawEllipse(layer: Konva.Container, layerDesc: TextureLayer, size: number): void {
     const color = parseColor(layerDesc.color as string)
     const x = Math.max(0, Math.min(layerDesc.x || size / 2, size))
     const y = Math.max(0, Math.min(layerDesc.y || size / 2, size))
@@ -242,12 +272,13 @@ export class TextureGenerator {
       radiusX: width / 2,
       radiusY: height / 2,
       fill: this.colorToHex(color),
+      rotation: layerDesc.rotation || 0,
     })
 
     layer.add(ellipse)
   }
 
-  private drawPolygon(layer: Konva.Layer, layerDesc: TextureLayer, size: number): void {
+  private drawPolygon(layer: Konva.Container, layerDesc: TextureLayer, size: number): void {
     const color = parseColor(layerDesc.color as string)
     const points = layerDesc.points || []
     if (points.length < 3) return // Need at least 3 points for polygon
@@ -264,6 +295,7 @@ export class TextureGenerator {
       points: flatPoints,
       fill: this.colorToHex(color),
       closed: true,
+      rotation: layerDesc.rotation || 0,
     })
 
     // Optional outline
@@ -275,7 +307,7 @@ export class TextureGenerator {
     layer.add(polygon)
   }
 
-  private drawPath(layer: Konva.Layer, layerDesc: TextureLayer, size: number): void {
+  private drawPath(layer: Konva.Container, layerDesc: TextureLayer, size: number): void {
     const pathData = layerDesc.path || ''
     const color = parseColor(layerDesc.color as string)
     const shouldFill = layerDesc.fill !== undefined ? layerDesc.fill : true
@@ -308,6 +340,7 @@ export class TextureGenerator {
       const line = new Konva.Line({
         points,
         closed: pathData.includes('Z'),
+        rotation: layerDesc.rotation || 0,
       })
 
       if (shouldFill) {

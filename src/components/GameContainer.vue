@@ -59,27 +59,39 @@ async function handleSpriteSelected(event: Event) {
     children[i].destroy()
   }
 
-  // Generate sprite image
-  const dataUrl = await textureGenerator.generateImage(texture)
+  // Create a group for the sprite to handle scaling and positioning
+  const spriteGroup = new Konva.Group({
+    x: stage.width() / 2,
+    y: stage.height() / 2,
+    offset: {
+      x: texture.size / 2,
+      y: texture.size / 2
+    },
+    scale: {
+      x: 2,
+      y: 2
+    }
+  })
 
-  // Create image element
-  const imageObj = new Image()
-  imageObj.onload = () => {
-    if (!layer || !stage) return
+  // Draw all layers
+  texture.layers.forEach((layerDesc) => {
+    if (layerDesc.visible !== false) {
+      // Create a group for each layer if needed, or just draw into spriteGroup
+      // TextureGenerator.drawLayer expects a Container (Group or Layer)
+      // We can pass spriteGroup directly
 
-    // Create Konva image and center it
-    const spriteImage = new Konva.Image({
-      image: imageObj,
-      x: stage.width() / 2 - (texture.size * 2) / 2,
-      y: stage.height() / 2 - (texture.size * 2) / 2,
-      width: texture.size * 2, // Scale up 2x
-      height: texture.size * 2,
-    })
+      // Note: TextureGenerator.drawLayer might add multiple nodes to the container
+      // If we want to support interactivity later, we might want per-layer groups
+      // But for GameContainer (view only), drawing directly into spriteGroup is fine.
 
-    layer.add(spriteImage)
-    layer.batchDraw()
-  }
-  imageObj.src = dataUrl
+      // However, TextureGenerator.drawPattern creates a group inside.
+      // Let's just pass spriteGroup.
+      textureGenerator.drawLayer(spriteGroup, layerDesc, texture.size)
+    }
+  })
+
+  layer.add(spriteGroup)
+  layer.batchDraw()
 }
 </script>
 <style scoped>

@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col items-center min-h-screen min-w-screen text-white px-2">
     <p class="my-2"> An app to generate graphics using AI language models. All sprites and SVGs shown were created by
-      prompting an LLM (bigger models are better). </p>
+      prompting an LLM (bigger models are better). <a href="https://parsehex.github.io/aAI-Art/docs/">Docs</a> </p>
     <div class="w-full max-w-6xl">
       <!-- Generation Type Toggle -->
       <div class="flex space-x-4 mb-4">

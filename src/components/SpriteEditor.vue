@@ -204,7 +204,7 @@ function initKonvaStage() {
   stage.value.add(layer.value)
 
   // Initial render
-  render(props.spriteData)
+  render(props.spriteData, true)
 }
 
 function getLayerName(layer: TextureLayer, index: number): string {
@@ -286,7 +286,7 @@ function updateSpriteSize() {
   render(newSpriteData)
 }
 
-function updateThumbnail(dataUrl: string, contextSpriteData?: TextureDescription) {
+function updateThumbnail(dataUrl: string, contextSpriteData?: TextureDescription, silent = false) {
   const targetData = contextSpriteData || props.spriteData
   if (!targetData) return
   if (targetData.thumbnail === dataUrl) return
@@ -295,10 +295,12 @@ function updateThumbnail(dataUrl: string, contextSpriteData?: TextureDescription
     ...targetData,
     thumbnail: dataUrl
   }
-  emit('spriteUpdated', newSpriteData)
+  if (!silent) {
+    emit('spriteUpdated', newSpriteData)
+  }
 }
 
-async function render(data: TextureDescription) {
+async function render(data: TextureDescription, silent = false) {
   if (!stage.value || !layer.value) {
     console.warn('Stage not initialized')
     return
@@ -308,7 +310,7 @@ async function render(data: TextureDescription) {
   const dataUrl = await textureGenerator.generateImage(data)
 
   // Update thumbnail
-  updateThumbnail(dataUrl, data)
+  updateThumbnail(dataUrl, data, silent)
 
   // Create an image element
   const imageObj = new Image()
@@ -352,7 +354,7 @@ watch(
       if (!stage.value && canvasContainer.value) {
         initKonvaStage()
       } else {
-        render(newVal)
+        render(newVal, true)
       }
     } else {
       stage.value?.destroy()

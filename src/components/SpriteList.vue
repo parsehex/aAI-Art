@@ -3,7 +3,8 @@
     <button @click="togglePresets" class="w-full bg-gray-700 text-white p-2 rounded-md hover:bg-gray-600 mb-2"> {{
       showPresets ? 'Hide Presets' : 'Show Presets' }} </button>
     <div v-for="texture in visibleTextures" :key="`texture-${texture.id}`"
-      class="sprite-item flex items-center space-x-2 p-2 hover:bg-gray-800 cursor-pointer"
+      class="sprite-item flex items-center space-x-2 p-2 cursor-pointer"
+      :class="{ 'bg-gray-700': selectedTextureId === texture.id || (route.params.id === texture.id) }"
       @click="handleTextureClick(texture)">
       <div v-if="(texture as any).thumbnail" class="w-16 h-16 rounded flex-shrink-0">
         <img :src="(texture as any).thumbnail" :alt="texture.name"
@@ -58,6 +59,7 @@
 </template>
 <script setup lang="ts">
 import { computed, ref, onMounted, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { presetTextures } from '@/data/preset-textures/registry'
 import { useTexturesStore } from '@/stores/textures'
 import { useAIStore } from '@/stores/ai'
@@ -73,10 +75,21 @@ const props = withDefaults(defineProps<{
 
 const store = useTexturesStore()
 const aiStore = useAIStore()
+const router = useRouter()
+const route = useRoute()
 const showPresets = ref(true)
 const editingId = ref<string | null>(null)
 const editingName = ref('')
 const selectedTextureId = ref<string | null>(null)
+
+// Sync selected ID with route
+watch(() => route.params.id, (newId) => {
+  if (newId) {
+    selectedTextureId.value = newId as string
+  } else {
+    selectedTextureId.value = null
+  }
+}, { immediate: true })
 const textureGenerator = new TextureGenerator()
 const isEdit = computed(() => props.mode === 'edit')
 
@@ -146,8 +159,10 @@ function handleTextureClick(texture: TextureDescription) {
   if (texture.generated && texture.id === editingId.value) return;
 
   if (isEdit.value) {
+    router.push({ name: 'sprite-edit', params: { id: texture.id } })
     window.dispatchEvent(new CustomEvent('editSprite', { detail: texture }))
   } else {
+    router.push({ name: 'sprite-generation', params: { id: texture.id } })
     selectedTextureId.value = texture.id
     window.dispatchEvent(new CustomEvent('spriteSelected', { detail: texture }))
   }
@@ -194,6 +209,7 @@ function stopEditing() {
 
 function editSprite(texture: TextureDescription) {
   window.dispatchEvent(new CustomEvent('editSprite', { detail: texture }))
+  router.push({ name: 'sprite-edit', params: { id: texture.id } })
 }
 </script>
 <style scoped>

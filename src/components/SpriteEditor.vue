@@ -218,8 +218,13 @@ function initKonvaStage() {
   mainLayer.value = new Konva.Layer()
   stage.value.add(mainLayer.value)
 
+
   transformer.value = new Konva.Transformer({
     nodes: [],
+    ignoreStroke: true,
+    rotateEnabled: true,
+    rotateAnchorOffset: 30,
+    enabledAnchors: ['top-left', 'top-right', 'bottom-left', 'bottom-right'],
     boundBoxFunc: (oldBox, newBox) => {
       // Limit minimum size
       if (newBox.width < 5 || newBox.height < 5) {
@@ -362,15 +367,23 @@ async function render(data: TextureDescription, silent = false) {
   data.layers.forEach((layerData, index) => {
     if (layerData.visible === false) return
 
+    // Calculate center for rotation
+    const center = getLayerCenter(layerData, data.size)
+
     const group = new Konva.Group({
       id: `layer-${index}`,
       draggable: true,
-      x: 0,
-      y: 0,
+      x: center.x,
+      y: center.y,
+      offsetX: center.x,
+      offsetY: center.y,
+      rotation: layerData.rotation || 0,
     })
 
     // Draw content into group
-    textureGenerator.drawLayer(group, layerData, data.size)
+    // We pass rotation: 0 because the group handles rotation
+    const layerWithoutRotation = { ...layerData, rotation: 0 }
+    textureGenerator.drawLayer(group, layerWithoutRotation, data.size)
 
     // Add events
     group.on('click tap', (e) => {
@@ -428,19 +441,46 @@ async function render(data: TextureDescription, silent = false) {
   }
 }
 
+function getLayerCenter(layer: TextureLayer, size: number) {
+  if (layer.type === 'circle' || layer.type === 'ellipse') {
+    const x = layer.x !== undefined ? layer.x : size / 2
+    const y = layer.y !== undefined ? layer.y : size / 2
+    return { x, y }
+  } else if (layer.type === 'line') {
+    const x1 = layer.x !== undefined ? layer.x : 0
+    const y1 = layer.y !== undefined ? layer.y : 0
+    const x2 = layer.x2 !== undefined ? layer.x2 : size
+    const y2 = layer.y2 !== undefined ? layer.y2 : size
+    return { x: (x1 + x2) / 2, y: (y1 + y2) / 2 }
+  } else {
+    // Rect, pattern, etc
+    const width = layer.width || 0
+    const height = layer.height || 0
+    const x = layer.x !== undefined ? layer.x : (size - width) / 2
+    const y = layer.y !== undefined ? layer.y : (size - height) / 2
+    return { x: x + width / 2, y: y + height / 2 }
+  }
+}
+
 function handleDragEnd(index: number, node: Konva.Group) {
   if (!props.spriteData) return
   const layer = props.spriteData.layers[index]
 
-  const deltaX = node.x()
-  const deltaY = node.y()
+  // node.x() and node.y() are the new center position
+  const newCenterX = node.x()
+  const newCenterY = node.y()
 
-  // Reset group position to 0,0 and update layer data
-  node.position({ x: 0, y: 0 })
+  // Calculate old center to find delta
+  const oldCenter = getLayerCenter(layer, props.spriteData.size)
+  const deltaX = newCenterX - oldCenter.x
+  const deltaY = newCenterY - oldCenter.y
+
+  // Reset group position
+  node.position({ x: newCenterX, y: newCenterY })
 
   const newLayer = { ...layer }
 
-  // Update position
+  // Update position based on delta
   if (layer.x !== undefined) newLayer.x = Math.round((layer.x || 0) + deltaX)
   if (layer.y !== undefined) newLayer.y = Math.round((layer.y || 0) + deltaY)
 
@@ -461,84 +501,63 @@ function handleTransformEnd(index: number, node: Konva.Group) {
   const scaleY = node.scaleY()
   const rotation = node.rotation()
 
-  // Get the transform matrix of the group
-  // This matrix transforms local group coordinates to parent (layer) coordinates
-  const transform = node.getTransform()
+  // New center position after transform
+  const newCenterX = node.x()
+  const newCenterY = node.y()
 
-  // Reset node transforms so we can apply them to the data
+  // Reset transforms
   node.scaleX(1)
   node.scaleY(1)
-  node.rotation(0)
-  node.position({ x: 0, y: 0 })
+  // Keep rotation and position on group until re-render
 
   const newLayer: TextureLayer = { ...layer }
 
   // Update rotation
-  newLayer.rotation = (newLayer.rotation || 0) + rotation
+  newLayer.rotation = rotation
 
-  // Handle different shape types
-  if (layer.type === 'line') {
-    // For lines, transform the start and end points
-    const x1 = layer.x !== undefined ? layer.x : 0
-    const y1 = layer.y !== undefined ? layer.y : 0
-    const x2 = layer.x2 !== undefined ? layer.x2 : props.spriteData.size
-    const y2 = layer.y2 !== undefined ? layer.y2 : props.spriteData.size
-
-    const p1 = transform.point({ x: x1, y: y1 })
-    const p2 = transform.point({ x: x2, y: y2 })
-
-    newLayer.x = Math.round(p1.x)
-    newLayer.y = Math.round(p1.y)
-    newLayer.x2 = Math.round(p2.x)
-    newLayer.y2 = Math.round(p2.y)
-
-    // Lines don't really have width/height scaling in the same way,
-    // the length changes by moving points.
-    // Stroke width might need scaling?
+  // Update dimensions and position
+  if (layer.type === 'circle') {
+    if (layer.radius) {
+      newLayer.radius = Math.round(layer.radius * ((scaleX + scaleY) / 2))
+    }
+    // Circle center is its position
+    newLayer.x = Math.round(newCenterX)
+    newLayer.y = Math.round(newCenterY)
+  } else if (layer.type === 'ellipse') {
+    if (layer.width) newLayer.width = Math.round((layer.width || 0) * scaleX)
+    if (layer.height) newLayer.height = Math.round((layer.height || 0) * scaleY)
+    // Ellipse center is its position
+    newLayer.x = Math.round(newCenterX)
+    newLayer.y = Math.round(newCenterY)
+  } else if (layer.type === 'line') {
+    // For lines, scale width
     if (layer.lineWidth) {
       newLayer.lineWidth = Math.round(layer.lineWidth * ((scaleX + scaleY) / 2))
     }
-  } else if (layer.type === 'circle' || layer.type === 'ellipse') {
-    // Center-based shapes
-    const x = layer.x !== undefined ? layer.x : props.spriteData.size / 2
-    const y = layer.y !== undefined ? layer.y : props.spriteData.size / 2
+    // Update start/end points based on new center and scale?
+    // This is tricky for lines. For now, just update center translation.
+    const oldCenter = getLayerCenter(layer, props.spriteData.size)
+    const deltaX = newCenterX - oldCenter.x
+    const deltaY = newCenterY - oldCenter.y
 
-    const center = transform.point({ x, y })
-    newLayer.x = Math.round(center.x)
-    newLayer.y = Math.round(center.y)
-
-    if (layer.type === 'circle' && layer.radius) {
-      newLayer.radius = Math.round(layer.radius * ((scaleX + scaleY) / 2))
-    } else if (layer.type === 'ellipse') {
-      if (layer.width) newLayer.width = Math.round(layer.width * scaleX)
-      if (layer.height) newLayer.height = Math.round(layer.height * scaleY)
-    }
+    if (layer.x !== undefined) newLayer.x = Math.round((layer.x || 0) + deltaX)
+    if (layer.y !== undefined) newLayer.y = Math.round((layer.y || 0) + deltaY)
+    if (layer.x2 !== undefined) newLayer.x2 = Math.round((layer.x2 || 0) + deltaX)
+    if (layer.y2 !== undefined) newLayer.y2 = Math.round((layer.y2 || 0) + deltaY)
   } else {
-    // Top-left based shapes (rect, pattern, etc)
-    const width = layer.width || 0
-    const height = layer.height || 0
-    const x = layer.x !== undefined ? layer.x : (props.spriteData.size - width) / 2
-    const y = layer.y !== undefined ? layer.y : (props.spriteData.size - height) / 2
+    // Rect, pattern, etc
+    const newWidth = Math.round((layer.width || 0) * scaleX)
+    const newHeight = Math.round((layer.height || 0) * scaleY)
 
-    // Calculate center
-    const cx = x + width / 2
-    const cy = y + height / 2
-
-    // Transform center
-    const newCenter = transform.point({ x: cx, y: cy })
-
-    // Update dimensions
-    const newWidth = Math.round(width * scaleX)
-    const newHeight = Math.round(height * scaleY)
-
-    // Calculate new top-left from new center
     newLayer.width = newWidth
     newLayer.height = newHeight
-    newLayer.x = Math.round(newCenter.x - newWidth / 2)
-    newLayer.y = Math.round(newCenter.y - newHeight / 2)
+
+    // Calculate new top-left from new center
+    newLayer.x = Math.round(newCenterX - newWidth / 2)
+    newLayer.y = Math.round(newCenterY - newHeight / 2)
 
     if (layer.radius) {
-      newLayer.radius = Math.round(layer.radius * ((scaleX + scaleY) / 2))
+      newLayer.radius = Math.round((layer.radius || 0) * ((scaleX + scaleY) / 2))
     }
   }
 

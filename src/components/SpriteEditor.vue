@@ -25,7 +25,7 @@
             </button>
           </div>
         </div>
-        <button @click="addLayer" class="w-full mt-4 bg-green-600 text-white py-2 rounded hover:bg-green-700"> + Layer
+        <button @click="addLayer" class="w-full mt-4 bg-green-600 text-white py-2 rounded hover:bg-green-700">+ Layer
         </button>
         <div class="mt-4">
           <DraggableNumberInput v-model="spriteSize" label="Texture Size" :step="1" :min="16" :max="512"
@@ -74,7 +74,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, computed, onUnmounted } from 'vue'
 import { cloneFnJSON, useResizeObserver } from '@vueuse/core'
-import Phaser from 'phaser'
+import Konva from 'konva'
 import { Eye, EyeOff, X } from 'lucide-vue-next'
 import { TextureGenerator } from '@/utils'
 import { defaultLayerProperties } from '@/utils/layerDefaults'
@@ -98,10 +98,12 @@ const emit = defineEmits<{
 }>()
 
 const canvasContainer = ref<HTMLDivElement>()
-const game = ref<Phaser.Game>()
+const stage = ref<Konva.Stage>()
+const layer = ref<Konva.Layer>()
+const spriteImage = ref<Konva.Image>()
 const selectedLayerIndex = ref<number | null>(null)
-const spritePreviewUrl = ref<string>('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==')
 const spriteSize = ref(props.spriteData?.size || 64)
+const textureGenerator = new TextureGenerator()
 
 const selectedLayer = computed(() => {
   return selectedLayerIndex.value !== null && props.spriteData ? props.spriteData.layers[selectedLayerIndex.value] : null
@@ -181,33 +183,28 @@ onMounted(() => {
     useResizeObserver(canvasContainer, (entries) => {
       const entry = entries[0]
       const { width, height } = entry.contentRect
-      if (width > 0 && height > 0 && !game.value && props.spriteData) {
-        initPhaserGame()
+      if (width > 0 && height > 0 && !stage.value && props.spriteData) {
+        initKonvaStage()
       }
     })
   }
 })
 
-function initPhaserGame() {
+function initKonvaStage() {
   if (!canvasContainer.value || !props.spriteData) return
   if (canvasContainer.value.clientWidth === 0 || canvasContainer.value.clientHeight === 0) return
 
-  const config: Phaser.Types.Core.GameConfig = {
-    type: Phaser.AUTO,
+  stage.value = new Konva.Stage({
+    container: canvasContainer.value,
     width: canvasContainer.value.clientWidth,
     height: canvasContainer.value.clientHeight,
-    parent: canvasContainer.value,
-    backgroundColor: '#1f2937',
-    scene: SpriteEditorScene,
-    physics: {
-      default: 'arcade',
-      arcade: {
-        gravity: { y: 0, x: 0 },
-      },
-    },
-  }
+  })
 
-  game.value = new Phaser.Game(config)
+  layer.value = new Konva.Layer()
+  stage.value.add(layer.value)
+
+  // Initial render
+  render(props.spriteData)
 }
 
 function getLayerName(layer: TextureLayer, index: number): string {
@@ -301,21 +298,50 @@ function updateThumbnail(dataUrl: string, contextSpriteData?: TextureDescription
   emit('spriteUpdated', newSpriteData)
 }
 
-function render(data: TextureDescription) {
-  if (game.value) {
-    const scene = game.value.scene.getScene('SpriteEditorScene') as SpriteEditorScene
-    if (scene && scene.sys && scene.sys.settings.active) {
-      scene.updateSpriteData(data)
-    } else {
-      console.warn('Scene not active or not found', scene)
-    }
-  } else {
-    console.warn('Game not initialized')
+async function render(data: TextureDescription) {
+  if (!stage.value || !layer.value) {
+    console.warn('Stage not initialized')
+    return
   }
+
+  // Generate the sprite image
+  const dataUrl = await textureGenerator.generateImage(data)
+
+  // Update thumbnail
+  updateThumbnail(dataUrl, data)
+
+  // Create an image element
+  const imageObj = new Image()
+  imageObj.onload = () => {
+    if (!layer.value || !stage.value) return
+
+    // If sprite image already exists, just update its image source
+    if (spriteImage.value) {
+      spriteImage.value.image(imageObj)
+      // Update size in case sprite size changed
+      spriteImage.value.width(data.size * 4)
+      spriteImage.value.height(data.size * 4)
+      spriteImage.value.x(stage.value.width() / 2 - (data.size * 4) / 2)
+      spriteImage.value.y(stage.value.height() / 2 - (data.size * 4) / 2)
+    } else {
+      // Create new Konva image and center it
+      spriteImage.value = new Konva.Image({
+        image: imageObj,
+        x: stage.value.width() / 2 - (data.size * 4) / 2,
+        y: stage.value.height() / 2 - (data.size * 4) / 2,
+        width: data.size * 4, // Scale up 4x for better visibility
+        height: data.size * 4,
+      })
+      layer.value.add(spriteImage.value)
+    }
+
+    layer.value.batchDraw()
+  }
+  imageObj.src = dataUrl
 }
 
 onUnmounted(() => {
-  game.value?.destroy(true)
+  stage.value?.destroy()
 })
 
 watch(
@@ -323,97 +349,16 @@ watch(
   (newVal) => {
     if (newVal) {
       spriteSize.value = newVal.size
-      if (!game.value && canvasContainer.value) {
-        initPhaserGame()
+      if (!stage.value && canvasContainer.value) {
+        initKonvaStage()
       } else {
         render(newVal)
       }
     } else {
-      game.value?.destroy(true)
-      game.value = undefined
+      stage.value?.destroy()
+      stage.value = undefined
     }
   },
   { deep: true, flush: 'post' },
 )
-
-class SpriteEditorScene extends Phaser.Scene {
-  private textureGenerator!: TextureGenerator
-  private sprite?: Phaser.GameObjects.Sprite
-  private spriteData!: TextureDescription
-
-  constructor() {
-    super({ key: 'SpriteEditorScene' })
-  }
-
-  init() {
-    this.spriteData = cloneFnJSON(props.spriteData as TextureDescription);
-  }
-
-  create() {
-    this.textureGenerator = new TextureGenerator(this)
-
-    // Create a large sprite in the center
-    const { width, height } = this.scale.gameSize
-    this.sprite = this.textureGenerator.createGameObject(this.spriteData, width / 2, height / 2, {
-      scale: 4,
-      isInteractive: false,
-    })
-
-    // Generate and set the preview URL for the Vue component
-    this.generatePreview()
-
-    this.scale.on('resize', this.handleResize.bind(this))
-  }
-
-  updateSpriteData(newSpriteData: TextureDescription) {
-    this.spriteData = newSpriteData
-    if (this.sprite) {
-      const textureKey = this.textureGenerator.getTextureKey(this.spriteData, this)
-      this.sprite.setTexture(textureKey)
-      this.generatePreview() // Re-generate preview to update the Vue component
-    }
-  }
-
-  // update() {
-  //   // Update the sprite when spriteData changes
-  //   if (this.sprite) {
-  //     const textureKey = this.textureGenerator.getTextureKey(this.spriteData, this)
-  //     this.sprite.setTexture(textureKey)
-  //     this.generatePreview()
-  //   }
-  // }
-
-  private generatePreview() {
-    // Generate a data URL for the sprite preview
-    const graphics = this.add.graphics()
-    const size = this.spriteData.size
-
-    this.spriteData.layers.forEach((layer) => {
-      if (layer.visible !== false) {
-        this.textureGenerator.drawLayer(graphics, layer, size)
-      }
-    })
-
-    const textureKey = `preview-${Date.now()}`
-    graphics.generateTexture(textureKey, size, size)
-    graphics.destroy()
-
-    // Get the canvas and convert to data URL
-    const texture = this.textures.get(textureKey)
-    if (texture) {
-      const canvas = texture.getSourceImage() as HTMLCanvasElement
-      if (canvas) {
-        const dataUrl = canvas.toDataURL()
-        updateThumbnail(dataUrl, this.spriteData)
-      }
-    }
-  }
-
-  handleResize(gameSize: Phaser.Structs.Size) {
-    const { width, height } = gameSize
-    if (width === this.cameras.main.width && height === this.cameras.main.height) return
-    console.log('resized', gameSize)
-    this.cameras.main.setSize(width, height)
-  }
-}
 </script>

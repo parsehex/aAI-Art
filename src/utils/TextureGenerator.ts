@@ -1,140 +1,83 @@
+import Konva from 'konva'
 import { parseColor } from './color'
-import { getOffscreenScene, initGame } from '@/utils/OffscreenPhaserGame'
-
-export class GameObject extends Phaser.GameObjects.Sprite {
-  constructor(scene: Phaser.Scene, x: number, y: number, texture: string) {
-    super(scene, x, y, texture)
-    scene.add.existing(this)
-    scene.physics.add.existing(this)
-  }
-
-  setInteractive(): this {
-    super.setInteractive()
-    return this
-  }
-
-  enablePhysics(isStatic: boolean = false): this {
-    const body = this.body as Phaser.Physics.Arcade.Body
-    if (body) {
-      body.setCollideWorldBounds(true)
-      if (isStatic) {
-        body.setImmovable(true)
-      }
-    }
-    return this
-  }
-}
 
 export class TextureGenerator {
-  private scene: Phaser.Scene
-  public offscreenScene?: Phaser.Scene
   private textureCache: Map<string, string> = new Map()
 
-  constructor(scene: Phaser.Scene) {
-    this.scene = scene
-
-    initGame()
-    setTimeout(() => {
-      this.offscreenScene = getOffscreenScene()
-    }, 100)
+  constructor() {
+    // No scene needed for Konva!
   }
 
-  createGameObject(
-    desc: TextureDescription,
-    x: number,
-    y: number,
-    options: {
-      isStatic?: boolean
-      isInteractive?: boolean
-      scale?: number
-      name?: string
-      background?: boolean // New option for background rendering
-    } = {},
-  ): GameObject {
-    const targetScene = options.background && this.offscreenScene ? this.offscreenScene : this.scene
-    const textureKey = this.getTextureKey(desc, targetScene)
+  /**
+   * Generate a data URL (base64 image) from a texture description
+   * This is the main method for rendering sprites
+   */
+  async generateImage(desc: TextureDescription): Promise<string> {
+    const cacheKey = this.getTextureKey(desc)
 
-    // Create the game object
-    const gameObject = new GameObject(targetScene, x, y, textureKey)
-
-    // Apply options
-    if (options.scale) {
-      gameObject.setScale(options.scale)
+    if (this.textureCache.has(cacheKey)) {
+      return this.textureCache.get(cacheKey)!
     }
 
-    if (options.isInteractive) {
-      gameObject.setInteractive()
-    }
-
-    if (options.name) {
-      gameObject.setName(options.name)
-    }
-
-    gameObject.enablePhysics(options.isStatic)
-
-    return gameObject
+    const dataUrl = await this.renderToDataUrl(desc)
+    this.textureCache.set(cacheKey, dataUrl)
+    return dataUrl
   }
 
-  public getTextureKey(desc: TextureDescription, targetScene: Phaser.Scene): string {
+  /**
+   * Generate a thumbnail (same as generateImage, but kept for API compatibility)
+   */
+  async generateThumbnail(desc: TextureDescription): Promise<string> {
+    return this.generateImage(desc)
+  }
+
+  /**
+   * Render a texture description to a data URL
+   * This creates an offscreen Konva stage and exports it
+   */
+  private async renderToDataUrl(desc: TextureDescription): Promise<string> {
+    const size = desc.size
+
+    // Create an offscreen stage (not attached to DOM)
+    const stage = new Konva.Stage({
+      container: document.createElement('div'),
+      width: size,
+      height: size,
+    })
+
+    const layer = new Konva.Layer()
+    stage.add(layer)
+
+    // Draw all layers
+    desc.layers.forEach((layerDesc) => {
+      if (layerDesc.visible !== false) {
+        this.drawLayer(layer, layerDesc, size)
+      }
+    })
+
+    layer.draw()
+
+    // Export to data URL
+    const dataUrl = stage.toDataURL()
+
+    // Clean up
+    stage.destroy()
+
+    return dataUrl
+  }
+
+  /**
+   * Get a unique cache key for a texture description
+   */
+  public getTextureKey(desc: TextureDescription): string {
     if (!desc || !desc.size || !desc.layers) {
       console.error('Invalid texture description:', desc)
       return 'fallback-texture'
     }
 
-    // Generate a unique key based on the texture description
     const descString = JSON.stringify(desc)
     const hash = this.hashString(descString)
-
-    const cacheKey = `${targetScene.sys.settings.key}-${hash}`
-
-    if (!this.textureCache.has(cacheKey)) {
-      const graphics = targetScene.add.graphics()
-      const size = desc.size
-
-      desc.layers.forEach((layer) => {
-        this.drawLayer(graphics, layer, size)
-      })
-
-      const textureKey = `texture-${hash}`
-      graphics.generateTexture(textureKey, size, size)
-      graphics.destroy()
-
-      this.textureCache.set(cacheKey, textureKey)
-    }
-
-    return this.textureCache.get(cacheKey)!
-  }
-
-  async generateThumbnail(desc: TextureDescription): Promise<string> {
-    if (!this.offscreenScene) {
-      await new Promise<void>((resolve) => {
-        const check = () => {
-          if (this.offscreenScene) resolve()
-          else setTimeout(check, 50)
-        }
-        check()
-      })
-    }
-
-    const scene = this.offscreenScene!
-    const size = desc.size
-    const graphics = scene.add.graphics()
-
-    desc.layers.forEach((layer) => {
-      this.drawLayer(graphics, layer, size)
-    })
-
-    const textureKey = `thumb-${Date.now()}-${Math.random()}`
-    graphics.generateTexture(textureKey, size, size)
-    graphics.destroy()
-
-    const texture = scene.textures.get(textureKey)
-    const canvas = texture.getSourceImage() as HTMLCanvasElement
-    const dataUrl = canvas.toDataURL()
-
-    scene.textures.remove(textureKey)
-
-    return dataUrl
+    return `texture-${hash}`
   }
 
   private hashString(str: string): string {
@@ -150,224 +93,232 @@ export class TextureGenerator {
     return hash.toString(36)
   }
 
-  createSprite(
-    desc: TextureDescription,
-    x: number,
-    y: number,
-    targetScene: Phaser.Scene,
-  ): Phaser.GameObjects.Sprite {
-    const graphics = targetScene.add.graphics()
-    const size = desc.size
-
-    desc.layers.forEach((layer) => {
-      this.drawLayer(graphics, layer, size)
-    })
-
-    const textureKey = `texture-${Date.now()}-${desc.name}`
-    graphics.generateTexture(textureKey, size, size)
-    graphics.destroy()
-    console.log('x, y', x, y)
-    return targetScene.add.sprite(x, y, textureKey)
-  }
-
-  public drawLayer(graphics: Phaser.GameObjects.Graphics, layer: TextureLayer, size: number): void {
+  /**
+   * Draw a single layer to the Konva layer
+   */
+  public drawLayer(layer: Konva.Layer, layerDesc: TextureLayer, size: number): void {
     // Skip invisible layers
-    if (layer.visible === false) return
+    if (layerDesc.visible === false) return
 
-    switch (layer.type) {
+    switch (layerDesc.type) {
       case 'circle':
-        this.drawCircle(graphics, layer, size)
+        this.drawCircle(layer, layerDesc, size)
         break
       case 'rect':
-        this.drawRect(graphics, layer, size)
+        this.drawRect(layer, layerDesc, size)
         break
       case 'line':
-        this.drawLine(graphics, layer, size)
+        this.drawLine(layer, layerDesc, size)
         break
       case 'pattern':
-        this.drawPattern(graphics, layer, size)
+        this.drawPattern(layer, layerDesc, size)
         break
       case 'ellipse':
-        this.drawEllipse(graphics, layer, size)
+        this.drawEllipse(layer, layerDesc, size)
         break
       case 'polygon':
-        this.drawPolygon(graphics, layer, size)
+        this.drawPolygon(layer, layerDesc, size)
         break
       case 'path':
-        this.drawPath(graphics, layer, size)
+        this.drawPath(layer, layerDesc, size)
         break
     }
   }
 
-  private drawCircle(
-    graphics: Phaser.GameObjects.Graphics,
-    layer: TextureLayer,
-    size: number,
-  ): void {
-    const color = parseColor(layer.color as string)
-    graphics.fillStyle(color, 1)
-    const x = layer.x !== undefined ? layer.x : size / 2
-    const y = layer.y !== undefined ? layer.y : size / 2
-    const radius = layer.radius !== undefined ? layer.radius : Math.floor(size / 2)
-    graphics.fillCircle(x, y, radius)
+  private drawCircle(layer: Konva.Layer, layerDesc: TextureLayer, size: number): void {
+    const color = parseColor(layerDesc.color as string)
+    const x = layerDesc.x !== undefined ? layerDesc.x : size / 2
+    const y = layerDesc.y !== undefined ? layerDesc.y : size / 2
+    const radius = layerDesc.radius !== undefined ? layerDesc.radius : Math.floor(size / 2)
+
+    const circle = new Konva.Circle({
+      x,
+      y,
+      radius,
+      fill: this.colorToHex(color),
+    })
+
+    layer.add(circle)
   }
 
-  private drawRect(graphics: Phaser.GameObjects.Graphics, layer: TextureLayer, size: number): void {
-    const color = parseColor(layer.color as string)
-    graphics.fillStyle(color, 1)
-    const x = layer.x !== undefined ? layer.x : (size - (layer.width || 0)) / 2
-    const y = layer.y !== undefined ? layer.y : (size - (layer.height || 0)) / 2
-    graphics.fillRect(x, y, layer.width || 0, layer.height || 0)
+  private drawRect(layer: Konva.Layer, layerDesc: TextureLayer, size: number): void {
+    const color = parseColor(layerDesc.color as string)
+    const width = layerDesc.width || 0
+    const height = layerDesc.height || 0
+    const x = layerDesc.x !== undefined ? layerDesc.x : (size - width) / 2
+    const y = layerDesc.y !== undefined ? layerDesc.y : (size - height) / 2
+
+    const rect = new Konva.Rect({
+      x,
+      y,
+      width,
+      height,
+      fill: this.colorToHex(color),
+    })
+
+    layer.add(rect)
   }
 
-  private drawLine(graphics: Phaser.GameObjects.Graphics, layer: TextureLayer, size: number): void {
-    const color = parseColor(layer.color as string)
-    const lineWidth = layer.lineWidth || 1
+  private drawLine(layer: Konva.Layer, layerDesc: TextureLayer, size: number): void {
+    const color = parseColor(layerDesc.color as string)
+    const lineWidth = layerDesc.lineWidth || 1
 
-    graphics.lineStyle(lineWidth, color, 1)
+    const x1 = layerDesc.x !== undefined ? layerDesc.x : 0
+    const y1 = layerDesc.y !== undefined ? layerDesc.y : 0
+    const x2 = layerDesc.x2 !== undefined ? layerDesc.x2 : size
+    const y2 = layerDesc.y2 !== undefined ? layerDesc.y2 : size
 
-    const x1 = layer.x !== undefined ? layer.x : 0
-    const y1 = layer.y !== undefined ? layer.y : 0
-    const x2 = layer.x2 !== undefined ? layer.x2 : size
-    const y2 = layer.y2 !== undefined ? layer.y2 : size
+    const line = new Konva.Line({
+      points: [x1, y1, x2, y2],
+      stroke: this.colorToHex(color),
+      strokeWidth: lineWidth,
+    })
 
-    graphics.beginPath()
-    graphics.moveTo(x1, y1)
-    graphics.lineTo(x2, y2)
-    graphics.strokePath()
+    layer.add(line)
   }
 
-  private drawPattern(
-    graphics: Phaser.GameObjects.Graphics,
-    layer: TextureLayer,
-    size: number,
-  ): void {
-    const { patternType, color1, x = 0, y = 0, width = size, height = size } = layer
+  private drawPattern(layer: Konva.Layer, layerDesc: TextureLayer, size: number): void {
+    const { patternType, color1, x = 0, y = 0, width = size, height = size } = layerDesc
     const patternSize = 8 // Pattern tile size
 
-    if (color1) graphics.fillStyle(Phaser.Display.Color.ValueToColor(color1).color, 1)
+    const color = color1 ? this.colorToHex(color1) : '#000000'
 
     switch (patternType) {
       case 'checkerboard':
         for (let i = 0; i < width; i += patternSize) {
           for (let j = 0; j < height; j += patternSize) {
             if ((Math.floor(i / patternSize) + Math.floor(j / patternSize)) % 2 === 0) {
-              graphics.fillRect(x + i, y + j, patternSize, patternSize)
+              const rect = new Konva.Rect({
+                x: x + i,
+                y: y + j,
+                width: patternSize,
+                height: patternSize,
+                fill: color,
+              })
+              layer.add(rect)
             }
           }
         }
         break
       case 'stripes':
         for (let i = 0; i < width; i += patternSize) {
-          graphics.fillRect(x + i, y, patternSize, height)
+          const rect = new Konva.Rect({
+            x: x + i,
+            y: y,
+            width: patternSize,
+            height: height,
+            fill: color,
+          })
+          layer.add(rect)
         }
         break
       case 'dots':
         const dotRadius = 3
         for (let i = 0; i < width; i += patternSize) {
           for (let j = 0; j < height; j += patternSize) {
-            graphics.fillCircle(x + i + patternSize / 2, y + j + patternSize / 2, dotRadius)
+            const circle = new Konva.Circle({
+              x: x + i + patternSize / 2,
+              y: y + j + patternSize / 2,
+              radius: dotRadius,
+              fill: color,
+            })
+            layer.add(circle)
           }
         }
         break
     }
   }
 
-  private drawEllipse(
-    graphics: Phaser.GameObjects.Graphics,
-    layer: TextureLayer,
-    size: number,
-  ): void {
-    const color = parseColor(layer.color as string)
-    graphics.fillStyle(color, 1)
-    const x = Math.max(0, Math.min(layer.x || size / 2, size))
-    const y = Math.max(0, Math.min(layer.y || size / 2, size))
-    const width = Math.max(1, Math.min(layer.width || size, size))
-    const height = Math.max(1, Math.min(layer.height || size, size))
-    graphics.fillEllipse(x, y, width, height)
+  private drawEllipse(layer: Konva.Layer, layerDesc: TextureLayer, size: number): void {
+    const color = parseColor(layerDesc.color as string)
+    const x = Math.max(0, Math.min(layerDesc.x || size / 2, size))
+    const y = Math.max(0, Math.min(layerDesc.y || size / 2, size))
+    const width = Math.max(1, Math.min(layerDesc.width || size, size))
+    const height = Math.max(1, Math.min(layerDesc.height || size, size))
+
+    const ellipse = new Konva.Ellipse({
+      x,
+      y,
+      radiusX: width / 2,
+      radiusY: height / 2,
+      fill: this.colorToHex(color),
+    })
+
+    layer.add(ellipse)
   }
 
-  private drawPolygon(
-    graphics: Phaser.GameObjects.Graphics,
-    layer: TextureLayer,
-    size: number,
-  ): void {
-    const color = parseColor(layer.color as string)
-    const points = layer.points || []
+  private drawPolygon(layer: Konva.Layer, layerDesc: TextureLayer, size: number): void {
+    const color = parseColor(layerDesc.color as string)
+    const points = layerDesc.points || []
     if (points.length < 3) return // Need at least 3 points for polygon
 
-    graphics.fillStyle(color, 1)
-    graphics.beginPath()
-    const [firstX, firstY] = points[0] || [0, 0]
-    const clampedFirstX = Math.max(0, Math.min(firstX, size))
-    const clampedFirstY = Math.max(0, Math.min(firstY, size))
-    graphics.moveTo(clampedFirstX, clampedFirstY)
-    for (let i = 1; i < points.length; i++) {
-      const [px, py] = points[i]
+    // Flatten points array for Konva
+    const flatPoints: number[] = []
+    points.forEach(([px, py]) => {
       const clampedX = Math.max(0, Math.min(px, size))
       const clampedY = Math.max(0, Math.min(py, size))
-      graphics.lineTo(clampedX, clampedY)
-    }
-    graphics.closePath()
-    graphics.fillPath()
+      flatPoints.push(clampedX, clampedY)
+    })
+
+    const polygon = new Konva.Line({
+      points: flatPoints,
+      fill: this.colorToHex(color),
+      closed: true,
+    })
 
     // Optional outline
-    if (layer.lineWidth && layer.lineWidth > 0) {
-      const lineColor = parseColor(layer.color as string) // Reuse color or add strokeColor
-      graphics.lineStyle(layer.lineWidth, lineColor, 1)
-      graphics.strokePath()
+    if (layerDesc.lineWidth && layerDesc.lineWidth > 0) {
+      polygon.stroke(this.colorToHex(color))
+      polygon.strokeWidth(layerDesc.lineWidth)
     }
+
+    layer.add(polygon)
   }
 
-  private drawPath(graphics: Phaser.GameObjects.Graphics, layer: TextureLayer, size: number): void {
-    const pathData = layer.path || ''
-    const color = parseColor(layer.color as string)
-    const shouldFill = layer.fill !== undefined ? layer.fill : true
-    const lineWidth = layer.lineWidth || 1
+  private drawPath(layer: Konva.Layer, layerDesc: TextureLayer, size: number): void {
+    const pathData = layerDesc.path || ''
+    const color = parseColor(layerDesc.color as string)
+    const shouldFill = layerDesc.fill !== undefined ? layerDesc.fill : true
+    const lineWidth = layerDesc.lineWidth || 1
 
     if (!pathData) return
 
     // Simple SVG path parser supporting M, L, Z (basic lines and closes)
-    graphics.beginPath()
-    let currentX = 0,
-      currentY = 0
+    const points: number[] = []
     let i = 0
     while (i < pathData.length) {
       const char = pathData[i]
       i++
-      if (char === 'M') {
+      if (char === 'M' || char === 'L') {
         const mx = this.parseNumber(pathData, i)
         i += mx.length
         const my = this.parseNumber(pathData, i)
         i += my.length
-        currentX = Math.max(0, Math.min(parseFloat(mx), size))
-        currentY = Math.max(0, Math.min(parseFloat(my), size))
-        graphics.moveTo(currentX, currentY)
-      } else if (char === 'L') {
-        const lx = this.parseNumber(pathData, i)
-        i += lx.length
-        const ly = this.parseNumber(pathData, i)
-        i += ly.length
-        currentX = Math.max(0, Math.min(parseFloat(lx), size))
-        currentY = Math.max(0, Math.min(parseFloat(ly), size))
-        graphics.lineTo(currentX, currentY)
+        const currentX = Math.max(0, Math.min(parseFloat(mx), size))
+        const currentY = Math.max(0, Math.min(parseFloat(my), size))
+        points.push(currentX, currentY)
       } else if (char === 'Z') {
-        graphics.closePath()
+        // Close path - Konva handles this with closed: true
       } else if (char === ' ') {
         // Skip whitespace
-      } else {
-        // Skip unknown commands (e.g., Q for curves - can add arc support later)
-        i--
       }
     }
 
-    if (shouldFill) {
-      graphics.fillStyle(color, 1)
-      graphics.fillPath()
-    }
-    if (lineWidth > 0) {
-      graphics.lineStyle(lineWidth, color, 1)
-      graphics.strokePath()
+    if (points.length > 0) {
+      const line = new Konva.Line({
+        points,
+        closed: pathData.includes('Z'),
+      })
+
+      if (shouldFill) {
+        line.fill(this.colorToHex(color))
+      }
+      if (lineWidth > 0) {
+        line.stroke(this.colorToHex(color))
+        line.strokeWidth(lineWidth)
+      }
+
+      layer.add(line)
     }
   }
 
@@ -377,5 +328,15 @@ export class TextureGenerator {
       i++
     }
     return str.substring(start, i).trim()
+  }
+
+  /**
+   * Convert a numeric color to hex string
+   */
+  private colorToHex(color: number | string): string {
+    if (typeof color === 'string') {
+      return color
+    }
+    return '#' + color.toString(16).padStart(6, '0')
   }
 }

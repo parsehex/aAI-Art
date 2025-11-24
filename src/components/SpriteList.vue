@@ -64,7 +64,6 @@ import { useAIStore } from '@/stores/ai'
 import { Check, Pencil, X, RefreshCw, Clipboard, Edit } from 'lucide-vue-next'
 import { GenerateSpriteMessages } from '@/data/prompt'
 import { TextureGenerator } from '@/utils/TextureGenerator'
-import Phaser from 'phaser'
 
 const props = withDefaults(defineProps<{
   mode?: 'generate' | 'edit'
@@ -78,7 +77,7 @@ const showPresets = ref(true)
 const editingId = ref<string | null>(null)
 const editingName = ref('')
 const selectedTextureId = ref<string | null>(null)
-const textureGenerator = new TextureGenerator({} as Phaser.Scene)
+const textureGenerator = new TextureGenerator()
 const isEdit = computed(() => props.mode === 'edit')
 
 onMounted(() => {

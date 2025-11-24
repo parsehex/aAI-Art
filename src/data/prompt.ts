@@ -1,3 +1,4 @@
+import type { TextureDescription, TextureLayer } from '@/types/Textures'
 import { BrownBear } from './preset-textures/BrownBear'
 import { Tree } from './preset-textures/Tree'
 import { Villager } from './preset-textures/Villager'
@@ -8,7 +9,9 @@ interface ChatMessage {
 }
 
 function formatTextureJson(texture: TextureDescription): string {
-  const layersStr = texture.layers.map((layer) => `    ${JSON.stringify(layer)}`).join(',\n')
+  const layersStr = texture.layers
+    .map((layer: TextureLayer) => `    ${JSON.stringify(layer)}`)
+    .join(',\n')
   return `{
   "name": "${texture.name}",
   "size": ${texture.size},

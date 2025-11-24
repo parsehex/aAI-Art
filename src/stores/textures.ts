@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { v4 } from 'uuid'
+import type { TextureDescription } from '@/types/Textures'
 
 export const useTexturesStore = defineStore('textures', () => {
   const generatedTextures = ref<TextureDescription[]>([])
@@ -38,7 +39,7 @@ export const useTexturesStore = defineStore('textures', () => {
   }
 
   function updateTextureName(id: string, name: string) {
-    const texture = generatedTextures.value.find((t) => t.id === id)
+    const texture = generatedTextures.value.find((t: TextureDescription) => t.id === id)
     if (texture) {
       texture.name = name
       save()

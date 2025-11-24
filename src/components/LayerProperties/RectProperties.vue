@@ -7,6 +7,7 @@
   </div>
 </template>
 <script setup lang="ts">
+import type { TextureLayer } from '@/types/Textures';
 import DraggableNumberInput from '../DraggableNumberInput.vue'
 
 interface Props {

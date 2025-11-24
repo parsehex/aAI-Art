@@ -1,3 +1,5 @@
+import type { TextureDescription } from '@/types/Textures'
+
 export const BrownBear: TextureDescription = {
   id: 'brown-bear-1',
   name: 'brown-bear-standing',

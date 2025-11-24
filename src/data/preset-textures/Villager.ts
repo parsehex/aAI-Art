@@ -1,3 +1,5 @@
+import type { TextureDescription } from '@/types/Textures'
+
 export const Villager: TextureDescription = {
   id: 'villager-1',
   name: 'villager',

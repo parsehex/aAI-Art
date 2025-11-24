@@ -1,3 +1,5 @@
+import type { TextureDescription } from '@/types/Textures'
+
 export const House: TextureDescription = {
   id: 'house-1',
   name: 'house',

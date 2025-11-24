@@ -1,3 +1,5 @@
+import type { TextureLayer } from '@/types/Textures'
+
 export const defaultLayerProperties: Record<TextureLayer['type'], Partial<TextureLayer>> = {
   circle: {
     type: 'circle',

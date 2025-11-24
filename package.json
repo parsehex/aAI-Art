@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "run-p type-check \"build-only {@}\" --",
+    "prebuild": "npm run render preset:all -- --output docs/assets/ai-sprites.png --overwrite",
     "preview": "vite preview",
     "test:unit": "vitest",
     "test:e2e": "playwright test",
@@ -14,7 +15,8 @@
     "lint": "eslint . --fix",
     "format": "prettier --write src/",
     "docs:build": "vitepress build docs",
-    "docs:dev": "vitepress dev docs"
+    "docs:dev": "vitepress dev docs",
+    "render": "tsx cli-render.ts"
   },
   "dependencies": {
     "@parsehex/vuepak": "^0.1.6",
@@ -28,6 +30,7 @@
     "pinia": "^3.0.4",
     "radix-vue": "^1.9.17",
     "reka-ui": "^2.6.0",
+    "skia-canvas": "^3.0.8",
     "tailwind-merge": "^3.4.0",
     "tailwindcss-animate": "^1.0.7",
     "uuid": "^13.0.0",
@@ -56,6 +59,7 @@
     "postcss": "^8.5.6",
     "prettier": "^3.6.2",
     "tailwindcss": "^4.1.17",
+    "tsx": "^4.20.6",
     "typescript": "~5.7.3",
     "vite": "^7.2.4",
     "vite-plugin-vue-devtools": "^8.0.5",

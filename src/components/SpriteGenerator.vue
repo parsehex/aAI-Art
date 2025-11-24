@@ -75,6 +75,7 @@ import { useAIStore } from '@/stores/ai'
 import { useTexturesStore } from '@/stores/textures'
 import { TextureGenerator } from '@/utils/TextureGenerator'
 import GameContainer from '@/components/GameContainer.vue'
+import type { TextureDescription } from '@/types/Textures'
 
 const Form = ref<typeof GeneratorForm>()
 

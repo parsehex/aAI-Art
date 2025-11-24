@@ -1,3 +1,5 @@
+import type { TextureDescription } from '@/types/Textures'
+
 export const Cloud: TextureDescription = {
   id: 'cloud-1',
   name: 'cloud',

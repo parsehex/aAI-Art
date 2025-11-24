@@ -64,6 +64,7 @@ import { Check, Pencil, X, RefreshCw, Edit } from 'lucide-vue-next'
 import CopyButton from '@/components/CopyButton.vue'
 import { GenerateSpriteMessages } from '@/data/prompt'
 import { TextureGenerator } from '@/utils/TextureGenerator'
+import type { TextureDescription } from '@/types/Textures'
 
 const props = withDefaults(defineProps<{
   mode?: 'generate' | 'edit'

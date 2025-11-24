@@ -13,6 +13,7 @@ import SpriteList from '@/components/SpriteList.vue'
 import SpriteEditor from '@/components/SpriteEditor.vue'
 import { useTexturesStore } from '@/stores/textures'
 import { presetTextures } from '@/data/preset-textures/registry'
+import type { TextureDescription } from '@/types/Textures'
 
 const route = useRoute()
 const selectedSpriteForEditing = ref<TextureDescription | null>(null)
@@ -20,7 +21,7 @@ const store = useTexturesStore()
 
 function handleSpriteUpdate(updatedSprite: TextureDescription) {
   // Check if it exists in generated textures
-  const exists = store.generatedTextures.some(t => t.id === updatedSprite.id)
+  const exists = store.generatedTextures.some((t: TextureDescription) => t.id === updatedSprite.id)
 
   if (exists) {
     store.updateGeneratedTexture(updatedSprite.id, updatedSprite)
@@ -62,8 +63,8 @@ function loadSpriteFromRoute() {
   const spriteId = route.params.id as string | undefined
   if (spriteId) {
     // Find sprite in generated textures or presets
-    const sprite = store.generatedTextures.find(t => t.id === spriteId)
-      || presetTextures.find(t => t.id === spriteId)
+    const sprite = store.generatedTextures.find((t: TextureDescription) => t.id === spriteId)
+      || presetTextures.find((t: TextureDescription) => t.id === spriteId)
 
     if (sprite) {
       selectedSpriteForEditing.value = sprite

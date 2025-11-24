@@ -91,6 +91,7 @@ import PatternProperties from './LayerProperties/PatternProperties.vue'
 import GradientProperties from './LayerProperties/GradientProperties.vue'
 import PolygonProperties from './LayerProperties/PolygonProperties.vue'
 import PathProperties from './LayerProperties/PathProperties.vue'
+import type { TextureDescription, TextureLayer } from '@/types/Textures'
 
 interface Props {
   spriteData: TextureDescription | null

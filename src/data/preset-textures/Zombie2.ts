@@ -1,3 +1,5 @@
+import type { TextureDescription } from '@/types/Textures'
+
 export const Zombie2: TextureDescription = {
   id: 'rotting-zombie-2',
   name: 'rotting-zombie',

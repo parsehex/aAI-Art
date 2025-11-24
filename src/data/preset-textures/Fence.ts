@@ -1,3 +1,5 @@
+import type { TextureDescription } from '@/types/Textures'
+
 export const Fence: TextureDescription = {
   id: 'fence-1',
   name: 'fence',

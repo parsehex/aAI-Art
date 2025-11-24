@@ -1,4 +1,4 @@
-type TextureLayer = {
+export type TextureLayer = {
   type: 'circle' | 'rect' | 'line' | 'gradient' | 'pattern' | 'ellipse' | 'polygon' | 'path'
   color?: string
   colorStart?: string // For gradient
@@ -23,7 +23,7 @@ type TextureLayer = {
   rotation?: number // Rotation in degrees
 }
 
-interface TextureDescription {
+export interface TextureDescription {
   size: number
   layers: TextureLayer[]
   name: string

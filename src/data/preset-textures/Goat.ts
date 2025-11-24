@@ -1,3 +1,5 @@
+import type { TextureDescription } from '@/types/Textures'
+
 export const Goat: TextureDescription = {
   id: 'goat-1',
   name: 'goat_side',

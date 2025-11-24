@@ -1,3 +1,5 @@
+import type { TextureDescription } from '@/types/Textures'
+
 export const Tree: TextureDescription = {
   id: 'tree-1',
   name: 'tree',

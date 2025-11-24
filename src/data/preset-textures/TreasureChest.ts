@@ -1,3 +1,5 @@
+import type { TextureDescription } from '@/types/Textures'
+
 export const TreasureChest: TextureDescription = {
   id: 'treasure-chest-1',
   name: 'treasure-chest',

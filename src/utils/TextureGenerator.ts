@@ -1,5 +1,6 @@
 import Konva from 'konva'
 import { parseColor } from './color'
+import type { TextureDescription, TextureLayer } from '@/types/Textures'
 
 export class TextureGenerator {
   private textureCache: Map<string, string> = new Map()

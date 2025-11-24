@@ -10,6 +10,7 @@ import { Tree } from './Tree'
 import { Villager } from './Villager'
 import { Warehouse } from './Warehouse'
 import { Zombie } from './Zombie'
+import type { TextureDescription } from '@/types/Textures'
 // import { Zombie2 } from './Zombie2'
 
 export const PatternTexture: TextureDescription = {

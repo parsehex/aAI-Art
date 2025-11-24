@@ -12,6 +12,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import DraggableNumberInput from '../DraggableNumberInput.vue'
+import type { TextureLayer } from '@/types/Textures';
 
 interface Props {
   layer: TextureLayer

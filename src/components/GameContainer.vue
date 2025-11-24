@@ -8,6 +8,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import Konva from 'konva'
 import { TextureGenerator } from '@/utils/TextureGenerator'
+import type { TextureDescription } from '@/types/Textures'
 
 const containerRef = ref<HTMLDivElement>()
 let stage: Konva.Stage | null = null

@@ -3,34 +3,32 @@ import 'konva/skia-backend'
 import Konva from 'konva'
 import { TextureGenerator } from './src/utils/TextureGenerator'
 import { presetTextures } from './src/data/preset-textures'
-import type { TextureDescription } from './src/types/Textures'
+import type { TextureDescription, TextureLayer } from './src/types/Textures'
 import { readFileSync, writeFileSync, existsSync } from 'fs'
 import { resolve, basename } from 'path'
 
 interface CliOptions {
-  input: string
+  input?: string
   output?: string
   overwrite: boolean
+  useStdin: boolean
 }
 
 function parseArgs(): CliOptions {
   const args = process.argv.slice(2)
 
+  // If no arguments, use stdin
   if (args.length === 0) {
-    console.error('Usage: npm run render <input> [--output <path>] [--overwrite]')
-    console.error('  <input>: Path to JSON file or "preset:{id}"')
-    console.error('  --output: Optional output path (default: current directory)')
-    console.error('  --overwrite: Overwrite existing files without prompting')
-    console.error('\nExamples:')
-    console.error('  npm run render preset:cloud-1')
-    console.error('  npm run render sprite.json --output ./output/sprite.png')
-    console.error('  npm run render preset:all --output docs/assets/ai-sprites.png --overwrite')
-    process.exit(1)
+    return {
+      useStdin: true,
+      overwrite: false,
+    }
   }
 
   const options: CliOptions = {
     input: args[0],
     overwrite: false,
+    useStdin: false,
   }
 
   for (let i = 1; i < args.length; i++) {
@@ -39,10 +37,62 @@ function parseArgs(): CliOptions {
       i++
     } else if (args[i] === '--overwrite') {
       options.overwrite = true
+    } else if (args[i] === '--help' || args[i] === '-h') {
+      printHelp()
+      process.exit(0)
     }
   }
 
   return options
+}
+
+function printHelp() {
+  console.error('Usage: npm run render [input] [--output <path>] [--overwrite]')
+  console.error('\nArguments:')
+  console.error('  [input]: Path to JSON file, "preset:{id}", or omit to read from stdin')
+  console.error('\nOptions:')
+  console.error('  --output <path>: Output path (default: current directory)')
+  console.error('  --overwrite: Overwrite existing files without prompting')
+  console.error('  --help, -h: Show this help message')
+  console.error('\nExamples:')
+  console.error('  npm run render preset:cloud-1')
+  console.error('  npm run render sprite.json --output ./output/sprite.png')
+  console.error('  npm run render preset:all --output docs/assets/ai-sprites.png --overwrite')
+  console.error("  echo '{...}' | npm run render")
+  console.error('  npm run render  # Then paste JSON and press Ctrl+D')
+}
+
+async function readStdin(): Promise<string> {
+  return new Promise((resolve, reject) => {
+    let data = ''
+
+    console.error('Paste JSON sprite data (press Ctrl+D or Enter when done):')
+
+    process.stdin.setEncoding('utf-8')
+    process.stdin.on('data', (chunk) => {
+      data += chunk
+
+      // Try to parse JSON after each chunk to detect complete input
+      try {
+        JSON.parse(data.trim())
+        // If parsing succeeds, we have valid JSON
+        process.stdin.pause()
+        resolve(data.trim())
+      } catch (e) {
+        // Not valid JSON yet, continue reading
+      }
+    })
+
+    process.stdin.on('end', () => {
+      if (data.trim()) {
+        resolve(data.trim())
+      } else {
+        reject(new Error('No input received'))
+      }
+    })
+
+    process.stdin.on('error', reject)
+  })
 }
 
 function loadSpriteData(input: string): TextureDescription | 'ALL_PRESETS' {
@@ -172,7 +222,7 @@ async function renderAllPresets(): Promise<Buffer> {
     })
 
     // Draw sprite layers
-    preset.layers.forEach((layerDesc) => {
+    preset.layers.forEach((layerDesc: TextureLayer) => {
       if (layerDesc.visible !== false) {
         generator.drawLayer(spriteGroup, layerDesc, preset.size)
       }
@@ -217,8 +267,33 @@ function getOutputPath(
 async function main() {
   const options = parseArgs()
 
-  console.log(`Loading sprite data from: ${options.input}`)
-  const spriteData = loadSpriteData(options.input)
+  let spriteData: TextureDescription | 'ALL_PRESETS'
+
+  if (options.useStdin) {
+    try {
+      const jsonInput = await readStdin()
+      const data = JSON.parse(jsonInput) as TextureDescription
+
+      // Validate required fields
+      if (!data.size || !data.layers || !data.id) {
+        console.error('Error: Invalid sprite data. Required fields: size, layers, id')
+        process.exit(1)
+      }
+
+      spriteData = data
+      console.log(`Loaded sprite from stdin: ${data.name || data.id}`)
+    } catch (error) {
+      if (error instanceof SyntaxError) {
+        console.error('Error: Invalid JSON input')
+      } else {
+        console.error(`Error: ${(error as Error).message}`)
+      }
+      process.exit(1)
+    }
+  } else {
+    console.log(`Loading sprite data from: ${options.input}`)
+    spriteData = loadSpriteData(options.input!)
+  }
 
   let imageBuffer: Buffer
 

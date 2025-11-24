@@ -47,6 +47,18 @@
           <p v-if="justSaved" class="text-green-400 text-sm">✓ Sprite saved successfully!</p>
         </div>
       </div>
+      <!-- JSON Viewer -->
+      <div class="mt-4 pt-4 border-t border-gray-700">
+        <button @click="jsonCollapsed = !jsonCollapsed"
+          class="flex items-center gap-2 text-sm font-medium text-gray-400 hover:text-white transition-colors w-full">
+          <svg class="w-4 h-4 transition-transform duration-200" :class="{ '-rotate-90': jsonCollapsed }"
+            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg> JSON Data </button>
+        <div v-show="!jsonCollapsed" class="mt-2 bg-gray-900 rounded-md overflow-hidden text-xs">
+          <JsonViewer :data="jsonDisplayData || {}" />
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -54,6 +66,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useLocalStorage } from '@vueuse/core'
 import { v4 } from 'uuid'
+import { JsonViewer } from '@parsehex/vuepak'
 import GeneratorForm from '@/components/GeneratorForm.vue'
 import { GenerateSpriteMessages } from '@/data/prompt'
 import { useAIStore } from '@/stores/ai'
@@ -72,6 +85,7 @@ const generatedSprite = ref<TextureDescription | null>(null)
 const spritePreview = ref<string | null>(null)
 const justSaved = ref(false)
 const formCollapsed = useLocalStorage('formCollapsed', true)
+const jsonCollapsed = useLocalStorage('jsonCollapsed', true)
 
 // Computed property to get the current sprite (either newly generated or selected)
 const currentSprite = computed(() => generatedSprite.value || selectedTexture.value)
@@ -84,6 +98,13 @@ const currentPreview = computed(() => {
   if (spritePreview.value) return spritePreview.value
   if (selectedTexture.value?.thumbnail) return selectedTexture.value.thumbnail
   return null
+})
+
+const jsonDisplayData = computed(() => {
+  if (!currentSprite.value) return null
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { thumbnail, ...rest } = currentSprite.value
+  return rest
 })
 
 const canSend = computed(() => {

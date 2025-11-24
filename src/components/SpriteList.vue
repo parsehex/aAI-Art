@@ -180,9 +180,9 @@ function regenerateSprite(texture: TextureDescription) {
 }
 
 async function copyToClipboard(texture: TextureDescription) {
-  const json = JSON.stringify(texture, null, 2)
   try {
-    await navigator.clipboard.writeText(json)
+    const { thumbnail, ...rest } = texture
+    await navigator.clipboard.writeText(JSON.stringify(rest, null, 2))
     console.log('Texture JSON copied to clipboard')
   } catch (err) {
     console.error('Failed to copy JSON:', err)

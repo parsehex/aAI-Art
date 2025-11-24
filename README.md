@@ -13,7 +13,7 @@ This is an app that explores using AI to create procedural graphics, in contrast
 
 Here are some examples of sprites created by LLMs:
 
-![Preview image of sprites generated with aAI-Art](./ai-sprites.png)
+![Preview image of sprites generated with aAI-Art](./docs/assets/ai-sprites.png)
 
 ## Getting Started
 

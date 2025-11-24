@@ -32,10 +32,7 @@
         <RefreshCw class="w-4 h-4" />
       </button>
       <!-- Copy JSON to clipboard -->
-      <button v-if="!isEdit" @click.stop="copyToClipboard(texture)"
-        class="ml-2 text-purple-400 hover:text-purple-600 text-lg" title="Copy JSON to Clipboard">
-        <Clipboard class="w-4 h-4" />
-      </button>
+      <CopyButton v-if="!isEdit" :data="texture" class="ml-2 text-lg" />
       <!-- Edit sprite name -->
       <button v-if="!isEdit && texture.generated && texture.id !== editingId"
         @click.stop="startEdit(texture.id, texture.name)" class="ml-2 text-blue-400 hover:text-blue-600 text-lg"
@@ -63,7 +60,8 @@ import { useRouter, useRoute } from 'vue-router'
 import { presetTextures } from '@/data/preset-textures/registry'
 import { useTexturesStore } from '@/stores/textures'
 import { useAIStore } from '@/stores/ai'
-import { Check, Pencil, X, RefreshCw, Clipboard, Edit } from 'lucide-vue-next'
+import { Check, Pencil, X, RefreshCw, Edit } from 'lucide-vue-next'
+import CopyButton from '@/components/CopyButton.vue'
 import { GenerateSpriteMessages } from '@/data/prompt'
 import { TextureGenerator } from '@/utils/TextureGenerator'
 
@@ -179,15 +177,7 @@ function regenerateSprite(texture: TextureDescription) {
   window.dispatchEvent(new CustomEvent('regenerateTexture', { detail: { id: texture.id, prompt: texture.prompt } }))
 }
 
-async function copyToClipboard(texture: TextureDescription) {
-  try {
-    const { thumbnail, ...rest } = texture
-    await navigator.clipboard.writeText(JSON.stringify(rest, null, 2))
-    console.log('Texture JSON copied to clipboard')
-  } catch (err) {
-    console.error('Failed to copy JSON:', err)
-  }
-}
+
 
 function startEdit(id: string, name: string) {
   editingId.value = id

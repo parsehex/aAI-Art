@@ -48,16 +48,17 @@
         </div>
       </div>
       <!-- JSON Viewer -->
-      <div class="mt-4 pt-4 border-t border-gray-700">
+      <div class="mt-4 pt-4 border-t border-gray-700 flex items-center">
+        <CopyButton :data="jsonDisplayData" class="mr-4" />
         <button @click="jsonCollapsed = !jsonCollapsed"
           class="flex items-center gap-2 text-sm font-medium text-gray-400 hover:text-white transition-colors w-full">
           <svg class="w-4 h-4 transition-transform duration-200" :class="{ '-rotate-90': jsonCollapsed }"
             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
           </svg> JSON Data </button>
-        <div v-show="!jsonCollapsed" class="mt-2 bg-gray-900 rounded-md overflow-hidden text-xs">
-          <JsonViewer :data="jsonDisplayData || {}" />
-        </div>
+      </div>
+      <div v-show="!jsonCollapsed" class="mt-2 bg-gray-900 rounded-md overflow-hidden text-xs">
+        <JsonViewer :data="jsonDisplayData || {}" />
       </div>
     </div>
   </div>
@@ -67,6 +68,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useLocalStorage } from '@vueuse/core'
 import { v4 } from 'uuid'
 import { JsonViewer } from '@parsehex/vuepak'
+import CopyButton from '@/components/CopyButton.vue'
 import GeneratorForm from '@/components/GeneratorForm.vue'
 import { GenerateSpriteMessages } from '@/data/prompt'
 import { useAIStore } from '@/stores/ai'

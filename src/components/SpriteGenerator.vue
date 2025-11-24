@@ -1,6 +1,15 @@
 <template>
   <div class="space-y-4">
-    <GeneratorForm ref="Form" placeholder="Describe your sprite...">
+    <button @click="formCollapsed = !formCollapsed"
+      class="w-full flex flex-col items-center gap-1 py-2 hover:bg-gray-800 rounded-md transition group">
+      <span class="text-sm font-medium text-gray-300 group-hover:text-white">Generate</span>
+      <svg class="w-5 h-5 text-gray-400 group-hover:text-white transition-transform duration-200"
+        :class="{ 'rotate-180': formCollapsed }" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+        stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+      </svg>
+    </button>
+    <GeneratorForm v-show="!formCollapsed" ref="Form" placeholder="Describe your sprite...">
       <template #button>
         <button :disabled="!canSend" @click="generateSprite"
           class="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition disabled:opacity-50">
@@ -12,7 +21,7 @@
         </button>
       </template>
     </GeneratorForm>
-    <GameContainer />
+    <GameContainer v-show="currentSprite" />
     <!-- Preview and Save Area -->
     <div v-if="currentSprite" class="bg-gray-800 p-4 mt-4 rounded-lg shadow-lg border border-gray-700">
       <h3 class="text-lg font-bold mb-3 text-white">Sprite Preview</h3>
@@ -43,6 +52,7 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
+import { useLocalStorage } from '@vueuse/core'
 import { v4 } from 'uuid'
 import GeneratorForm from '@/components/GeneratorForm.vue'
 import { GenerateSpriteMessages } from '@/data/prompt'
@@ -61,6 +71,7 @@ const selectedTexture = ref<TextureDescription | null>(null)
 const generatedSprite = ref<TextureDescription | null>(null)
 const spritePreview = ref<string | null>(null)
 const justSaved = ref(false)
+const formCollapsed = useLocalStorage('formCollapsed', true)
 
 // Computed property to get the current sprite (either newly generated or selected)
 const currentSprite = computed(() => generatedSprite.value || selectedTexture.value)

@@ -13,7 +13,8 @@
     "type-check": "vue-tsc --build",
     "lint": "eslint . --fix",
     "format": "prettier --write src/",
-    "docs:build": "vitepress build docs"
+    "docs:build": "vitepress build docs",
+    "docs:dev": "vitepress dev docs"
   },
   "dependencies": {
     "@parsehex/vuepak": "^0.1.6",
@@ -49,6 +50,7 @@
     "eslint-plugin-vue": "^9.32.0",
     "jiti": "^2.4.2",
     "jsdom": "^26.0.0",
+    "markdown-it-implicit-figures": "^0.12.0",
     "npm-run-all2": "^7.0.2",
     "postcss": "^8.5.1",
     "prettier": "^3.6.2",

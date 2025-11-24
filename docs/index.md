@@ -13,3 +13,7 @@ hero:
     #   text: 'What is aAI Art?'
     #   link: '/guide/what-is-aai-art'
 ---
+
+---
+
+![Preview image of sprites generated with aAI-Art](./assets/ai-sprites.png)

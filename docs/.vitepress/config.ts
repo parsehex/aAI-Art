@@ -1,4 +1,5 @@
 import { defineConfig } from 'vitepress'
+import implicitFigures from 'markdown-it-implicit-figures'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -8,6 +9,14 @@ export default defineConfig({
   base: '/aAI-Art/docs/',
   vite: {
     configFile: false,
+  },
+  markdown: {
+    config: (md) => {
+      md.use(implicitFigures, {
+        figcaption: true,
+        copyAttrs: '^class$',
+      })
+    },
   },
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config

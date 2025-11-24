@@ -31,7 +31,6 @@
             <SpriteList />
             <div class="flex flex-col flex-1 space-y-4">
               <SpriteGenerator />
-              <GameContainer />
             </div>
           </div>
         </template>
@@ -52,7 +51,6 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import GameContainer from './components/GameContainer.vue'
 import SpriteGenerator from './components/SpriteGenerator.vue'
 import SvgGenerator from './components/SvgGenerator.vue'
 import SpriteList from './components/SpriteList.vue'

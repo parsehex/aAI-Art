@@ -58,8 +58,8 @@
                 @update:modelValue="updateSprite" />
             </div>
             <div>
-              <DraggableNumberInput v-model="rotation" label="Rotation" :step="1" :min="0" :max="360"
-                @update:modelValue="updateSprite" />
+              <DraggableNumberInput :model-value="selectedLayer.rotation || 0" label="Rotation" :step="1" :min="0"
+                :max="360" @update:model-value="(val) => updateLayerProperty('rotation', val)" />
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-300">Color</label>
@@ -111,13 +111,6 @@ const textureGenerator = new TextureGenerator()
 
 // Scale factor for the editor view
 const EDITOR_SCALE = 4
-
-const rotation = computed({
-  get: () => selectedLayer.value?.rotation || 0,
-  set: (value) => {
-    updateLayerProperty('rotation', value)
-  }
-})
 
 const selectedLayer = computed(() => {
   return selectedLayerIndex.value !== null && props.spriteData ? props.spriteData.layers[selectedLayerIndex.value] : null
@@ -438,23 +431,22 @@ function handleDragEnd(index: number, node: Konva.Group) {
   if (!props.spriteData) return
   const layer = props.spriteData.layers[index]
 
-  // Calculate new position
-  // The group position is the delta because we rendered at (0,0) inside the group?
-  // Wait, TextureGenerator renders at layer.x/y.
-  // So the group starts at 0,0.
-  // The visual position is layer.x + group.x.
-
-  const newX = (layer.x || 0) + node.x()
-  const newY = (layer.y || 0) + node.y()
+  const deltaX = node.x()
+  const deltaY = node.y()
 
   // Reset group position to 0,0 and update layer data
-  // This prevents accumulation of offsets in the group
   node.position({ x: 0, y: 0 })
 
-  const newLayer = {
-    ...layer,
-    x: Math.round(newX),
-    y: Math.round(newY)
+  const newLayer = { ...layer }
+
+  // Update position
+  if (layer.x !== undefined) newLayer.x = Math.round((layer.x || 0) + deltaX)
+  if (layer.y !== undefined) newLayer.y = Math.round((layer.y || 0) + deltaY)
+
+  // For lines, also update end coordinates
+  if (layer.type === 'line') {
+    if (layer.x2 !== undefined) newLayer.x2 = Math.round((layer.x2 || 0) + deltaX)
+    if (layer.y2 !== undefined) newLayer.y2 = Math.round((layer.y2 || 0) + deltaY)
   }
 
   updateLayerAtIndex(index, newLayer)
@@ -468,43 +460,86 @@ function handleTransformEnd(index: number, node: Konva.Group) {
   const scaleY = node.scaleY()
   const rotation = node.rotation()
 
-  // Reset node transforms
+  // Get the transform matrix of the group
+  // This matrix transforms local group coordinates to parent (layer) coordinates
+  const transform = node.getTransform()
+
+  // Reset node transforms so we can apply them to the data
   node.scaleX(1)
   node.scaleY(1)
   node.rotation(0)
-
-  // Update layer properties
-  // This is tricky because different shapes handle width/height/radius differently
-  // And TextureGenerator might not support all these updates easily if we just change width/height
-  // But let's try basic mapping
+  node.position({ x: 0, y: 0 })
 
   const newLayer: TextureLayer = { ...layer }
 
   // Update rotation
   newLayer.rotation = (newLayer.rotation || 0) + rotation
 
-  // Update dimensions
-  if (newLayer.width !== undefined) {
-    newLayer.width = Math.round(newLayer.width * scaleX)
-  }
-  if (newLayer.height !== undefined) {
-    newLayer.height = Math.round(newLayer.height * scaleY)
-  }
-  if (newLayer.radius !== undefined) {
-    // Average scale for radius
-    newLayer.radius = Math.round(newLayer.radius * ((scaleX + scaleY) / 2))
-  }
+  // Handle different shape types
+  if (layer.type === 'line') {
+    // For lines, transform the start and end points
+    const x1 = layer.x !== undefined ? layer.x : 0
+    const y1 = layer.y !== undefined ? layer.y : 0
+    const x2 = layer.x2 !== undefined ? layer.x2 : props.spriteData.size
+    const y2 = layer.y2 !== undefined ? layer.y2 : props.spriteData.size
 
-  // Also need to handle position change if rotation/scaling changed the center?
-  // Konva transformer changes x/y if centered scaling is not used?
-  // For now let's assume simple scaling.
-  // Actually, transformer might move the node.
-  const newX = (layer.x || 0) + node.x()
-  const newY = (layer.y || 0) + node.y()
-  node.position({ x: 0, y: 0 })
+    const p1 = transform.point({ x: x1, y: y1 })
+    const p2 = transform.point({ x: x2, y: y2 })
 
-  newLayer.x = Math.round(newX)
-  newLayer.y = Math.round(newY)
+    newLayer.x = Math.round(p1.x)
+    newLayer.y = Math.round(p1.y)
+    newLayer.x2 = Math.round(p2.x)
+    newLayer.y2 = Math.round(p2.y)
+
+    // Lines don't really have width/height scaling in the same way,
+    // the length changes by moving points.
+    // Stroke width might need scaling?
+    if (layer.lineWidth) {
+      newLayer.lineWidth = Math.round(layer.lineWidth * ((scaleX + scaleY) / 2))
+    }
+  } else if (layer.type === 'circle' || layer.type === 'ellipse') {
+    // Center-based shapes
+    const x = layer.x !== undefined ? layer.x : props.spriteData.size / 2
+    const y = layer.y !== undefined ? layer.y : props.spriteData.size / 2
+
+    const center = transform.point({ x, y })
+    newLayer.x = Math.round(center.x)
+    newLayer.y = Math.round(center.y)
+
+    if (layer.type === 'circle' && layer.radius) {
+      newLayer.radius = Math.round(layer.radius * ((scaleX + scaleY) / 2))
+    } else if (layer.type === 'ellipse') {
+      if (layer.width) newLayer.width = Math.round(layer.width * scaleX)
+      if (layer.height) newLayer.height = Math.round(layer.height * scaleY)
+    }
+  } else {
+    // Top-left based shapes (rect, pattern, etc)
+    const width = layer.width || 0
+    const height = layer.height || 0
+    const x = layer.x !== undefined ? layer.x : (props.spriteData.size - width) / 2
+    const y = layer.y !== undefined ? layer.y : (props.spriteData.size - height) / 2
+
+    // Calculate center
+    const cx = x + width / 2
+    const cy = y + height / 2
+
+    // Transform center
+    const newCenter = transform.point({ x: cx, y: cy })
+
+    // Update dimensions
+    const newWidth = Math.round(width * scaleX)
+    const newHeight = Math.round(height * scaleY)
+
+    // Calculate new top-left from new center
+    newLayer.width = newWidth
+    newLayer.height = newHeight
+    newLayer.x = Math.round(newCenter.x - newWidth / 2)
+    newLayer.y = Math.round(newCenter.y - newHeight / 2)
+
+    if (layer.radius) {
+      newLayer.radius = Math.round(layer.radius * ((scaleX + scaleY) / 2))
+    }
+  }
 
   updateLayerAtIndex(index, newLayer)
 }
@@ -514,17 +549,28 @@ onUnmounted(() => {
 })
 
 const currentSpriteId = ref<string | null>(null)
+const lastTextureKey = ref<string>('')
 
 watch(
   () => props.spriteData,
-  (newVal) => {
+  (newVal, oldVal) => {
     if (newVal) {
       spriteSize.value = newVal.size
 
-      // If the sprite ID changed, it's a new load. Render silently.
-      // Otherwise, it's an update to the current sprite. Render and emit changes.
-      const isNewSprite = newVal.id !== currentSpriteId.value
+      const newKey = textureGenerator.getTextureKey(newVal)
+
+      // If the sprite ID changed, it's a new load.
+      // Also if we went from generated -> not generated (reset), treat as new load.
+      const isReset = oldVal?.generated && !newVal.generated
+      const isNewSprite = newVal.id !== currentSpriteId.value || isReset
+
+      // If ID is same and visual content (key) is same, ignore update (e.g. thumbnail/name change)
+      if (!isNewSprite && newKey === lastTextureKey.value) {
+        return
+      }
+
       currentSpriteId.value = newVal.id
+      lastTextureKey.value = newKey
 
       if (!stage.value && canvasContainer.value) {
         initKonvaStage()
@@ -533,6 +579,7 @@ watch(
       }
     } else {
       currentSpriteId.value = null
+      lastTextureKey.value = ''
       stage.value?.destroy()
       stage.value = undefined
     }

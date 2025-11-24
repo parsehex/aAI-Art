@@ -155,12 +155,16 @@ export class TextureGenerator {
     const x = layerDesc.x !== undefined ? layerDesc.x : (size - width) / 2
     const y = layerDesc.y !== undefined ? layerDesc.y : (size - height) / 2
 
+    // To rotate around center while keeping x,y as top-left:
+    // Place at center, set offset to half width/height
     const rect = new Konva.Rect({
-      x,
-      y,
+      x: x + width / 2,
+      y: y + height / 2,
       width,
       height,
       fill: this.colorToHex(color),
+      offsetX: width / 2,
+      offsetY: height / 2,
       rotation: layerDesc.rotation || 0,
     })
 
@@ -176,11 +180,20 @@ export class TextureGenerator {
     const x2 = layerDesc.x2 !== undefined ? layerDesc.x2 : size
     const y2 = layerDesc.y2 !== undefined ? layerDesc.y2 : size
 
+    // Calculate center of the line
+    const cx = (x1 + x2) / 2
+    const cy = (y1 + y2) / 2
+
     const line = new Konva.Line({
       points: [x1, y1, x2, y2],
       stroke: this.colorToHex(color),
       strokeWidth: lineWidth,
       rotation: layerDesc.rotation || 0,
+      // Rotate around center
+      x: cx,
+      y: cy,
+      offsetX: cx,
+      offsetY: cy,
     })
 
     layer.add(line)

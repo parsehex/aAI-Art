@@ -96,6 +96,10 @@ export const useAIStore = defineStore('ai', () => {
               model: modelId,
               messages,
               stream: true,
+              reasoning: {
+                max_tokens: 500,
+                exclude: true,
+              },
               ...options,
             }),
           })
@@ -118,11 +122,11 @@ export const useAIStore = defineStore('ai', () => {
               if (line.startsWith('data: ')) {
                 try {
                   const data = JSON.parse(line.slice(6))
-                  const delta = data.choices[0]?.delta?.content || ''
+                  let delta = data.choices[0]?.delta?.content || ''
                   content += delta
                   if (options.onProgress) options.onProgress(content)
                 } catch (e) {
-                  console.warn('Error parsing stream chunk', e)
+                  console.warn('Error parsing stream chunk', e, line)
                 }
               }
             }
@@ -137,6 +141,7 @@ export const useAIStore = defineStore('ai', () => {
           const response = await ollama.chat({
             model: modelId,
             messages,
+            format: 'json',
             stream: true,
             ...options,
           })
@@ -153,11 +158,26 @@ export const useAIStore = defineStore('ai', () => {
         throw new Error('Unknown provider')
       }
 
-      // Strip markdown code blocks
+      // Extract content from within markdown code blocks
       const lines = content.split('\n')
-      if (lines[0]?.startsWith('```')) lines.shift()
-      if (lines[lines.length - 1]?.startsWith('```')) lines.pop()
-      return lines.join('\n')
+      const startIdx = lines.findIndex((line: string) => line.startsWith('```'))
+
+      // Find last occurrence of code fence
+      let endIdx = -1
+      for (let i = lines.length - 1; i >= 0; i--) {
+        if (lines[i].startsWith('```')) {
+          endIdx = i
+          break
+        }
+      }
+
+      // If we found code fences, extract only the content between them
+      if (startIdx !== -1 && endIdx !== -1 && startIdx !== endIdx) {
+        return lines.slice(startIdx + 1, endIdx).join('\n')
+      }
+
+      // Otherwise return the full content
+      return content
     } finally {
       isLoading.value = false
     }

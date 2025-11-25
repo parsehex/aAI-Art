@@ -149,7 +149,7 @@ async function generateSprite() {
   try {
     const { parse } = await import('partial-json')
 
-    await aiStore.generate(
+    const result = await aiStore.generate(
       aiStore.selectedModel,
       GenerateSpriteMessages(p),
       {
@@ -195,6 +195,7 @@ async function generateSprite() {
         }
       }
     )
+    console.log(result)
 
     // Final pass to ensure everything is consistent
     if (generatedSprite.value) {

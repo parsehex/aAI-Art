@@ -44,12 +44,12 @@ Each layer is drawn in order and must have a "type" and "color".
 All layers support an optional "rotation" property (in degrees).
 
 ## Layer Types
-- Rectangle: { "type": "rect", "color": string, "x": number, "y": number, "width": number, "height": number, "rotation"?: number }
+- Rectangle: { "type": "rect", "color": string, "x": number, "y": number, "width": number, "height": number }
 - Circle:    { "type": "circle", "color": string, "x": number, "y": number, "radius": number }
-- Line:      { "type": "line", "color": string, "x": number, "y": number, "x2": number, "y2": number, "lineWidth"?: number, "rotation"?: number }
-- Ellipse:   { "type": "ellipse", "color": string, "x": number, "y": number, "width": number, "height": number, "rotation"?: number }
-- Polygon:   { "type": "polygon", "color": string, "points": [[x,y],...], "lineWidth"?: number, "rotation"?: number }
-- Path:      { "type": "path", "color": string, "path": string, "fill"?: boolean, "lineWidth"?: number, "rotation"?: number }
+- Line:      { "type": "line", "color": string, "x": number, "y": number, "x2": number, "y2": number, "lineWidth": number }
+- Ellipse:   { "type": "ellipse", "color": string, "x": number, "y": number, "width": number, "height": number }
+- Polygon:   { "type": "polygon", "color": string, "points": [[x,y],...], "lineWidth": number }
+- Path:      { "type": "path", "color": string, "path": string, "fill": boolean, "lineWidth": number }
 
 Colors: hex codes ("#FF0000") or names ("red","gray","transparent").
 
@@ -58,6 +58,7 @@ Colors: hex codes ("#FF0000") or names ("red","gray","transparent").
 2. Keep size reasonable (64 or 128).
 3. Use multiple shapes to build details when desired.
 4. Use rotation to add visual interest or create angled shapes.
+5. IMPORTANT: Output must be VALID JSON -- for example, there should be no comments.
 
 ## Examples
 

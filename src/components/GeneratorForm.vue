@@ -1,7 +1,8 @@
 <template>
   <div class="bg-gray-800 p-4 rounded-lg shadow-lg border border-gray-700 space-y-4 w-80 mx-auto">
-    <input v-model="prompt" :placeholder="placeholder"
-      class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+    <textarea v-model="prompt" :placeholder="placeholder"
+      class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+      rows="4" />
     <div class="mb-2">
       <label class="block text-sm font-bold mb-1">AI Provider:</label>
       <select v-model="store.provider"

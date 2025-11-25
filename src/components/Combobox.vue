@@ -12,7 +12,7 @@
         <CommandEmpty>No model found.</CommandEmpty>
         <CommandList>
           <CommandGroup>
-            <CommandItem v-for="item in sortedItems" :key="item.id" @select="selectModel(item.id)" :value="item"
+            <CommandItem v-for="item in sortedItems" :key="item.id" @select="selectModel(item.id)" :value="item.name"
               class="flex justify-between cursor-pointer">
               <div class="flex items-center">
                 <Check :class="cn('mr-2 h-4 w-4', selectedItem === item.id ? 'opacity-100' : 'opacity-0')

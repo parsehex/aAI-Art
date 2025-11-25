@@ -31,7 +31,17 @@
       <GameContainer v-show="currentSprite" />
       <!-- Preview and Save Area -->
       <div v-if="currentSprite" class="bg-gray-800 p-4 rounded-lg shadow-lg border border-gray-700">
-        <h3 class="text-lg font-bold mb-3 text-white">Sprite Preview</h3>
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-lg font-bold text-white">Sprite Preview</h3>
+          <button @click="redrawSprite" :disabled="isRedrawing"
+            class="px-3 py-1 text-sm bg-purple-600 text-white rounded-md hover:bg-purple-700 transition disabled:opacity-50 disabled:cursor-not-allowed">
+            <span v-if="!isRedrawing">🎨 Draw Again</span>
+            <span v-else class="flex items-center">
+              <div class="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin mr-1"></div>
+              Redrawing...
+            </span>
+          </button>
+        </div>
         <div class="flex items-center gap-4">
           <!-- Preview -->
           <div class="bg-gray-900 p-4 rounded-md border border-gray-600">
@@ -66,8 +76,9 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
             </svg> JSON Data </button>
         </div>
-        <div v-show="!jsonCollapsed" class="mt-2 bg-gray-900 rounded-md overflow-hidden text-xs">
-          <JsonViewer :data="jsonDisplayData || {}" />
+        <div v-if="jsonDisplayData !== undefined && jsonDisplayData !== null" v-show="!jsonCollapsed"
+          class="mt-2 bg-gray-900 rounded-md overflow-hidden text-xs">
+          <JsonViewer :data="jsonDisplayData" />
         </div>
       </div>
     </div>
@@ -98,6 +109,7 @@ const generatedSprite = ref<TextureDescription | null>(null)
 const spritePreview = ref<string | null>(null)
 const justSaved = ref(false)
 const isSaved = ref(false)
+const isRedrawing = ref(false)
 const formCollapsed = useLocalStorage('formCollapsed', true)
 const jsonCollapsed = useLocalStorage('jsonCollapsed', true)
 
@@ -118,6 +130,12 @@ const jsonDisplayData = computed(() => {
   if (!currentSprite.value) return null
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { thumbnail, ...rest } = currentSprite.value
+  if (!rest) return null
+  // remove any undefined properties
+  Object.keys(rest).forEach((key: string) => {
+    // @ts-ignore
+    if (rest[key] === undefined) delete rest[key]
+  })
   return rest
 })
 
@@ -253,6 +271,77 @@ async function downloadSprite() {
   document.body.appendChild(link)
   link.click()
   document.body.removeChild(link)
+}
+
+async function redrawSprite() {
+  if (!currentSprite.value || isRedrawing.value) return
+
+  isRedrawing.value = true
+  const sprite = currentSprite.value
+  const { thumbnail, ...spriteData } = sprite
+  const jsonString = JSON.stringify(spriteData, null, 2)
+
+  try {
+    const { parse } = await import('partial-json')
+
+    // Simulate character-by-character reconstruction
+    for (let i = 0; i < jsonString.length; i++) {
+      const partialJson = jsonString.substring(0, i + 1)
+
+      try {
+        const partialData = parse(partialJson)
+
+        if (partialData && typeof partialData === 'object') {
+          // Ensure minimal structure
+          if (!partialData.size) partialData.size = sprite.size || 64
+          if (!partialData.layers) partialData.layers = []
+
+          const tempSprite = {
+            ...partialData,
+            id: sprite.id,
+            prompt: sprite.prompt
+          } as TextureDescription
+
+          // Update the current sprite (either generated or selected)
+          if (generatedSprite.value) {
+            generatedSprite.value = tempSprite
+          } else {
+            selectedTexture.value = tempSprite
+          }
+
+          // Update preview
+          try {
+            spritePreview.value = await textureGenerator.generateImage(tempSprite)
+          } catch (e) {
+            // Ignore preview errors during animation
+          }
+
+          // Dispatch event for GameContainer
+          window.dispatchEvent(new CustomEvent('spriteSelected', { detail: tempSprite }))
+        }
+      } catch (e) {
+        // Ignore parsing errors for incomplete JSON
+      }
+
+      // Add a small delay to make the animation visible
+      // Adjust speed based on JSON length
+      const delay = Math.max(1, Math.min(10, 1000 / jsonString.length))
+      await new Promise(resolve => setTimeout(resolve, delay))
+    }
+
+    // Final update to ensure everything is correct
+    if (generatedSprite.value) {
+      spritePreview.value = await textureGenerator.generateImage(generatedSprite.value)
+      window.dispatchEvent(new CustomEvent('spriteSelected', { detail: generatedSprite.value }))
+    } else if (selectedTexture.value) {
+      spritePreview.value = await textureGenerator.generateImage(selectedTexture.value)
+      window.dispatchEvent(new CustomEvent('spriteSelected', { detail: selectedTexture.value }))
+    }
+  } catch (error) {
+    console.error('Error redrawing sprite:', error)
+  } finally {
+    isRedrawing.value = false
+  }
 }
 
 function clearCurrent() {

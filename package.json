@@ -19,7 +19,7 @@
     "render": "tsx cli-render.ts"
   },
   "dependencies": {
-    "@parsehex/vuepak": "^0.1.6",
+    "@parsehex/vuepak": "^0.1.7",
     "@tailwindcss/vite": "^4.1.17",
     "@vueuse/core": "^14.0.0",
     "class-variance-authority": "^0.7.1",

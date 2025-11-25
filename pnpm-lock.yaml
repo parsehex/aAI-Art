@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@parsehex/vuepak':
-        specifier: ^0.1.6
-        version: 0.1.6(vue@3.5.24(typescript@5.7.3))
+        specifier: ^0.1.7
+        version: 0.1.7(vue@3.5.24(typescript@5.7.3))
       '@tailwindcss/vite':
         specifier: ^4.1.17
         version: 4.1.17(vite@7.2.4(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.20.6))
@@ -827,8 +827,8 @@ packages:
   '@one-ini/wasm@0.1.1':
     resolution: {integrity: sha512-XuySG1E38YScSJoMlqovLru4KTUNSjgVTIjyh7qMX6aNN5HY5Ct5LhRJdxO79JtTzKfzV/bnWpz+zquYrISsvw==}
 
-  '@parsehex/vuepak@0.1.6':
-    resolution: {integrity: sha512-Ct5MyCfoQcLykfidvky8YPCPwYU4CsNllfDZISK1+1ZNOObLBUWQ5JrlnSqKdeN5x5WrOaQ/wJvnZufuCMsaDg==}
+  '@parsehex/vuepak@0.1.7':
+    resolution: {integrity: sha512-uhEKV3eLqJJ3GrjDqwwWGJmLwug20w0qro1ssdS1Fjanmkycg91bQbjyAXTgtRlwNbhcrrNFKEt3UcYzEZk/FQ==}
     peerDependencies:
       vue: ^3
 
@@ -3626,7 +3626,7 @@ snapshots:
 
   '@one-ini/wasm@0.1.1': {}
 
-  '@parsehex/vuepak@0.1.6(vue@3.5.24(typescript@5.7.3))':
+  '@parsehex/vuepak@0.1.7(vue@3.5.24(typescript@5.7.3))':
     dependencies:
       vue: 3.5.24(typescript@5.7.3)
 

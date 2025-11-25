@@ -28,9 +28,7 @@ const BrownBearJson = formatTextureJson(BrownBear)
 export const GenerateSpriteMessages = (input: string) => {
   const msgs: ChatMessage[] = []
 
-  // TODO update this to match the new schema
-  // - shouldn't need to mention "visible" -- dont know what use invisible layers would be & it defaults to true, saves on tokens
-  // - "rotation" -- this is optional and can be used on all layer types, defaults is 0 when not specified
+  // System prompt configuration
   msgs.push({
     role: 'system',
     content: `Assistant's task is to create a new detailed texture based on the INPUT, by using the provided instructions and example(s).
@@ -43,14 +41,15 @@ export const GenerateSpriteMessages = (input: string) => {
 }
 
 Each layer is drawn in order and must have a "type" and "color".
+All layers support an optional "rotation" property (in degrees).
 
 ## Layer Types
-- Rectangle: { "type": "rect", "color": string, "x": number, "y": number, "width": number, "height": number }
+- Rectangle: { "type": "rect", "color": string, "x": number, "y": number, "width": number, "height": number, "rotation"?: number }
 - Circle:    { "type": "circle", "color": string, "x": number, "y": number, "radius": number }
-- Line:      { "type": "line", "color": string, "x": number, "y": number, "x2": number, "y2": number, "lineWidth"?: number }
-- Ellipse:   { "type": "ellipse", "color": string, "x": number, "y": number, "width": number, "height": number }
-- Polygon:   { "type": "polygon", "color": string, "points": [[x,y],...], "lineWidth"?: number }
-- Path:      { "type": "path", "color": string, "path": string, "fill"?: boolean, "lineWidth"?: number }
+- Line:      { "type": "line", "color": string, "x": number, "y": number, "x2": number, "y2": number, "lineWidth"?: number, "rotation"?: number }
+- Ellipse:   { "type": "ellipse", "color": string, "x": number, "y": number, "width": number, "height": number, "rotation"?: number }
+- Polygon:   { "type": "polygon", "color": string, "points": [[x,y],...], "lineWidth"?: number, "rotation"?: number }
+- Path:      { "type": "path", "color": string, "path": string, "fill"?: boolean, "lineWidth"?: number, "rotation"?: number }
 
 Colors: hex codes ("#FF0000") or names ("red","gray","transparent").
 
@@ -58,21 +57,21 @@ Colors: hex codes ("#FF0000") or names ("red","gray","transparent").
 1. Base the design on the INPUT concept.
 2. Keep size reasonable (64 or 128).
 3. Use multiple shapes to build details when desired.
+4. Use rotation to add visual interest or create angled shapes.
 
-## Example
+## Examples
+
 INPUT: tree
 OUTPUT:
-{
-  "name": "tree",
-  "size": 64,
-  "layers": [
-    { "type": "rect", "color": "#8B4513", "x": 28, "y": 40, "width": 8, "height": 20 },
-    { "type": "circle", "color": "#228B22", "x": 32, "y": 24, "radius": 16 },
-    { "type": "circle", "color": "#006400", "x": 24, "y": 32, "radius": 12 },
-    { "type": "circle", "color": "#228B22", "x": 40, "y": 28, "radius": 14 },
-    { "type": "circle", "color": "#006400", "x": 32, "y": 20, "radius": 15 }
-  ]
-}`,
+${TreeJson}
+
+INPUT: villager
+OUTPUT:
+${VillagerJson}
+
+INPUT: brown bear
+OUTPUT:
+${BrownBearJson}`,
   })
 
   msgs.push({

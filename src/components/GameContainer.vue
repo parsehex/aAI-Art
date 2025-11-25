@@ -10,6 +10,8 @@ import Konva from 'konva'
 import { TextureGenerator } from '@/utils/TextureGenerator'
 import type { TextureDescription } from '@/types/Textures'
 
+const PREVIEW_SCALE = 3
+
 const containerRef = ref<HTMLDivElement>()
 let stage: Konva.Stage | null = null
 let layer: Konva.Layer | null = null
@@ -82,8 +84,8 @@ async function handleSpriteSelected(event: Event) {
       y: texture.size / 2
     },
     scale: {
-      x: 4,
-      y: 4
+      x: PREVIEW_SCALE,
+      y: PREVIEW_SCALE
     }
   })
 

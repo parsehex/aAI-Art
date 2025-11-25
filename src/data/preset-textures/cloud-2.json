@@ -1,0 +1,57 @@
+{
+  "name": "cloud-2",
+  "size": 64,
+  "layers": [
+    {
+      "type": "circle",
+      "color": "#F0F8FF",
+      "x": 32,
+      "y": 35,
+      "radius": 20
+    },
+    {
+      "type": "circle",
+      "color": "#E6E6FA",
+      "x": 20,
+      "y": 38,
+      "radius": 12
+    },
+    {
+      "type": "circle",
+      "color": "#E6E6FA",
+      "x": 45,
+      "y": 38,
+      "radius": 14
+    },
+    {
+      "type": "circle",
+      "color": "#FFFFFF",
+      "x": 32,
+      "y": 32,
+      "radius": 18
+    },
+    {
+      "type": "circle",
+      "color": "#FFFFFF",
+      "x": 18,
+      "y": 35,
+      "radius": 10
+    },
+    {
+      "type": "circle",
+      "color": "#FFFFFF",
+      "x": 48,
+      "y": 35,
+      "radius": 12
+    },
+    {
+      "type": "circle",
+      "color": "#FFFFFF",
+      "x": 35,
+      "y": 26,
+      "radius": 12
+    }
+  ],
+  "prompt": "a fluffy cloud",
+  "id": "cloud-2"
+}

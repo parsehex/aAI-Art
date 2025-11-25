@@ -1,6 +1,6 @@
 {
   "id": "villager-1",
-  "name": "villager",
+  "name": "villager-1",
   "size": 64,
   "layers": [
     { "type": "rect", "color": "#8B4000", "x": 10, "y": 36, "width": 44, "height": 22 },

@@ -1,0 +1,166 @@
+{
+  "name": "restaurant-1",
+  "size": 128,
+  "layers": [
+    {
+      "type": "rect",
+      "color": "#87CEEB",
+      "x": 0,
+      "y": 0,
+      "width": 128,
+      "height": 128
+    },
+    {
+      "type": "rect",
+      "color": "#C0C0C0",
+      "x": 0,
+      "y": 115,
+      "width": 128,
+      "height": 13
+    },
+    {
+      "type": "line",
+      "color": "#808080",
+      "x": 0,
+      "y": 127,
+      "x2": 128,
+      "y2": 127,
+      "lineWidth": 2
+    },
+    {
+      "type": "rect",
+      "color": "#A52A2A",
+      "x": 14,
+      "y": 50,
+      "width": 100,
+      "height": 65
+    },
+    {
+      "type": "line",
+      "color": "#800000",
+      "x": 14,
+      "y": 60,
+      "x2": 114,
+      "y2": 60,
+      "lineWidth": 1
+    },
+    {
+      "type": "line",
+      "color": "#800000",
+      "x": 14,
+      "y": 70,
+      "x2": 114,
+      "y2": 70,
+      "lineWidth": 1
+    },
+    {
+      "type": "line",
+      "color": "#800000",
+      "x": 14,
+      "y": 80,
+      "x2": 114,
+      "y2": 80,
+      "lineWidth": 1
+    },
+    {
+      "type": "line",
+      "color": "#800000",
+      "x": 14,
+      "y": 90,
+      "x2": 114,
+      "y2": 90,
+      "lineWidth": 1
+    },
+    {
+      "type": "line",
+      "color": "#800000",
+      "x": 14,
+      "y": 100,
+      "x2": 114,
+      "y2": 100,
+      "lineWidth": 1
+    },
+    {
+      "type": "rect",
+      "color": "#DA291C",
+      "x": 10,
+      "y": 25,
+      "width": 108,
+      "height": 25
+    },
+    {
+      "type": "rect",
+      "color": "#FFC72C",
+      "x": 10,
+      "y": 48,
+      "width": 108,
+      "height": 4
+    },
+    {
+      "type": "path",
+      "color": "#FFC72C",
+      "path": "M 48 45 C 48 32, 64 32, 64 45 M 64 45 C 64 32, 80 32, 80 45",
+      "fill": false,
+      "lineWidth": 6
+    },
+    {
+      "type": "rect",
+      "color": "#363636",
+      "x": 22,
+      "y": 65,
+      "width": 40,
+      "height": 45
+    },
+    {
+      "type": "rect",
+      "color": "#BDE6F4",
+      "x": 25,
+      "y": 68,
+      "width": 34,
+      "height": 39
+    },
+    {
+      "type": "line",
+      "color": "#363636",
+      "x": 42,
+      "y": 68,
+      "x2": 42,
+      "y2": 107,
+      "lineWidth": 2
+    },
+    {
+      "type": "rect",
+      "color": "#363636",
+      "x": 72,
+      "y": 65,
+      "width": 34,
+      "height": 50
+    },
+    {
+      "type": "rect",
+      "color": "#BDE6F4",
+      "x": 75,
+      "y": 68,
+      "width": 12,
+      "height": 47
+    },
+    {
+      "type": "rect",
+      "color": "#BDE6F4",
+      "x": 91,
+      "y": 68,
+      "width": 12,
+      "height": 47
+    },
+    {
+      "type": "rect",
+      "color": "#C0C0C0",
+      "x": 88,
+      "y": 88,
+      "width": 2,
+      "height": 10
+    }
+  ],
+  "prompt": "a detailed restaurant building",
+  "id": "restaurant-1"
+}

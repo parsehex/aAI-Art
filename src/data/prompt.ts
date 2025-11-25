@@ -1,9 +1,9 @@
 import type { TextureDescription, TextureLayer } from '@/types/Textures'
 
 // Update examples used in the prompt here
-import example1Json from './preset-textures/cloud-1.json'
+import example1Json from './preset-textures/cloud-2.json'
 import example2Json from './preset-textures/tree-2.json'
-import example3Json from './preset-textures/abandoned-warehouse.json'
+import example3Json from './preset-textures/restaurant-1.json'
 
 interface ChatMessage {
   role: string

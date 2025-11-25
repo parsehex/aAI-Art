@@ -7,11 +7,14 @@ import { delay } from '@/utils'
 type Provider = 'openrouter' | 'ollama'
 type Model = { id: string; name: string }
 
+type ReasoningEffort = 'high' | 'medium' | 'low' | 'minimal' | 'none'
+
 export const useAIStore = defineStore('ai', () => {
   const provider = useLocalStorage<Provider>('ai-provider', 'ollama')
   const apiKey = useLocalStorage('openrouter-api-key', '')
   const ollamaHost = useLocalStorage('ollama-host', 'http://localhost:11434')
   const selectedModel = useLocalStorage('selected-model', 'cohere/command-r')
+  const reasoningEffort = useLocalStorage<ReasoningEffort>('reasoning-effort', 'low')
   const models = ref<Model[]>([])
   const isLoading = ref(false)
 
@@ -97,7 +100,7 @@ export const useAIStore = defineStore('ai', () => {
               messages,
               stream: true,
               reasoning: {
-                max_tokens: 500,
+                effort: reasoningEffort.value,
                 exclude: true,
               },
               ...options,
@@ -195,6 +198,7 @@ export const useAIStore = defineStore('ai', () => {
     apiKey,
     ollamaHost,
     selectedModel,
+    reasoningEffort,
     models,
     isLoading,
     fetchModels,

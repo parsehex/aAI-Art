@@ -32,6 +32,17 @@
         </svg>
       </button>
     </div>
+    <div v-if="store.provider === 'openrouter'" class="mb-2">
+      <label class="block text-sm font-bold mb-1">Reasoning Effort (when applicable):</label>
+      <select v-model="store.reasoningEffort"
+        class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <option value="high">High</option>
+        <option value="medium">Medium</option>
+        <option value="low">Low</option>
+        <option value="minimal">Minimal</option>
+        <option value="none">None</option>
+      </select>
+    </div>
     <div>
       <label class="block text-sm font-bold mb-1">Choose Model:</label>
       <!-- Favorite Models as Buttons -->

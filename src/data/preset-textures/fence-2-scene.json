@@ -1,0 +1,249 @@
+{
+  "name": "fence-2-scene",
+  "size": 128,
+  "layers": [
+    {
+      "type": "rect",
+      "color": "#a0d2e8",
+      "x": 0,
+      "y": 0,
+      "width": 128,
+      "height": 128
+    },
+    {
+      "type": "rect",
+      "color": "#567d46",
+      "x": 0,
+      "y": 95,
+      "width": 128,
+      "height": 33
+    },
+    {
+      "type": "rect",
+      "color": "#6B4226",
+      "x": 0,
+      "y": 45,
+      "width": 128,
+      "height": 8
+    },
+    {
+      "type": "rect",
+      "color": "#6B4226",
+      "x": 0,
+      "y": 80,
+      "width": 128,
+      "height": 8
+    },
+    {
+      "type": "rect",
+      "color": "#8C6D52",
+      "x": 0,
+      "y": 46,
+      "width": 128,
+      "height": 3
+    },
+    {
+      "type": "rect",
+      "color": "#8C6D52",
+      "x": 0,
+      "y": 81,
+      "width": 128,
+      "height": 3
+    },
+    {
+      "type": "rect",
+      "color": "#A0522D",
+      "x": 8,
+      "y": 35,
+      "width": 12,
+      "height": 65
+    },
+    {
+      "type": "polygon",
+      "color": "#A0522D",
+      "points": [
+        [
+          8,
+          35
+        ],
+        [
+          20,
+          35
+        ],
+        [
+          14,
+          25
+        ]
+      ]
+    },
+    {
+      "type": "line",
+      "color": "#804000",
+      "x": 17,
+      "y": 35,
+      "x2": 17,
+      "y2": 100,
+      "lineWidth": 1
+    },
+    {
+      "type": "rect",
+      "color": "#8C6D52",
+      "x": 26,
+      "y": 38,
+      "width": 12,
+      "height": 62
+    },
+    {
+      "type": "polygon",
+      "color": "#5E3A1E",
+      "points": [
+        [
+          26,
+          38
+        ],
+        [
+          38,
+          40
+        ],
+        [
+          38,
+          42
+        ],
+        [
+          26,
+          40
+        ]
+      ]
+    },
+    {
+      "type": "rect",
+      "color": "#A0522D",
+      "x": 44,
+      "y": 35,
+      "width": 12,
+      "height": 65,
+      "rotation": -4
+    },
+    {
+      "type": "polygon",
+      "color": "#A0522D",
+      "points": [
+        [
+          44,
+          35
+        ],
+        [
+          56,
+          35
+        ],
+        [
+          50,
+          25
+        ]
+      ],
+      "rotation": -4
+    },
+    {
+      "type": "rect",
+      "color": "#9F8C76",
+      "x": 80,
+      "y": 40,
+      "width": 12,
+      "height": 60
+    },
+    {
+      "type": "polygon",
+      "color": "#9F8C76",
+      "points": [
+        [
+          80,
+          40
+        ],
+        [
+          92,
+          40
+        ],
+        [
+          86,
+          32
+        ]
+      ]
+    },
+    {
+      "type": "line",
+      "color": "#7a6c5d",
+      "x": 83,
+      "y": 40,
+      "x2": 83,
+      "y2": 100,
+      "lineWidth": 1
+    },
+    {
+      "type": "rect",
+      "color": "#8C6D52",
+      "x": 98,
+      "y": 35,
+      "width": 12,
+      "height": 65
+    },
+    {
+      "type": "polygon",
+      "color": "#8C6D52",
+      "points": [
+        [
+          98,
+          35
+        ],
+        [
+          110,
+          35
+        ],
+        [
+          104,
+          25
+        ]
+      ]
+    },
+    {
+      "type": "line",
+      "color": "#5E3A1E",
+      "x": 107,
+      "y": 35,
+      "x2": 107,
+      "y2": 100,
+      "lineWidth": 1
+    },
+    {
+      "type": "rect",
+      "color": "#A0522D",
+      "x": 116,
+      "y": 60,
+      "width": 12,
+      "height": 40
+    },
+    {
+      "type": "polygon",
+      "color": "#5E3A1E",
+      "points": [
+        [
+          116,
+          60
+        ],
+        [
+          128,
+          58
+        ],
+        [
+          128,
+          63
+        ],
+        [
+          116,
+          61
+        ]
+      ]
+    }
+  ],
+  "prompt": "detailed scene depicting a fence, worn down over time",
+  "id": "fence-2-scene"
+}

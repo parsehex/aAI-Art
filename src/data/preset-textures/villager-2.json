@@ -1,0 +1,91 @@
+{
+  "name": "villager-2",
+  "size": 64,
+  "layers": [
+    {
+      "type": "rect",
+      "color": "#8B4513",
+      "x": 24,
+      "y": 42,
+      "width": 16,
+      "height": 14
+    },
+    {
+      "type": "rect",
+      "color": "#4682B4",
+      "x": 22,
+      "y": 28,
+      "width": 20,
+      "height": 16
+    },
+    {
+      "type": "rect",
+      "color": "#FFDAB9",
+      "x": 16,
+      "y": 30,
+      "width": 6,
+      "height": 12
+    },
+    {
+      "type": "rect",
+      "color": "#FFDAB9",
+      "x": 42,
+      "y": 30,
+      "width": 6,
+      "height": 12
+    },
+    {
+      "type": "circle",
+      "color": "#FFDAB9",
+      "x": 32,
+      "y": 20,
+      "radius": 10
+    },
+    {
+      "type": "circle",
+      "color": "#654321",
+      "x": 32,
+      "y": 16,
+      "radius": 10
+    },
+    {
+      "type": "circle",
+      "color": "#000000",
+      "x": 28,
+      "y": 19,
+      "radius": 1.5
+    },
+    {
+      "type": "circle",
+      "color": "#000000",
+      "x": 36,
+      "y": 19,
+      "radius": 1.5
+    },
+    {
+      "type": "path",
+      "color": "#000000",
+      "path": "M 29 24 Q 32 27 35 24",
+      "fill": false,
+      "lineWidth": 1.5
+    },
+    {
+      "type": "rect",
+      "color": "#5D4037",
+      "x": 24,
+      "y": 56,
+      "width": 7,
+      "height": 4
+    },
+    {
+      "type": "rect",
+      "color": "#5D4037",
+      "x": 33,
+      "y": 56,
+      "width": 7,
+      "height": 4
+    }
+  ],
+  "prompt": "a friendly villager",
+  "id": "villager-2"
+}

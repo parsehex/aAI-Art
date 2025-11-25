@@ -1,7 +1,7 @@
 import type { TextureDescription, TextureLayer } from '@/types/Textures'
-import { BrownBear } from './preset-textures/BrownBear'
-import { Tree } from './preset-textures/Tree'
-import { Villager } from './preset-textures/Villager'
+import BrownBear from './preset-textures/brown-bear-1.json'
+import Tree from './preset-textures/tree-1.json'
+import Villager from './preset-textures/villager-1.json'
 
 interface ChatMessage {
   role: string
@@ -21,9 +21,9 @@ ${layersStr}
 }`
 }
 
-const TreeJson = formatTextureJson(Tree)
-const VillagerJson = formatTextureJson(Villager)
-const BrownBearJson = formatTextureJson(BrownBear)
+const TreeJson = formatTextureJson(Tree as TextureDescription)
+const VillagerJson = formatTextureJson(Villager as TextureDescription)
+const BrownBearJson = formatTextureJson(BrownBear as TextureDescription)
 
 export const GenerateSpriteMessages = (input: string) => {
   const msgs: ChatMessage[] = []

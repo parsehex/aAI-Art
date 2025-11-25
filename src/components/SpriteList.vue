@@ -7,8 +7,7 @@
       :class="{ 'bg-gray-700': selectedTextureId === texture.id || (route.params.id === texture.id) }"
       @click="handleTextureClick(texture)">
       <div v-if="(texture as any).thumbnail" class="w-16 h-16 rounded flex-shrink-0">
-        <img :src="(texture as any).thumbnail" :alt="texture.name"
-          class="w-16 h-16 object-contain rounded bg-gray-800" />
+        <img :src="(texture as any).thumbnail" :alt="texture.name" class="w-16 h-16 object-contain rounded" />
       </div>
       <div v-else class="w-16 h-16 bg-gray-600 flex items-center justify-center rounded flex-shrink-0">
         <span class="text-xs text-center px-1">{{ texture.name }}</span>

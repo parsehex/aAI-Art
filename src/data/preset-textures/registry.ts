@@ -1,17 +1,17 @@
 // src/data/preset-textures/textureRegistry.ts
-import { Cloud } from './Cloud'
-import { BrownBear } from './BrownBear'
-import { Fence } from './Fence'
-// import { Goat } from './Goat'
-import { GoryRottingZombie } from './GoryRottingZombie'
-import { House } from './House'
-import { TreasureChest } from './TreasureChest'
-import { Tree } from './Tree'
-import { Villager } from './Villager'
-import { Warehouse } from './Warehouse'
-import { Zombie } from './Zombie'
 import type { TextureDescription } from '@/types/Textures'
-// import { Zombie2 } from './Zombie2'
+import Cloud from './cloud-1.json'
+import BrownBear from './brown-bear-1.json'
+import Fence from './fence-1.json'
+import GoryRottingZombie from './gory-rotting-zombie.json'
+import House from './house-1.json'
+import TreasureChest from './treasure-chest-1.json'
+import Tree from './tree-1.json'
+import Villager from './villager-1.json'
+import Warehouse from './abandoned-warehouse.json'
+import Zombie from './zombie-1.json'
+import RobotHead from './robot-head.json'
+import WizardHat from './wizard-hat-2.json'
 
 export const PatternTexture: TextureDescription = {
   id: 'pattern-1',
@@ -31,7 +31,7 @@ export const PatternTexture: TextureDescription = {
   ],
 }
 
-export const presetTextures: TextureDescription[] = [
+export const presetTextures = [
   Cloud,
   BrownBear,
   Fence,
@@ -41,8 +41,8 @@ export const presetTextures: TextureDescription[] = [
   Villager,
   Warehouse,
   Zombie,
-  // Zombie2,
-  // Goat,
   PatternTexture,
   GoryRottingZombie,
-]
+  RobotHead,
+  WizardHat,
+] as TextureDescription[]

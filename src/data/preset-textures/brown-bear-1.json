@@ -1,0 +1,74 @@
+{
+  "id": "brown-bear-1",
+  "name": "brown-bear-standing",
+  "size": 64,
+  "layers": [
+    {
+      "type": "ellipse",
+      "color": "#8B4513",
+      "x": 32,
+      "y": 40,
+      "width": 28,
+      "height": 24
+    },
+    {
+      "type": "circle",
+      "color": "#8B4513",
+      "x": 32,
+      "y": 24,
+      "radius": 16
+    },
+    {
+      "type": "ellipse",
+      "color": "#8B4513",
+      "x": 32,
+      "y": 12,
+      "width": 20,
+      "height": 16
+    },
+    {
+      "type": "circle",
+      "color": "#8B4513",
+      "x": 20,
+      "y": 16,
+      "radius": 6
+    },
+    {
+      "type": "circle",
+      "color": "#8B4513",
+      "x": 44,
+      "y": 16,
+      "radius": 6
+    },
+    {
+      "type": "ellipse",
+      "color": "#654321",
+      "x": 32,
+      "y": 22,
+      "width": 12,
+      "height": 8
+    },
+    {
+      "type": "circle",
+      "color": "#000000",
+      "x": 26,
+      "y": 20,
+      "radius": 2
+    },
+    {
+      "type": "circle",
+      "color": "#000000",
+      "x": 38,
+      "y": 20,
+      "radius": 2
+    },
+    {
+      "type": "ellipse",
+      "color": "#000000",
+      "x": 32,
+      "y": 26,
+      "width": 6,
+      "height": 2
+    }
+  ]
+}

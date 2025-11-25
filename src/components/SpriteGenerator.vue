@@ -195,7 +195,7 @@ async function generateSprite() {
         }
       }
     )
-    console.log(result)
+    console.log('Full (parsed) model response', result)
 
     // Final pass to ensure everything is consistent
     if (generatedSprite.value) {

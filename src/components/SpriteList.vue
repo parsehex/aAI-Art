@@ -30,8 +30,6 @@
         title="Regenerate Sprite">
         <RefreshCw class="w-4 h-4" />
       </button>
-      <!-- Copy JSON to clipboard -->
-      <CopyButton v-if="!isEdit" :data="texture" class="ml-2 text-lg" />
       <!-- Edit sprite name -->
       <button v-if="!isEdit && texture.generated && texture.id !== editingId"
         @click.stop="startEdit(texture.id, texture.name)" class="ml-2 text-blue-400 hover:text-blue-600 text-lg"

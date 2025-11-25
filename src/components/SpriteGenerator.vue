@@ -34,7 +34,7 @@
         <div class="flex items-center justify-between mb-3">
           <h3 class="text-lg font-bold text-white">Sprite Preview</h3>
           <button @click="redrawSprite" :disabled="isRedrawing"
-            class="px-3 py-1 text-sm bg-purple-600 text-white rounded-md hover:bg-purple-700 transition disabled:opacity-50 disabled:cursor-not-allowed">
+            class="px-3 py-1 text-sm bg-gray-600 text-white rounded-md hover:bg-gray-700 transition disabled:opacity-50 disabled:cursor-not-allowed">
             <span v-if="!isRedrawing">🎨 Draw Again</span>
             <span v-else class="flex items-center">
               <div class="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin mr-1"></div>

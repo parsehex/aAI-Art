@@ -1,4 +1,3 @@
-// src/data/preset-textures/textureRegistry.ts
 import type { TextureDescription } from '@/types/Textures'
 import Cloud from './cloud-1.json'
 import BrownBear from './brown-bear-1.json'

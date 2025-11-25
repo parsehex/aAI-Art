@@ -1,6 +1,7 @@
 {
   "id": "cloud-1",
   "name": "cloud",
+  "prompt": "cloud",
   "size": 64,
   "layers": [
     { "type": "circle", "color": "#FFFFFF", "radius": 12, "x": 24, "y": 32 },

@@ -1,0 +1,59 @@
+{
+  "name": "tree-2",
+  "size": 64,
+  "layers": [
+    {
+      "type": "rect",
+      "color": "#8B4513",
+      "x": 28,
+      "y": 36,
+      "width": 8,
+      "height": 28
+    },
+    {
+      "type": "rect",
+      "color": "#A0522D",
+      "x": 29,
+      "y": 36,
+      "width": 6,
+      "height": 28
+    },
+    {
+      "type": "circle",
+      "color": "#006400",
+      "x": 32,
+      "y": 26,
+      "radius": 22
+    },
+    {
+      "type": "circle",
+      "color": "#228B22",
+      "x": 20,
+      "y": 30,
+      "radius": 15
+    },
+    {
+      "type": "circle",
+      "color": "#228B22",
+      "x": 44,
+      "y": 30,
+      "radius": 15
+    },
+    {
+      "type": "circle",
+      "color": "#556B2F",
+      "x": 32,
+      "y": 16,
+      "radius": 16
+    },
+    {
+      "type": "circle",
+      "color": "#3CB371",
+      "x": 32,
+      "y": 28,
+      "radius": 12
+    }
+  ],
+  "prompt": "a tree",
+  "id": "tree-2"
+}

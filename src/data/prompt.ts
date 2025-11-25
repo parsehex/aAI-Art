@@ -1,7 +1,9 @@
 import type { TextureDescription, TextureLayer } from '@/types/Textures'
-import BrownBear from './preset-textures/brown-bear-1.json'
-import Tree from './preset-textures/tree-1.json'
-import Villager from './preset-textures/villager-1.json'
+
+// Update examples used in the prompt here
+import example1Json from './preset-textures/cloud-1.json'
+import example2Json from './preset-textures/tree-2.json'
+import example3Json from './preset-textures/abandoned-warehouse.json'
 
 interface ChatMessage {
   role: string
@@ -9,10 +11,16 @@ interface ChatMessage {
 }
 
 function formatTextureJson(texture: TextureDescription): string {
+  if (!texture.prompt) {
+    texture.prompt = texture.name.replace(/-/g, ' ')
+    console.warn(`Texture ${texture.name} has no prompt`)
+  }
   const layersStr = texture.layers
     .map((layer: TextureLayer) => `    ${JSON.stringify(layer)}`)
     .join(',\n')
-  return `{
+  return `INPUT: ${texture.prompt}
+OUTPUT:
+{
   "name": "${texture.name}",
   "size": ${texture.size},
   "layers": [
@@ -21,9 +29,9 @@ ${layersStr}
 }`
 }
 
-const TreeJson = formatTextureJson(Tree as TextureDescription)
-const VillagerJson = formatTextureJson(Villager as TextureDescription)
-const BrownBearJson = formatTextureJson(BrownBear as TextureDescription)
+const Example1 = formatTextureJson(example1Json as TextureDescription)
+const Example2 = formatTextureJson(example2Json as TextureDescription)
+const Example3 = formatTextureJson(example3Json as TextureDescription)
 
 export const GenerateSpriteMessages = (input: string) => {
   const msgs: ChatMessage[] = []
@@ -62,17 +70,11 @@ Colors: hex codes ("#FF0000") or names ("red","gray","transparent").
 
 ## Examples
 
-INPUT: tree
-OUTPUT:
-${TreeJson}
+${Example1}
 
-INPUT: villager
-OUTPUT:
-${VillagerJson}
+${Example2}
 
-INPUT: brown bear
-OUTPUT:
-${BrownBearJson}`,
+${Example3}`,
   })
 
   msgs.push({

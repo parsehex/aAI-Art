@@ -3,7 +3,7 @@
     <p class="my-2"> An app to generate and edit graphics using AI language models. Unless edited, all sprites shown are
       created by prompting an LLM (bigger models are better). <a
         href="https://parsehex.github.io/aAI-Art/docs/">Docs</a> </p>
-    <div class="w-full max-w-6xl">
+    <div class="w-full max-w-screen-2xl">
       <!-- Navigation -->
       <nav class="flex space-x-4 mb-4">
         <router-link to="/view" :class="[

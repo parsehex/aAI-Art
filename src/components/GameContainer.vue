@@ -41,12 +41,25 @@ onMounted(() => {
 
   // Listen for sprite selection events
   window.addEventListener('spriteSelected', handleSpriteSelected)
+  window.addEventListener('spriteCleared', handleSpriteCleared)
 })
 
 onUnmounted(() => {
   window.removeEventListener('spriteSelected', handleSpriteSelected)
+  window.removeEventListener('spriteCleared', handleSpriteCleared)
   stage?.destroy()
 })
+
+function handleSpriteCleared() {
+  if (!stage || !layer) return
+
+  // Clear previous sprites (except background)
+  const children = layer.children
+  for (let i = children.length - 1; i > 0; i--) {
+    children[i].destroy()
+  }
+  layer.batchDraw()
+}
 
 async function handleSpriteSelected(event: Event) {
   const customEvent = event as CustomEvent<TextureDescription>
@@ -69,8 +82,8 @@ async function handleSpriteSelected(event: Event) {
       y: texture.size / 2
     },
     scale: {
-      x: 2,
-      y: 2
+      x: 4,
+      y: 4
     }
   })
 
@@ -97,7 +110,7 @@ async function handleSpriteSelected(event: Event) {
 </script>
 <style scoped>
 #game-container {
-  width: 50vw;
+  width: 100%;
   max-width: 100%;
   height: 400px;
 }

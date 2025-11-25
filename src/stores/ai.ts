@@ -76,14 +76,14 @@ export const useAIStore = defineStore('ai', () => {
   const generate = async (
     modelId: string,
     messages: any[],
-    options: { temperature?: number } = { temperature: 0.01 },
+    options: { temperature?: number; onProgress?: (partial: string) => void } = {
+      temperature: 0.01,
+    },
   ): Promise<string> => {
     isLoading.value = true
     try {
-      let content: string
+      let content = ''
       if (provider.value === 'openrouter') {
-        // there's an issue here where the request finishes before isLoading is toggled / the button is active again
-        // this only seems to happen with openrouter, even when ollama takes only a few seconds before ui is instantly responsive again
         if (!apiKey.value.trim()) throw new Error('API key required for OpenRouter')
         try {
           const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
@@ -95,12 +95,38 @@ export const useAIStore = defineStore('ai', () => {
             body: JSON.stringify({
               model: modelId,
               messages,
+              stream: true,
               ...options,
             }),
           })
+
           if (!response.ok) throw new Error(`API error: ${response.statusText}`)
-          const data = await response.json()
-          content = data.choices[0]?.message?.content?.trim() || ''
+          if (!response.body) throw new Error('No response body')
+
+          const reader = response.body.getReader()
+          const decoder = new TextDecoder()
+
+          while (true) {
+            const { done, value } = await reader.read()
+            if (done) break
+
+            const chunk = decoder.decode(value, { stream: true })
+            const lines = chunk.split('\n').filter((line) => line.trim() !== '')
+
+            for (const line of lines) {
+              if (line === 'data: [DONE]') continue
+              if (line.startsWith('data: ')) {
+                try {
+                  const data = JSON.parse(line.slice(6))
+                  const delta = data.choices[0]?.delta?.content || ''
+                  content += delta
+                  if (options.onProgress) options.onProgress(content)
+                } catch (e) {
+                  console.warn('Error parsing stream chunk', e)
+                }
+              }
+            }
+          }
         } catch (error) {
           console.error('Error generating with OpenRouter:', error)
           throw error
@@ -108,12 +134,17 @@ export const useAIStore = defineStore('ai', () => {
       } else if (provider.value === 'ollama') {
         try {
           const ollama = new Ollama({ host: ollamaHost.value })
-          const { message } = await ollama.chat({
+          const response = await ollama.chat({
             model: modelId,
             messages,
+            stream: true,
             ...options,
           })
-          content = message.content.trim()
+
+          for await (const part of response) {
+            content += part.message.content
+            if (options.onProgress) options.onProgress(content)
+          }
         } catch (error) {
           console.error('Error generating with Ollama:', error)
           throw error

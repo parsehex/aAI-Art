@@ -1,4 +1,5 @@
 export function parseColor(color: string): number {
+  if (!color) return 0xffffff
   if (color.startsWith('#')) {
     return parseInt(color.replace('#', '0x'))
   }

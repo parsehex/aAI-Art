@@ -39,10 +39,10 @@
             <p><strong>Layers:</strong> {{ currentSprite.layers.length }}</p>
           </div>
           <div class="flex gap-2">
-            <button @click="saveSprite"
+            <button v-if="isNewlyGenerated && !isSaved" @click="saveSprite"
               class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition"> Save </button>
-            <!-- <button @click="editSprite"
-              class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"> Edit </button> -->
+            <button @click="downloadSprite"
+              class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"> Download </button>
           </div>
           <p v-if="justSaved" class="text-green-400 text-sm">✓ Sprite saved successfully!</p>
         </div>
@@ -87,6 +87,7 @@ const selectedTexture = ref<TextureDescription | null>(null)
 const generatedSprite = ref<TextureDescription | null>(null)
 const spritePreview = ref<string | null>(null)
 const justSaved = ref(false)
+const isSaved = ref(false)
 const formCollapsed = useLocalStorage('formCollapsed', true)
 const jsonCollapsed = useLocalStorage('jsonCollapsed', true)
 
@@ -140,6 +141,7 @@ async function generateSprite() {
     generatedSprite.value = newTexture
     spritePreview.value = await textureGenerator.generateImage(newTexture)
     justSaved.value = false
+    isSaved.value = false
 
     // Also dispatch event for GameContainer
     window.dispatchEvent(new CustomEvent('newTexture', { detail: newTexture }))
@@ -167,11 +169,26 @@ function saveSprite() {
 
   texturesStore.addGeneratedTexture(spriteToSave)
   justSaved.value = true
+  isSaved.value = true
 
   // Clear the "just saved" message after 3 seconds
   setTimeout(() => {
     justSaved.value = false
   }, 3000)
+}
+
+async function downloadSprite() {
+  if (!currentSprite.value) return
+
+  const dataUrl = currentPreview.value || await textureGenerator.generateImage(currentSprite.value)
+  const filename = `${currentSprite.value.name || currentSprite.value.id || 'sprite'}.png`
+
+  const link = document.createElement('a')
+  link.href = dataUrl
+  link.download = filename
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
 }
 
 function clearCurrent() {
@@ -184,7 +201,18 @@ function clearCurrent() {
 onMounted(() => {
   window.addEventListener('spriteSelected', async (event: Event) => {
     const customEvent = event as CustomEvent<TextureDescription>
-    selectedTexture.value = customEvent.detail
+    const selected = customEvent.detail
+
+    // If the selected sprite is the one we just generated, don't clear it
+    if (generatedSprite.value && generatedSprite.value.id === selected.id) {
+      return
+    }
+
+    // Clear any generated sprite so we show the selected one
+    generatedSprite.value = null
+    spritePreview.value = null
+
+    selectedTexture.value = selected
 
     // Generate preview if it doesn't have a thumbnail
     if (!selectedTexture.value.thumbnail) {

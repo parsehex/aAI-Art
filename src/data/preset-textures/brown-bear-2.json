@@ -1,0 +1,152 @@
+{
+  "name": "brown-bear-2",
+  "size": 128,
+  "layers": [
+    {
+      "type": "ellipse",
+      "color": "#8B4513",
+      "x": 64,
+      "y": 82,
+      "width": 55,
+      "height": 75
+    },
+    {
+      "type": "rect",
+      "color": "#8B4513",
+      "x": 42,
+      "y": 90,
+      "width": 20,
+      "height": 41
+    },
+    {
+      "type": "rect",
+      "color": "#8B4513",
+      "x": 67,
+      "y": 96,
+      "width": 20,
+      "height": 35
+    },
+    {
+      "type": "ellipse",
+      "color": "#654321",
+      "x": 52,
+      "y": 125,
+      "width": 24,
+      "height": 10
+    },
+    {
+      "type": "ellipse",
+      "color": "#654321",
+      "x": 76,
+      "y": 125,
+      "width": 24,
+      "height": 10
+    },
+    {
+      "type": "circle",
+      "color": "#A0522D",
+      "x": 64,
+      "y": 50,
+      "radius": 25
+    },
+    {
+      "type": "circle",
+      "color": "#A0522D",
+      "x": 46,
+      "y": 30,
+      "radius": 10
+    },
+    {
+      "type": "circle",
+      "color": "#A0522D",
+      "x": 82,
+      "y": 30,
+      "radius": 10
+    },
+    {
+      "type": "circle",
+      "color": "#D2B48C",
+      "x": 47,
+      "y": 31,
+      "radius": 6
+    },
+    {
+      "type": "circle",
+      "color": "#D2B48C",
+      "x": 81,
+      "y": 31,
+      "radius": 6
+    },
+    {
+      "type": "ellipse",
+      "color": "#A0522D",
+      "x": 42,
+      "y": 75,
+      "width": 20,
+      "height": 40,
+      "rotation": 25
+    },
+    {
+      "type": "ellipse",
+      "color": "#A0522D",
+      "x": 86,
+      "y": 75,
+      "width": 20,
+      "height": 40,
+      "rotation": -25
+    },
+    {
+      "type": "circle",
+      "color": "#654321",
+      "x": 32,
+      "y": 92,
+      "radius": 9
+    },
+    {
+      "type": "circle",
+      "color": "#654321",
+      "x": 96,
+      "y": 92,
+      "radius": 9
+    },
+    {
+      "type": "ellipse",
+      "color": "#D2B48C",
+      "x": 64,
+      "y": 85,
+      "width": 30,
+      "height": 45
+    },
+    {
+      "type": "ellipse",
+      "color": "#D2B48C",
+      "x": 64,
+      "y": 58,
+      "width": 30,
+      "height": 24
+    },
+    {
+      "type": "circle",
+      "color": "#2F1B0C",
+      "x": 64,
+      "y": 54,
+      "radius": 5
+    },
+    {
+      "type": "circle",
+      "color": "#000000",
+      "x": 54,
+      "y": 48,
+      "radius": 3
+    },
+    {
+      "type": "circle",
+      "color": "#000000",
+      "x": 74,
+      "y": 48,
+      "radius": 3
+    }
+  ],
+  "prompt": "brown bear standing on its hind legs",
+  "id": "brown-bear-2"
+}

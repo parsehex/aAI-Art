@@ -1,6 +1,6 @@
 import type { TextureDescription } from '@/types/Textures'
 import Cloud from './cloud-2.json'
-import BrownBear from './brown-bear-1.json'
+import BrownBear from './brown-bear-2.json'
 import Fence from './fence-1.json'
 import GoryRottingZombie from './gory-rotting-zombie.json'
 import House from './house-1.json'

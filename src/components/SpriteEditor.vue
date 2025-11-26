@@ -111,7 +111,8 @@ const spriteSize = ref(props.spriteData?.size || 64)
 const textureGenerator = new TextureGenerator()
 
 // Scale factor for the editor view
-const EDITOR_SCALE = 4
+const scale = ref(1)
+const stagePos = ref({ x: 0, y: 0 })
 
 const selectedLayer = computed(() => {
   return selectedLayerIndex.value !== null && props.spriteData ? props.spriteData.layers[selectedLayerIndex.value] : null
@@ -198,7 +199,7 @@ onMounted(() => {
         } else if (stage.value) {
           stage.value.width(width)
           stage.value.height(height)
-          centerStage()
+          fitToScreen()
         }
       }
     })
@@ -213,6 +214,7 @@ function initKonvaStage() {
     container: canvasContainer.value,
     width: canvasContainer.value.clientWidth,
     height: canvasContainer.value.clientHeight,
+    draggable: true, // Enable panning
   })
 
   mainLayer.value = new Konva.Layer()
@@ -242,21 +244,76 @@ function initKonvaStage() {
     }
   })
 
-  centerStage()
+  // Handle zooming
+  stage.value.on('wheel', (e) => {
+    e.evt.preventDefault()
+    if (!stage.value) return
+
+    const scaleBy = 1.1
+    const oldScale = stage.value.scaleX()
+    const pointer = stage.value.getPointerPosition()
+
+    if (!pointer) return
+
+    const mousePointTo = {
+      x: (pointer.x - stage.value.x()) / oldScale,
+      y: (pointer.y - stage.value.y()) / oldScale,
+    }
+
+    let newScale = e.evt.deltaY > 0 ? oldScale / scaleBy : oldScale * scaleBy
+
+    // Limit zoom
+    newScale = Math.max(0.1, Math.min(newScale, 20))
+
+    stage.value.scale({ x: newScale, y: newScale })
+
+    const newPos = {
+      x: pointer.x - mousePointTo.x * newScale,
+      y: pointer.y - mousePointTo.y * newScale,
+    }
+    stage.value.position(newPos)
+
+    scale.value = newScale
+    stagePos.value = newPos
+  })
+
+  fitToScreen()
   render(props.spriteData, true)
 }
 
-function centerStage() {
+function fitToScreen() {
   if (!stage.value || !mainLayer.value || !props.spriteData) return
 
-  // Center the content
   const stageWidth = stage.value.width()
   const stageHeight = stage.value.height()
-  const contentSize = props.spriteData.size * EDITOR_SCALE
+  const contentSize = props.spriteData.size
 
-  mainLayer.value.x(stageWidth / 2 - contentSize / 2)
-  mainLayer.value.y(stageHeight / 2 - contentSize / 2)
-  mainLayer.value.scale({ x: EDITOR_SCALE, y: EDITOR_SCALE })
+  // Calculate scale to fit with some padding
+  const padding = 40
+  const scaleX = (stageWidth - padding) / contentSize
+  const scaleY = (stageHeight - padding) / contentSize
+  const newScale = Math.min(scaleX, scaleY, 10) // Cap max initial scale
+
+  scale.value = newScale
+
+  // Center the content
+  const newX = (stageWidth - contentSize * newScale) / 2
+  const newY = (stageHeight - contentSize * newScale) / 2
+
+  stagePos.value = { x: newX, y: newY }
+
+  stage.value.scale({ x: newScale, y: newScale })
+  stage.value.position({ x: newX, y: newY })
+
+  // Reset main layer position since we're moving the stage now
+  mainLayer.value.x(0)
+  mainLayer.value.y(0)
+  mainLayer.value.scale({ x: 1, y: 1 })
+}
+
+function centerStage() {
+  // Deprecated in favor of fitToScreen, but kept for compatibility if called elsewhere
+  fitToScreen()
 }
 
 function getLayerName(layer: TextureLayer, index: number): string {
@@ -423,13 +480,24 @@ async function render(data: TextureDescription, silent = false) {
     width: data.size,
     height: data.size,
     stroke: '#444',
-    strokeWidth: 1 / EDITOR_SCALE, // Keep line thin
+    strokeWidth: 1 / (scale.value || 1), // Keep line thin
     listening: false
   })
   mainLayer.value.add(border)
   border.moveToBottom()
 
-  centerStage()
+  if (!silent) {
+    // Only fit to screen on initial load or reset, not every render
+    // But for now, let's just keep it simple. If we are dragging, we don't want to reset.
+    // We can check if it's a new sprite.
+    // The 'silent' flag is true for initial load? No, false.
+    // Actually, 'render' is called with silent=true in initKonvaStage.
+  }
+
+  // If it's a new sprite (silent=true usually means init), fit to screen
+  if (silent) {
+    fitToScreen()
+  }
 
   // Generate thumbnail for UI
   if (!silent) {

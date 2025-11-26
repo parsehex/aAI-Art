@@ -10,7 +10,7 @@ import Konva from 'konva'
 import { TextureGenerator } from '@/utils/TextureGenerator'
 import type { TextureDescription } from '@/types/Textures'
 
-const PREVIEW_SCALE = 3
+
 
 const containerRef = ref<HTMLDivElement>()
 let stage: Konva.Stage | null = null
@@ -25,6 +25,7 @@ onMounted(() => {
     container: containerRef.value,
     width: containerRef.value.clientWidth || 800,
     height: 400,
+    draggable: true, // Enable panning
   })
 
   layer = new Konva.Layer()
@@ -32,14 +33,44 @@ onMounted(() => {
 
   // Set background color
   const background = new Konva.Rect({
-    x: 0,
-    y: 0,
-    width: stage.width(),
-    height: stage.height(),
+    x: -5000, // Make it large enough to cover panning
+    y: -5000,
+    width: 10000,
+    height: 10000,
     fill: '#1f2937',
   })
   layer.add(background)
   layer.draw()
+
+  // Handle zooming
+  stage.on('wheel', (e) => {
+    e.evt.preventDefault()
+    if (!stage) return
+
+    const scaleBy = 1.1
+    const oldScale = stage.scaleX()
+    const pointer = stage.getPointerPosition()
+
+    if (!pointer) return
+
+    const mousePointTo = {
+      x: (pointer.x - stage.x()) / oldScale,
+      y: (pointer.y - stage.y()) / oldScale,
+    }
+
+    let newScale = e.evt.deltaY > 0 ? oldScale / scaleBy : oldScale * scaleBy
+
+    // Limit zoom
+    newScale = Math.max(0.1, Math.min(newScale, 20))
+
+    stage.scale({ x: newScale, y: newScale })
+
+    const newPos = {
+      x: pointer.x - mousePointTo.x * newScale,
+      y: pointer.y - mousePointTo.y * newScale,
+    }
+    stage.position(newPos)
+  })
 
   // Listen for sprite selection events
   window.addEventListener('spriteSelected', handleSpriteSelected)
@@ -76,38 +107,46 @@ async function handleSpriteSelected(event: Event) {
   }
 
   // Create a group for the sprite to handle scaling and positioning
+  // We don't need a group for scaling anymore, we scale the stage
+  // But we can keep it for organization
   const spriteGroup = new Konva.Group({
-    x: stage.width() / 2,
-    y: stage.height() / 2,
-    offset: {
-      x: texture.size / 2,
-      y: texture.size / 2
-    },
-    scale: {
-      x: PREVIEW_SCALE,
-      y: PREVIEW_SCALE
-    }
+    x: 0,
+    y: 0,
   })
 
   // Draw all layers
   texture.layers.forEach((layerDesc) => {
     if (layerDesc.visible !== false) {
-      // Create a group for each layer if needed, or just draw into spriteGroup
-      // TextureGenerator.drawLayer expects a Container (Group or Layer)
-      // We can pass spriteGroup directly
-
-      // Note: TextureGenerator.drawLayer might add multiple nodes to the container
-      // If we want to support interactivity later, we might want per-layer groups
-      // But for GameContainer (view only), drawing directly into spriteGroup is fine.
-
-      // However, TextureGenerator.drawPattern creates a group inside.
-      // Let's just pass spriteGroup.
       textureGenerator.drawLayer(spriteGroup, layerDesc, texture.size)
     }
   })
 
   layer.add(spriteGroup)
+
+  // Fit to screen
+  fitToScreen(texture.size)
+
   layer.batchDraw()
+}
+
+function fitToScreen(contentSize: number) {
+  if (!stage) return
+
+  const stageWidth = stage.width()
+  const stageHeight = stage.height()
+
+  // Calculate scale to fit with some padding
+  const padding = 40
+  const scaleX = (stageWidth - padding) / contentSize
+  const scaleY = (stageHeight - padding) / contentSize
+  const newScale = Math.min(scaleX, scaleY, 10) // Cap max initial scale
+
+  // Center the content
+  const newX = (stageWidth - contentSize * newScale) / 2
+  const newY = (stageHeight - contentSize * newScale) / 2
+
+  stage.scale({ x: newScale, y: newScale })
+  stage.position({ x: newX, y: newY })
 }
 </script>
 <style scoped>

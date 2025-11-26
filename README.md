@@ -2,7 +2,11 @@
 
 > alternative AI Art
 
-This is an app that explores using AI to create procedural graphics, in contrast to using traditional image models. Instead of generating images directly, we prompt an LLM to return JSON instructions that define sprites, which are then rendered using [Phaser.js](https://phaser.io).
+This is an app that explores using AI to create procedural graphics, in contrast to using traditional image models. Instead of generating images directly, we prompt an LLM to return JSON instructions that define sprites, which are then rendered using [Konva](https://konvajs.org/). You can now also **Edit** sprites created in this app.
+
+Here are some examples of sprites created by LLMs:
+
+![Preview image of sprites generated with aAI-Art](./docs/assets/ai-sprites.png)
 
 > [!NOTE]
 > **See any potential here? Let me know / Spread the word!**
@@ -11,16 +15,14 @@ This is an app that explores using AI to create procedural graphics, in contrast
 
 ![Preview image of the aAI-Art web app](./aai-art-preview.png)
 
-Here are some examples of sprites created by LLMs:
-
-![Preview image of sprites generated with aAI-Art](./docs/assets/ai-sprites.png)
-
 ## Getting Started
+
+[Try the app here](https://parsehex.github.io/aAI-Art/)
 
 ### Prerequisites
 
-- Node.js (v18 or higher)
-- pnpm (recommended) or npm
+- Node.js
+- pnpm
 
 ### Installation
 
@@ -49,7 +51,7 @@ pnpm dev
 
 - **Vue 3** - Frontend framework
 - **TypeScript** - Type safety
-- **Phaser.js** - Game engine for sprite rendering
+- **Konva** - Canvas engine for sprite rendering
 - **Tailwind CSS** - Styling
 - **Vite** - Build tool and dev server
 
@@ -59,7 +61,7 @@ pnpm dev
 src/
 ├── components/     # Vue components
 ├── data/          # Preset sprites and prompts
-├── game/          # Phaser game logic
+├── game/          # Konva game logic
 ├── stores/        # State management
 ├── types/         # TypeScript definitions
 └── utils/         # Utility functions

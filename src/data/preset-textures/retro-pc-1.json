@@ -1,0 +1,199 @@
+{
+  "name": "retro-pc-1",
+  "size": 256,
+  "layers": [
+    {
+      "type": "rect",
+      "color": "#4F4A41",
+      "x": 0,
+      "y": 210,
+      "width": 256,
+      "height": 46
+    },
+    {
+      "type": "rect",
+      "color": "#D4CABD",
+      "x": 160,
+      "y": 70,
+      "width": 76,
+      "height": 140
+    },
+    {
+      "type": "rect",
+      "color": "#EAE3D5",
+      "x": 165,
+      "y": 75,
+      "width": 66,
+      "height": 130
+    },
+    {
+      "type": "rect",
+      "color": "#333333",
+      "x": 172,
+      "y": 90,
+      "width": 52,
+      "height": 10
+    },
+    {
+      "type": "line",
+      "color": "#555555",
+      "x": 172,
+      "y": 95,
+      "x2": 224,
+      "y2": 95,
+      "lineWidth": 1
+    },
+    {
+      "type": "rect",
+      "color": "#333333",
+      "x": 172,
+      "y": 105,
+      "width": 52,
+      "height": 20
+    },
+    {
+      "type": "rect",
+      "color": "#888888",
+      "x": 175,
+      "y": 140,
+      "width": 15,
+      "height": 15
+    },
+    {
+      "type": "circle",
+      "color": "#FF0000",
+      "x": 215,
+      "y": 147,
+      "radius": 3
+    },
+    {
+      "type": "rect",
+      "color": "#BFB6A8",
+      "x": 50,
+      "y": 190,
+      "width": 90,
+      "height": 20
+    },
+    {
+      "type": "rect",
+      "color": "#D4CABD",
+      "x": 20,
+      "y": 50,
+      "width": 150,
+      "height": 140
+    },
+    {
+      "type": "rect",
+      "color": "#EAE3D5",
+      "x": 30,
+      "y": 60,
+      "width": 130,
+      "height": 120
+    },
+    {
+      "type": "rect",
+      "color": "#0A1A0A",
+      "x": 45,
+      "y": 70,
+      "width": 100,
+      "height": 80
+    },
+    {
+      "type": "line",
+      "color": "#32CD32",
+      "x": 52,
+      "y": 80,
+      "x2": 90,
+      "y2": 80,
+      "lineWidth": 2
+    },
+    {
+      "type": "line",
+      "color": "#32CD32",
+      "x": 52,
+      "y": 88,
+      "x2": 135,
+      "y2": 88,
+      "lineWidth": 2
+    },
+    {
+      "type": "line",
+      "color": "#32CD32",
+      "x": 52,
+      "y": 96,
+      "x2": 120,
+      "y2": 96,
+      "lineWidth": 2
+    },
+    {
+      "type": "line",
+      "color": "#32CD32",
+      "x": 52,
+      "y": 104,
+      "x2": 138,
+      "y2": 104,
+      "lineWidth": 2
+    },
+    {
+      "type": "line",
+      "color": "#32CD32",
+      "x": 52,
+      "y": 112,
+      "x2": 105,
+      "y2": 112,
+      "lineWidth": 2
+    },
+    {
+      "type": "line",
+      "color": "#32CD32",
+      "x": 52,
+      "y": 120,
+      "x2": 130,
+      "y2": 120,
+      "lineWidth": 2
+    },
+    {
+      "type": "line",
+      "color": "#32CD32",
+      "x": 52,
+      "y": 128,
+      "x2": 80,
+      "y2": 128,
+      "lineWidth": 2
+    },
+    {
+      "type": "rect",
+      "color": "#32CD32",
+      "x": 84,
+      "y": 125,
+      "width": 6,
+      "height": 8
+    },
+    {
+      "type": "circle",
+      "color": "#888888",
+      "x": 60,
+      "y": 165,
+      "radius": 6
+    },
+    {
+      "type": "circle",
+      "color": "#888888",
+      "x": 80,
+      "y": 165,
+      "radius": 6
+    },
+    {
+      "type": "line",
+      "color": "#666666",
+      "x": 60,
+      "y": 160,
+      "x2": 60,
+      "y2": 170,
+      "lineWidth": 1,
+      "rotation": 45
+    }
+  ],
+  "prompt": "A beige retro computer monitor with a bulky casing and tower, the screen is a green monochrome screen displaying lines of text.",
+  "id": "retro-pc-1"
+}

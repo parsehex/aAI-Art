@@ -8,7 +8,25 @@
     </div>
     <template v-else>
       <div class="layer-panel w-64 bg-gray-800 p-4 border-r border-gray-700 overflow-y-auto">
-        <h3 class="text-lg font-bold mb-4 text-white">Layers</h3>
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-bold text-white">Layers</h3>
+          <div class="flex space-x-1">
+            <button @click="undo" :disabled="!canUndo"
+              class="p-1 rounded hover:bg-gray-700 text-gray-400 hover:text-white disabled:opacity-30 disabled:hover:bg-transparent"
+              title="Undo (Cmd+Z)">
+              <Undo class="w-4 h-4" />
+            </button>
+            <button @click="redo" :disabled="!canRedo"
+              class="p-1 rounded hover:bg-gray-700 text-gray-400 hover:text-white disabled:opacity-30 disabled:hover:bg-transparent"
+              title="Redo (Cmd+Shift+Z)">
+              <Redo class="w-4 h-4" />
+            </button>
+            <button @click="revertAll" class="p-1 rounded hover:bg-gray-700 text-gray-400 hover:text-white"
+              title="Revert All Changes">
+              <RotateCcw class="w-4 h-4" />
+            </button>
+          </div>
+        </div>
         <div class="space-y-2">
           <div v-for="(layer, index) in spriteData.layers" :key="index"
             class="layer-item flex items-center p-2 bg-gray-700 rounded cursor-pointer"
@@ -53,18 +71,18 @@
             </div>
             <div class="grid grid-cols-2 gap-4">
               <DraggableNumberInput v-model="selectedLayer.x!" label="X" :step="1" :min="0" :max="spriteData.size"
-                @update:modelValue="updateSprite" />
+                @update:modelValue="(v) => updateSprite(v, true)" />
               <DraggableNumberInput v-model="selectedLayer.y!" label="Y" :step="1" :min="0" :max="spriteData.size"
-                @update:modelValue="updateSprite" />
+                @update:modelValue="(v) => updateSprite(v, true)" />
             </div>
             <div>
               <DraggableNumberInput :model-value="selectedLayer.rotation || 0" label="Rotation" :step="1" :min="0"
-                :max="360" @update:model-value="(val) => updateLayerProperty('rotation', val)" />
+                :max="360" @update:model-value="(val) => updateLayerProperty('rotation', val, true)" />
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-300">Color</label>
               <input v-model="selectedLayer.color" type="color" class="w-full p-2 bg-gray-700 text-white rounded"
-                @input="updateSprite" />
+                @change="updateSprite" />
             </div>
             <component :is="currentLayerPropertiesComponent" :layer="selectedLayer" :sprite-size="spriteData.size"
               @update:layer="updateLayerProperties" />
@@ -79,8 +97,9 @@
 import { ref, onMounted, watch, computed, onUnmounted, nextTick } from 'vue'
 import { useResizeObserver } from '@vueuse/core'
 import Konva from 'konva'
-import { Eye, EyeOff, X } from 'lucide-vue-next'
+import { Eye, EyeOff, X, Undo, Redo, RotateCcw } from 'lucide-vue-next'
 import { TextureGenerator } from '@/utils'
+import { useHistory } from '@/composables/useHistory'
 import { defaultLayerProperties } from '@/utils/layerDefaults'
 import DraggableNumberInput from './DraggableNumberInput.vue'
 import CircleProperties from './LayerProperties/CircleProperties.vue'
@@ -109,6 +128,36 @@ const transformer = ref<Konva.Transformer>()
 const selectedLayerIndex = ref<number | null>(null)
 const spriteSize = ref(props.spriteData?.size || 64)
 const textureGenerator = new TextureGenerator()
+const { history, index, canUndo, canRedo, record, undo: historyUndo, redo: historyRedo, reset: historyReset } = useHistory<TextureDescription>()
+
+function createDebounce<T extends (...args: any[]) => any>(fn: T, delay: number) {
+  let timeout: ReturnType<typeof setTimeout> | null = null
+  let lastArgs: any[] | null = null
+
+  const debounced = (...args: Parameters<T>) => {
+    lastArgs = args
+    if (timeout) clearTimeout(timeout)
+    timeout = setTimeout(() => {
+      fn(...args)
+      timeout = null
+      lastArgs = null
+    }, delay)
+  }
+
+  debounced.flush = () => {
+    if (timeout && lastArgs) {
+      clearTimeout(timeout)
+      fn(...(lastArgs as Parameters<T>))
+      timeout = null
+      lastArgs = null
+    }
+  }
+
+  return debounced
+}
+
+const recordDebounced = createDebounce(record, 300)
+const initialState = ref<TextureDescription | null>(null)
 
 // Scale factor for the editor view
 const scale = ref(1)
@@ -163,18 +212,50 @@ function changeLayerType() {
   updateLayerAtIndex(selectedLayerIndex.value, newLayer)
 }
 
-function updateLayerProperty(key: keyof TextureLayer, value: any) {
+function updateLayerProperty(key: keyof TextureLayer, value: any, continuous = false) {
   if (!selectedLayer.value || selectedLayerIndex.value === null) return
   const newLayer = { ...selectedLayer.value, [key]: value }
-  updateLayerAtIndex(selectedLayerIndex.value, newLayer)
+  updateLayerAtIndex(selectedLayerIndex.value, newLayer, continuous)
 }
 
 function updateLayerProperties(layer: TextureLayer) {
   if (selectedLayerIndex.value === null) return
-  updateLayerAtIndex(selectedLayerIndex.value, layer)
+  // Assume layer properties updates (from subcomponents) are continuous (sliders)
+  updateLayerAtIndex(selectedLayerIndex.value, layer, true)
 }
 
-function updateLayerAtIndex(index: number, layer: TextureLayer) {
+function emitUpdate(newSpriteData: TextureDescription, continuous = false) {
+  emit('spriteUpdated', newSpriteData)
+  if (continuous) {
+    recordDebounced(newSpriteData)
+  } else {
+    recordDebounced.flush()
+    record(newSpriteData)
+  }
+}
+
+function undo() {
+  const prevState = historyUndo()
+  if (prevState) {
+    emit('spriteUpdated', prevState)
+  }
+}
+
+function redo() {
+  const nextState = historyRedo()
+  if (nextState) {
+    emit('spriteUpdated', nextState)
+  }
+}
+
+function revertAll() {
+  if (initialState.value) {
+    // Record the revert as a new state so it can be undone
+    emitUpdate(initialState.value)
+  }
+}
+
+function updateLayerAtIndex(index: number, layer: TextureLayer, continuous = false) {
   if (!props.spriteData) return
   const newLayers = [...props.spriteData.layers]
   newLayers[index] = layer
@@ -184,7 +265,7 @@ function updateLayerAtIndex(index: number, layer: TextureLayer) {
     layers: newLayers,
   }
 
-  emit('spriteUpdated', newSpriteData)
+  emitUpdate(newSpriteData, continuous)
   // Render will be triggered by watch
 }
 
@@ -204,7 +285,27 @@ onMounted(() => {
       }
     })
   }
+  window.addEventListener('keydown', handleKeydown)
 })
+
+onUnmounted(() => {
+  stage.value?.destroy()
+  window.removeEventListener('keydown', handleKeydown)
+})
+
+function handleKeydown(e: KeyboardEvent) {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'z') {
+    e.preventDefault()
+    if (e.shiftKey) {
+      redo()
+    } else {
+      undo()
+    }
+  } else if ((e.metaKey || e.ctrlKey) && e.key === 'y') {
+    e.preventDefault()
+    redo()
+  }
+}
 
 function initKonvaStage() {
   if (!canvasContainer.value || !props.spriteData) return
@@ -364,7 +465,7 @@ function addLayer() {
     ...props.spriteData,
     layers: [...props.spriteData.layers, newLayer],
   }
-  emit('spriteUpdated', newSpriteData)
+  emitUpdate(newSpriteData)
 }
 
 function removeLayer(index: number) {
@@ -380,24 +481,24 @@ function removeLayer(index: number) {
     } else if (selectedLayerIndex.value && selectedLayerIndex.value > index) {
       selectedLayerIndex.value--
     }
-    emit('spriteUpdated', newSpriteData)
+    emitUpdate(newSpriteData)
   }
 }
 
-function updateSprite() {
+function updateSprite(_?: any, continuous = false) {
   if (!props.spriteData) return
   // Deep copy to trigger update
   const newSpriteData = JSON.parse(JSON.stringify(props.spriteData))
-  emit('spriteUpdated', newSpriteData)
+  emitUpdate(newSpriteData, continuous)
 }
 
-function updateSpriteSize() {
+function updateSpriteSize(val: number) {
   if (!props.spriteData) return
   const newSpriteData = {
     ...props.spriteData,
-    size: spriteSize.value,
+    size: val, // Use val directly as spriteSize.value might be updated by v-model
   }
-  emit('spriteUpdated', newSpriteData)
+  emitUpdate(newSpriteData, true) // Size change via slider is continuous
 }
 
 async function render(data: TextureDescription, silent = false) {
@@ -632,9 +733,7 @@ function handleTransformEnd(index: number, node: Konva.Group) {
   updateLayerAtIndex(index, newLayer)
 }
 
-onUnmounted(() => {
-  stage.value?.destroy()
-})
+
 
 const currentSpriteId = ref<string | null>(null)
 const lastTextureKey = ref<string>('')
@@ -664,6 +763,11 @@ watch(
         initKonvaStage()
       } else {
         render(newVal, isNewSprite)
+      }
+
+      if (isNewSprite) {
+        historyReset(newVal)
+        initialState.value = JSON.parse(JSON.stringify(newVal))
       }
     } else {
       currentSpriteId.value = null

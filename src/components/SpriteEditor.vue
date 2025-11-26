@@ -340,7 +340,8 @@ function initKonvaStage() {
 
   // Handle clicks on stage to deselect
   stage.value.on('click tap', (e) => {
-    if (e.target === stage.value) {
+    // Deselect if clicked on stage or main layer (background)
+    if (e.target === stage.value || (e.target as any) === mainLayer.value) {
       selectLayer(-1) // Deselect
     }
   })
@@ -350,7 +351,7 @@ function initKonvaStage() {
     e.evt.preventDefault()
     if (!stage.value) return
 
-    const scaleBy = 1.1
+    const scaleBy = 1.05 // Slower zoom speed
     const oldScale = stage.value.scaleX()
     const pointer = stage.value.getPointerPosition()
 

@@ -76,6 +76,16 @@ export const useAIStore = defineStore('ai', () => {
     }
   }
 
+  const abortController = ref<AbortController | null>(null)
+
+  const cancel = () => {
+    if (abortController.value) {
+      abortController.value.abort()
+      abortController.value = null
+      isLoading.value = false
+    }
+  }
+
   const generate = async (
     modelId: string,
     messages: any[],
@@ -84,6 +94,8 @@ export const useAIStore = defineStore('ai', () => {
     },
   ): Promise<string> => {
     isLoading.value = true
+    abortController.value = new AbortController()
+
     try {
       let content = ''
       if (provider.value === 'openrouter') {
@@ -105,6 +117,7 @@ export const useAIStore = defineStore('ai', () => {
               },
               ...options,
             }),
+            signal: abortController.value.signal,
           })
 
           if (!response.ok) throw new Error(`API error: ${response.statusText}`)
@@ -134,13 +147,21 @@ export const useAIStore = defineStore('ai', () => {
               }
             }
           }
-        } catch (error) {
+        } catch (error: any) {
+          if (error.name === 'AbortError') {
+            console.log('Generation cancelled')
+            return content // Return what we have so far
+          }
           console.error('Error generating with OpenRouter:', error)
           throw error
         }
       } else if (provider.value === 'ollama') {
         try {
           const ollama = new Ollama({ host: ollamaHost.value })
+          // Ollama-js doesn't seem to support signal in chat options directly in types,
+          // but we can break the loop if aborted.
+          // Actually, we can check abortController.signal.aborted in the loop.
+
           const response = await ollama.chat({
             model: modelId,
             messages,
@@ -150,6 +171,12 @@ export const useAIStore = defineStore('ai', () => {
           })
 
           for await (const part of response) {
+            if (abortController.value?.signal.aborted) {
+              // Ollama request might still continue in background unless we can abort it,
+              // but at least we stop processing.
+              // TODO: Check if ollama-js supports aborting.
+              break
+            }
             content += part.message.content
             if (options.onProgress) options.onProgress(content)
           }
@@ -183,6 +210,7 @@ export const useAIStore = defineStore('ai', () => {
       return content
     } finally {
       isLoading.value = false
+      abortController.value = null
     }
   }
 
@@ -203,6 +231,7 @@ export const useAIStore = defineStore('ai', () => {
     isLoading,
     fetchModels,
     generate,
+    cancel,
     favoriteModels,
     favoriteModelIds,
     isFavorite,

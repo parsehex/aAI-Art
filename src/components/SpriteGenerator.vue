@@ -14,13 +14,13 @@
       <div v-show="!formCollapsed">
         <GeneratorForm ref="Form" placeholder="Describe your sprite...">
           <template #button>
-            <button :disabled="!canSend" @click="generateSprite"
+            <button v-if="!aiStore.isLoading" :disabled="!canSend" @click="generateSprite"
               class="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition disabled:opacity-50">
-              <span v-if="!aiStore.isLoading">Generate Sprite</span>
-              <span v-else class="flex items-center justify-center">
-                <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                Generating...
-              </span>
+              Generate Sprite </button>
+            <button v-else @click="aiStore.cancel"
+              class="w-full bg-red-600 text-white p-2 rounded-md hover:bg-red-700 transition flex items-center justify-center">
+              <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+              <SquareIcon class="w-4 h-4 mr-2" /> Stop Generating
             </button>
           </template>
         </GeneratorForm>
@@ -86,6 +86,7 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
+import { SquareIcon } from 'lucide-vue-next'
 import { useLocalStorage } from '@vueuse/core'
 import { v4 } from 'uuid'
 import { JsonViewer } from '@parsehex/vuepak'

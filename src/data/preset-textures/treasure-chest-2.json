@@ -1,0 +1,219 @@
+{
+  "name": "treasure-chest-2",
+  "size": 128,
+  "layers": [
+    {
+      "type": "rect",
+      "color": "#A0522D",
+      "x": 16,
+      "y": 50,
+      "width": 96,
+      "height": 15
+    },
+    {
+      "type": "ellipse",
+      "color": "#A0522D",
+      "x": 64,
+      "y": 50,
+      "width": 96,
+      "height": 50
+    },
+    {
+      "type": "rect",
+      "color": "#8B5A2B",
+      "x": 20,
+      "y": 65,
+      "width": 88,
+      "height": 45
+    },
+    {
+      "type": "line",
+      "color": "#654321",
+      "x": 45,
+      "y": 65,
+      "x2": 45,
+      "y2": 110,
+      "lineWidth": 1
+    },
+    {
+      "type": "line",
+      "color": "#654321",
+      "x": 64,
+      "y": 65,
+      "x2": 64,
+      "y2": 110,
+      "lineWidth": 1
+    },
+    {
+      "type": "line",
+      "color": "#654321",
+      "x": 83,
+      "y": 65,
+      "x2": 83,
+      "y2": 110,
+      "lineWidth": 1
+    },
+    {
+      "type": "rect",
+      "color": "#FFD700",
+      "x": 16,
+      "y": 60,
+      "width": 96,
+      "height": 5
+    },
+    {
+      "type": "path",
+      "color": "#FFD700",
+      "path": "M 32 62 A 32 25 0 0 1 32 28",
+      "fill": false,
+      "lineWidth": 8
+    },
+    {
+      "type": "path",
+      "color": "#FFD700",
+      "path": "M 96 62 A 32 25 0 0 0 96 28",
+      "fill": false,
+      "lineWidth": 8
+    },
+    {
+      "type": "rect",
+      "color": "#FFD700",
+      "x": 20,
+      "y": 105,
+      "width": 88,
+      "height": 5
+    },
+    {
+      "type": "rect",
+      "color": "#FFD700",
+      "x": 16,
+      "y": 65,
+      "width": 4,
+      "height": 45
+    },
+    {
+      "type": "rect",
+      "color": "#FFD700",
+      "x": 108,
+      "y": 65,
+      "width": 4,
+      "height": 45
+    },
+    {
+      "type": "rect",
+      "color": "#FFC72C",
+      "x": 56,
+      "y": 55,
+      "width": 16,
+      "height": 20
+    },
+    {
+      "type": "rect",
+      "color": "#DAA520",
+      "x": 58,
+      "y": 62,
+      "width": 12,
+      "height": 10
+    },
+    {
+      "type": "path",
+      "color": "#222222",
+      "path": "M 64 64 A 2 2 0 1 1 64 68 L 66 71 L 62 71 Z",
+      "fill": true,
+      "lineWidth": 0
+    },
+    {
+      "type": "circle",
+      "color": "#B8860B",
+      "x": 32,
+      "y": 58,
+      "radius": 1.5
+    },
+    {
+      "type": "circle",
+      "color": "#B8860B",
+      "x": 32,
+      "y": 38,
+      "radius": 1.5
+    },
+    {
+      "type": "circle",
+      "color": "#B8860B",
+      "x": 96,
+      "y": 58,
+      "radius": 1.5
+    },
+    {
+      "type": "circle",
+      "color": "#B8860B",
+      "x": 96,
+      "y": 38,
+      "radius": 1.5
+    },
+    {
+      "type": "circle",
+      "color": "#B8860B",
+      "x": 18,
+      "y": 70,
+      "radius": 1.5
+    },
+    {
+      "type": "circle",
+      "color": "#B8860B",
+      "x": 18,
+      "y": 100,
+      "radius": 1.5
+    },
+    {
+      "type": "circle",
+      "color": "#B8860B",
+      "x": 110,
+      "y": 70,
+      "radius": 1.5
+    },
+    {
+      "type": "circle",
+      "color": "#B8860B",
+      "x": 110,
+      "y": 100,
+      "radius": 1.5
+    },
+    {
+      "type": "circle",
+      "color": "#B8860B",
+      "x": 59,
+      "y": 58,
+      "radius": 1
+    },
+    {
+      "type": "circle",
+      "color": "#B8860B",
+      "x": 69,
+      "y": 58,
+      "radius": 1
+    },
+    {
+      "type": "circle",
+      "color": "#B8860B",
+      "x": 59,
+      "y": 72,
+      "radius": 1
+    },
+    {
+      "type": "circle",
+      "color": "#B8860B",
+      "x": 69,
+      "y": 72,
+      "radius": 1
+    },
+    {
+      "type": "path",
+      "color": "#B99075",
+      "path": "M 30 35 Q 64 25, 98 35",
+      "fill": false,
+      "lineWidth": 5
+    }
+  ],
+  "prompt": "treasure chest",
+  "id": "treasure-chest-2"
+}

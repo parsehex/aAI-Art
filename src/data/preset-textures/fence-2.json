@@ -1,0 +1,365 @@
+{
+  "name": "fence-2",
+  "size": 128,
+  "layers": [
+    {
+      "type": "rect",
+      "color": "#3CB371",
+      "x": 0,
+      "y": 100,
+      "width": 128,
+      "height": 28
+    },
+    {
+      "type": "rect",
+      "color": "#2E8B57",
+      "x": 0,
+      "y": 110,
+      "width": 128,
+      "height": 18
+    },
+    {
+      "type": "rect",
+      "color": "#8B4513",
+      "x": 0,
+      "y": 55,
+      "width": 128,
+      "height": 10
+    },
+    {
+      "type": "rect",
+      "color": "#A0522D",
+      "x": 0,
+      "y": 56,
+      "width": 128,
+      "height": 8
+    },
+    {
+      "type": "rect",
+      "color": "#8B4513",
+      "x": 0,
+      "y": 85,
+      "width": 128,
+      "height": 10
+    },
+    {
+      "type": "rect",
+      "color": "#A0522D",
+      "x": 0,
+      "y": 86,
+      "width": 128,
+      "height": 8
+    },
+    {
+      "type": "rect",
+      "color": "#DEB887",
+      "x": 14,
+      "y": 50,
+      "width": 14,
+      "height": 52
+    },
+    {
+      "type": "polygon",
+      "color": "#DEB887",
+      "points": [
+        [
+          14,
+          50
+        ],
+        [
+          28,
+          50
+        ],
+        [
+          21,
+          40
+        ]
+      ]
+    },
+    {
+      "type": "line",
+      "color": "#A0522D",
+      "x": 18,
+      "y": 52,
+      "x2": 18,
+      "y2": 98,
+      "lineWidth": 1
+    },
+    {
+      "type": "circle",
+      "color": "#696969",
+      "x": 21,
+      "y": 60,
+      "radius": 1
+    },
+    {
+      "type": "circle",
+      "color": "#696969",
+      "x": 21,
+      "y": 90,
+      "radius": 1
+    },
+    {
+      "type": "rect",
+      "color": "#DEB887",
+      "x": 34,
+      "y": 50,
+      "width": 14,
+      "height": 52
+    },
+    {
+      "type": "polygon",
+      "color": "#DEB887",
+      "points": [
+        [
+          34,
+          50
+        ],
+        [
+          48,
+          50
+        ],
+        [
+          41,
+          40
+        ]
+      ]
+    },
+    {
+      "type": "line",
+      "color": "#A0522D",
+      "x": 39,
+      "y": 54,
+      "x2": 39,
+      "y2": 99,
+      "lineWidth": 1
+    },
+    {
+      "type": "circle",
+      "color": "#696969",
+      "x": 41,
+      "y": 60,
+      "radius": 1
+    },
+    {
+      "type": "circle",
+      "color": "#696969",
+      "x": 41,
+      "y": 90,
+      "radius": 1
+    },
+    {
+      "type": "rect",
+      "color": "#DEB887",
+      "x": 54,
+      "y": 50,
+      "width": 14,
+      "height": 52
+    },
+    {
+      "type": "polygon",
+      "color": "#DEB887",
+      "points": [
+        [
+          54,
+          50
+        ],
+        [
+          68,
+          50
+        ],
+        [
+          61,
+          40
+        ]
+      ]
+    },
+    {
+      "type": "line",
+      "color": "#A0522D",
+      "x": 58,
+      "y": 52,
+      "x2": 58,
+      "y2": 98,
+      "lineWidth": 1
+    },
+    {
+      "type": "circle",
+      "color": "#696969",
+      "x": 61,
+      "y": 60,
+      "radius": 1
+    },
+    {
+      "type": "circle",
+      "color": "#696969",
+      "x": 61,
+      "y": 90,
+      "radius": 1
+    },
+    {
+      "type": "rect",
+      "color": "#DEB887",
+      "x": 74,
+      "y": 50,
+      "width": 14,
+      "height": 52
+    },
+    {
+      "type": "polygon",
+      "color": "#DEB887",
+      "points": [
+        [
+          74,
+          50
+        ],
+        [
+          88,
+          50
+        ],
+        [
+          81,
+          40
+        ]
+      ]
+    },
+    {
+      "type": "line",
+      "color": "#A0522D",
+      "x": 79,
+      "y": 54,
+      "x2": 79,
+      "y2": 99,
+      "lineWidth": 1
+    },
+    {
+      "type": "circle",
+      "color": "#696969",
+      "x": 81,
+      "y": 60,
+      "radius": 1
+    },
+    {
+      "type": "circle",
+      "color": "#696969",
+      "x": 81,
+      "y": 90,
+      "radius": 1
+    },
+    {
+      "type": "rect",
+      "color": "#DEB887",
+      "x": 94,
+      "y": 50,
+      "width": 14,
+      "height": 52
+    },
+    {
+      "type": "polygon",
+      "color": "#DEB887",
+      "points": [
+        [
+          94,
+          50
+        ],
+        [
+          108,
+          50
+        ],
+        [
+          101,
+          40
+        ]
+      ]
+    },
+    {
+      "type": "line",
+      "color": "#A0522D",
+      "x": 98,
+      "y": 52,
+      "x2": 98,
+      "y2": 98,
+      "lineWidth": 1
+    },
+    {
+      "type": "circle",
+      "color": "#696969",
+      "x": 101,
+      "y": 60,
+      "radius": 1
+    },
+    {
+      "type": "circle",
+      "color": "#696969",
+      "x": 101,
+      "y": 90,
+      "radius": 1
+    },
+    {
+      "type": "rect",
+      "color": "#8B4513",
+      "x": 4,
+      "y": 45,
+      "width": 10,
+      "height": 60
+    },
+    {
+      "type": "rect",
+      "color": "#A0522D",
+      "x": 5,
+      "y": 45,
+      "width": 8,
+      "height": 60
+    },
+    {
+      "type": "rect",
+      "color": "#654321",
+      "x": 3,
+      "y": 43,
+      "width": 12,
+      "height": 4
+    },
+    {
+      "type": "rect",
+      "color": "#8B4513",
+      "x": 3,
+      "y": 43,
+      "width": 12,
+      "height": 2
+    },
+    {
+      "type": "rect",
+      "color": "#8B4513",
+      "x": 114,
+      "y": 45,
+      "width": 10,
+      "height": 60
+    },
+    {
+      "type": "rect",
+      "color": "#A0522D",
+      "x": 115,
+      "y": 45,
+      "width": 8,
+      "height": 60
+    },
+    {
+      "type": "rect",
+      "color": "#654321",
+      "x": 113,
+      "y": 43,
+      "width": 12,
+      "height": 4
+    },
+    {
+      "type": "rect",
+      "color": "#8B4513",
+      "x": 113,
+      "y": 43,
+      "width": 12,
+      "height": 2
+    }
+  ],
+  "prompt": "a detailed fence",
+  "id": "fence-2"
+}

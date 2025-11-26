@@ -1,6 +1,6 @@
 {
   "id": "fence-1",
-  "name": "fence",
+  "name": "fence-1",
   "size": 64,
   "layers": [
     { "type": "line", "color": "#8B4513", "x": 16, "y": 16, "x2": 16, "y2": 48, "lineWidth": 4 },

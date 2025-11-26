@@ -28,7 +28,13 @@
     </div>
     <!-- Right Column: Sprite Preview and Actions -->
     <div class="flex-1 min-w-0 space-y-4">
-      <GameContainer v-show="currentSprite" />
+      <div v-if="aiStore.isLoading && (!currentSprite || aiStore.isThinking)"
+        class="h-96 bg-gray-900 rounded-lg border border-gray-700 flex flex-col items-center justify-center text-gray-400">
+        <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p v-if="aiStore.isLoading && !aiStore.isThinking" class="text-lg font-medium animate-pulse">Loading...</p>
+        <p v-if="aiStore.isThinking" class="text-lg font-medium animate-pulse">Thinking...</p>
+      </div>
+      <GameContainer v-show="currentSprite && !aiStore.isThinking" />
       <!-- Preview and Save Area -->
       <div v-if="currentSprite" class="bg-gray-800 p-4 rounded-lg shadow-lg border border-gray-700">
         <div class="flex items-center justify-between mb-3">

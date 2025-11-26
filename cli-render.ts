@@ -181,7 +181,7 @@ async function renderAllPresets(): Promise<Buffer> {
   // Find the maximum sprite size among all presets
   const maxSpriteSize = Math.max(...presetTextures.map((p) => p.size))
   const cellSize = maxSpriteSize // Use max size for cell dimensions
-  const padding = 8
+  const padding = 20
   const columns = 4
   const rows = Math.ceil(presetTextures.length / columns)
 
@@ -215,10 +215,16 @@ async function renderAllPresets(): Promise<Buffer> {
     const cellX = padding + col * (cellSize + padding)
     const cellY = padding + row * (cellSize + padding)
 
+    // Add margin within cell for visual spacing
+    const margin = 16
+    const effectiveCellSize = cellSize - margin * 2
+    const scale = effectiveCellSize / preset.size
+
     // Create a group for this sprite
     const spriteGroup = new Konva.Group({
-      x: cellX,
-      y: cellY,
+      x: cellX + margin,
+      y: cellY + margin,
+      scale: { x: scale, y: scale },
     })
 
     // Draw sprite layers
@@ -227,14 +233,6 @@ async function renderAllPresets(): Promise<Buffer> {
         generator.drawLayer(spriteGroup, layerDesc, preset.size)
       }
     })
-
-    // If sprite is smaller than cell, center it
-    // If sprite is larger, it will fit because cellSize = maxSpriteSize
-    if (preset.size < cellSize) {
-      const offset = (cellSize - preset.size) / 2
-      spriteGroup.x(cellX + offset)
-      spriteGroup.y(cellY + offset)
-    }
 
     layer.add(spriteGroup)
   })

@@ -4,14 +4,6 @@
   "layers": [
     {
       "type": "rect",
-      "color": "#87CEEB",
-      "x": 0,
-      "y": 0,
-      "width": 128,
-      "height": 128
-    },
-    {
-      "type": "rect",
       "color": "#C0C0C0",
       "x": 0,
       "y": 115,
@@ -95,13 +87,6 @@
       "y": 48,
       "width": 108,
       "height": 4
-    },
-    {
-      "type": "path",
-      "color": "#FFC72C",
-      "path": "M 48 45 C 48 32, 64 32, 64 45 M 64 45 C 64 32, 80 32, 80 45",
-      "fill": false,
-      "lineWidth": 6
     },
     {
       "type": "rect",

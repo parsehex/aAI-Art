@@ -1,10 +1,10 @@
 import type { TextureDescription } from '@/types/Textures'
 import Cloud from './cloud-2.json'
 import BrownBear from './brown-bear-2.json'
-import Fence from './fence-1.json'
+import Fence from './fence-2.json'
 import GoryRottingZombie from './gory-rotting-zombie.json'
 import House from './house-1.json'
-import TreasureChest from './treasure-chest-1.json'
+import TreasureChest from './treasure-chest-2.json'
 import Tree from './tree-2.json'
 import Villager from './villager-1.json'
 import Warehouse from './abandoned-warehouse.json'
@@ -12,6 +12,8 @@ import Zombie from './zombie-1.json'
 import RobotHead from './robot-head.json'
 import WizardHat from './wizard-hat-2.json'
 import Restaurant from './restaurant-1.json'
+import RetroPC from './retro-pc-1.json'
+import Campfire from './campfire-1.json'
 
 export const PatternTexture: TextureDescription = {
   id: 'pattern-1',
@@ -46,4 +48,6 @@ export const presetTextures = [
   RobotHead,
   WizardHat,
   Restaurant,
+  RetroPC,
+  Campfire,
 ] as TextureDescription[]

@@ -17,6 +17,7 @@ export const useAIStore = defineStore('ai', () => {
   const reasoningEffort = useLocalStorage<ReasoningEffort>('reasoning-effort', 'low')
   const models = ref<Model[]>([])
   const isLoading = ref(false)
+  const isThinking = ref(false)
 
   const FAVORITE_MODELS = ['cohere/command-r' /* add more */]
   const favoriteModelIds = useLocalStorage<string[]>('favorite-models', FAVORITE_MODELS)
@@ -83,6 +84,7 @@ export const useAIStore = defineStore('ai', () => {
       abortController.value.abort()
       abortController.value = null
       isLoading.value = false
+      isThinking.value = false
     }
   }
 
@@ -94,6 +96,7 @@ export const useAIStore = defineStore('ai', () => {
     },
   ): Promise<string> => {
     isLoading.value = true
+    isThinking.value = false
     abortController.value = new AbortController()
 
     try {
@@ -135,7 +138,12 @@ export const useAIStore = defineStore('ai', () => {
 
             for (const line of lines) {
               if (line === 'data: [DONE]') continue
+              if (line.startsWith(': OPENROUTER PROCESSING')) {
+                isThinking.value = true
+                continue
+              }
               if (line.startsWith('data: ')) {
+                isThinking.value = false // Stop thinking when data arrives
                 try {
                   const data = JSON.parse(line.slice(6))
                   let delta = data.choices[0]?.delta?.content || ''
@@ -229,6 +237,7 @@ export const useAIStore = defineStore('ai', () => {
     reasoningEffort,
     models,
     isLoading,
+    isThinking,
     fetchModels,
     generate,
     cancel,

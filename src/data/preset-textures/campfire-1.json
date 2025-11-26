@@ -1,0 +1,84 @@
+{
+  "name": "campfire-1",
+  "size": 64,
+  "layers": [
+    {
+      "type": "rect",
+      "color": "#654321",
+      "x": 20,
+      "y": 48,
+      "width": 24,
+      "height": 8
+    },
+    {
+      "type": "rect",
+      "color": "#8B4513",
+      "x": 16,
+      "y": 40,
+      "width": 32,
+      "height": 8,
+      "rotation": 15
+    },
+    {
+      "type": "rect",
+      "color": "#A0522D",
+      "x": 16,
+      "y": 40,
+      "width": 32,
+      "height": 8,
+      "rotation": -15
+    },
+    {
+      "type": "ellipse",
+      "color": "#FF8C00",
+      "x": 32,
+      "y": 32,
+      "width": 28,
+      "height": 40
+    },
+    {
+      "type": "ellipse",
+      "color": "#FFA500",
+      "x": 32,
+      "y": 36,
+      "width": 22,
+      "height": 35
+    },
+    {
+      "type": "ellipse",
+      "color": "#FFD700",
+      "x": 32,
+      "y": 40,
+      "width": 16,
+      "height": 25
+    },
+    {
+      "type": "ellipse",
+      "color": "#FFFF00",
+      "x": 32,
+      "y": 44,
+      "width": 10,
+      "height": 15
+    },
+    {
+      "type": "ellipse",
+      "color": "#FFA500",
+      "x": 25,
+      "y": 28,
+      "width": 8,
+      "height": 20,
+      "rotation": -20
+    },
+    {
+      "type": "ellipse",
+      "color": "#FFD700",
+      "x": 38,
+      "y": 30,
+      "width": 6,
+      "height": 18,
+      "rotation": 15
+    }
+  ],
+  "prompt": "A small campfire with brown logs arranged in a circle and bright orange and yellow flames rising up.",
+  "id": "campfire-1"
+}

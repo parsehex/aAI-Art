@@ -55,17 +55,11 @@ pnpm dev
 - **Tailwind CSS** - Styling
 - **Vite** - Build tool and dev server
 
-## Project Structure
+## Sprite Drawing Animation
 
-```
-src/
-├── components/     # Vue components
-├── data/          # Preset sprites and prompts
-├── game/          # Konva game logic
-├── stores/        # State management
-├── types/         # TypeScript definitions
-└── utils/         # Utility functions
-```
+The app renders sprites incrementally shile they're being generated, and you can also click to re-draw a sprite to see the effect again.
+
+https://github.com/user-attachments/assets/8d69e98b-bdb4-4608-92cb-09212b98079c
 
 ## License
 

@@ -25,6 +25,11 @@ const router = createRouter({
       name: 'svg-generation',
       component: SvgGenerationView,
     },
+    {
+      path: '/settings',
+      name: 'settings',
+      component: () => import('@/views/SettingsView.vue'),
+    },
   ],
 })
 

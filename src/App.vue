@@ -18,6 +18,12 @@
             ? 'bg-blue-500 text-white'
             : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
         ]"> Edit </router-link>
+        <router-link to="/settings" :class="[
+          'px-4 py-2 rounded-md transition',
+          route.path.startsWith('/settings')
+            ? 'bg-blue-500 text-white'
+            : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+        ]"> Settings </router-link>
       </nav>
       <div class="w-full">
         <router-view />
@@ -45,6 +51,5 @@ onMounted(() => {
   align-items: center;
   min-height: 100vh;
   padding: 0;
-  background-color: #242424;
 }
 </style>

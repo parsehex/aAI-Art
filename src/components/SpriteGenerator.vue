@@ -100,6 +100,7 @@ import CopyButton from '@/components/CopyButton.vue'
 import GeneratorForm from '@/components/GeneratorForm.vue'
 import { GenerateSpriteMessages } from '@/data/prompt'
 import { useAIStore } from '@/stores/ai'
+import { useSettingsStore } from '@/stores/settings'
 import { useTexturesStore } from '@/stores/textures'
 import { TextureGenerator } from '@/utils/TextureGenerator'
 import GameContainer from '@/components/GameContainer.vue'
@@ -108,6 +109,7 @@ import type { TextureDescription } from '@/types/Textures'
 const Form = ref<typeof GeneratorForm>()
 
 const aiStore = useAIStore()
+const settingsStore = useSettingsStore()
 const texturesStore = useTexturesStore()
 const textureGenerator = new TextureGenerator()
 
@@ -331,8 +333,9 @@ async function redrawSprite() {
       }
 
       // Add a small delay to make the animation visible
-      // Adjust speed based on JSON length
-      const delay = Math.max(1, Math.min(10, 1000 / jsonString.length))
+      // Adjust speed based on JSON length and user setting
+      const baseSpeed = settingsStore.redrawSpeed || 2500
+      const delay = Math.max(1, Math.min(100, baseSpeed / jsonString.length))
       await new Promise(resolve => setTimeout(resolve, delay))
     }
 

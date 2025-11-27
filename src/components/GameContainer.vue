@@ -5,16 +5,20 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 import Konva from 'konva'
 import { TextureGenerator } from '@/utils/TextureGenerator'
 import type { TextureDescription } from '@/types/Textures'
 
 
 
+import { useSettingsStore } from '@/stores/settings'
+
+const settingsStore = useSettingsStore()
 const containerRef = ref<HTMLDivElement>()
 let stage: Konva.Stage | null = null
 let layer: Konva.Layer | null = null
+let background: Konva.Rect | null = null
 const textureGenerator = new TextureGenerator()
 
 onMounted(() => {
@@ -32,14 +36,23 @@ onMounted(() => {
   stage.add(layer)
 
   // Set background color
-  const background = new Konva.Rect({
+  background = new Konva.Rect({
     x: -5000, // Make it large enough to cover panning
     y: -5000,
     width: 10000,
     height: 10000,
-    fill: '#1f2937',
+    fill: settingsStore.canvasBackgroundColor || '#00ff00',
   })
   layer.add(background)
+  layer.draw()
+
+  // Watch for background color changes
+  watch(() => settingsStore.canvasBackgroundColor, (newColor) => {
+    if (background) {
+      background.fill(newColor)
+      layer?.batchDraw()
+    }
+  })
   layer.draw()
 
   // Handle zooming

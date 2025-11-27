@@ -116,13 +116,6 @@
       "height": 10
     },
     {
-      "type": "path",
-      "color": "#222222",
-      "path": "M 64 64 A 2 2 0 1 1 64 68 L 66 71 L 62 71 Z",
-      "fill": true,
-      "lineWidth": 0
-    },
-    {
       "type": "circle",
       "color": "#B8860B",
       "x": 32,

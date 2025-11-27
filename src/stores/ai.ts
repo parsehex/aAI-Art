@@ -3,6 +3,7 @@ import { ref, computed, watch, onMounted, nextTick, reactive } from 'vue'
 import { useLocalStorage } from '@vueuse/core'
 import { Ollama } from 'ollama/browser'
 import { delay } from '@/utils'
+import { useSettingsStore } from './settings'
 
 type Provider = 'openrouter' | 'ollama'
 type Model = { id: string; name: string }
@@ -11,7 +12,6 @@ type ReasoningEffort = 'high' | 'medium' | 'low' | 'minimal' | 'none'
 
 export const useAIStore = defineStore('ai', () => {
   const provider = useLocalStorage<Provider>('ai-provider', 'ollama')
-  const apiKey = useLocalStorage('openrouter-api-key', '')
   const ollamaHost = useLocalStorage('ollama-host', 'http://localhost:11434')
   const selectedModel = useLocalStorage('selected-model', 'cohere/command-r')
   const reasoningEffort = useLocalStorage<ReasoningEffort>('reasoning-effort', 'low')
@@ -26,18 +26,20 @@ export const useAIStore = defineStore('ai', () => {
     return FAVORITE_MODELS.includes(id) || favoriteModelIds.value.includes(id)
   }
 
+  const settingsStore = useSettingsStore()
+
   const fetchModels = async () => {
     models.value = []
     let modelsArr: any
     if (provider.value === 'openrouter') {
-      if (!apiKey.value.trim()) {
+      if (!settingsStore.apiKey.trim()) {
         console.error('API key required for OpenRouter')
         return
       }
       try {
         const response = await fetch('https://openrouter.ai/api/v1/models', {
           headers: {
-            Authorization: `Bearer ${apiKey.value}`,
+            Authorization: `Bearer ${settingsStore.apiKey}`,
           },
         })
         if (!response.ok) throw new Error(`Failed to fetch models: ${response.statusText}`)
@@ -102,13 +104,13 @@ export const useAIStore = defineStore('ai', () => {
     try {
       let content = ''
       if (provider.value === 'openrouter') {
-        if (!apiKey.value.trim()) throw new Error('API key required for OpenRouter')
+        if (!settingsStore.apiKey.trim()) throw new Error('API key required for OpenRouter')
         try {
           const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              Authorization: `Bearer ${apiKey.value}`,
+              Authorization: `Bearer ${settingsStore.apiKey}`,
             },
             body: JSON.stringify({
               model: modelId,
@@ -231,7 +233,6 @@ export const useAIStore = defineStore('ai', () => {
 
   return {
     provider,
-    apiKey,
     ollamaHost,
     selectedModel,
     reasoningEffort,

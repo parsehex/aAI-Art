@@ -16,4 +16,6 @@ hero:
 
 ---
 
+<video src="./assets/aai-art-drawing-sprites.mp4" controls autoplay muted></video>
+
 ![Preview image of sprites generated with aAI-Art](./assets/ai-sprites.png)
